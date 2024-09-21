@@ -1,5 +1,4 @@
-import { CreateUserHandler } from "./POST/CreateUserCommand/CreateUserCommand";
 
-const handlers = [CreateUserHandler];
+const handlers = [];
 
 export default handlers;

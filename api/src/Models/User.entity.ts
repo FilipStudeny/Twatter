@@ -11,13 +11,16 @@ import UserTeam from "./UserTeam.entity";
 @Entity()
 export default class User extends DatesEntity {
 	@Column()
-	name: string;
+	firstName: string;
+
+	@Column()
+	lastName: string;
 
 	@Column({ unique: true })
 	email: string;
 
-	@OneToOne(() => Password, (password) => password.user, { cascade: true })
-	@JoinColumn()
+	@OneToOne(() => Password, (password) => password.user, { cascade: ["insert", "update"] })
+	@JoinColumn() // Ensures the foreign key is stored in this table
 	password: Password;
 
 	@ManyToMany(() => Role)

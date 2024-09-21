@@ -1,4 +1,3 @@
-import { AuthModule } from "./Services/Auth/auth.module";
 import Comment from "@Models/Comment.entity";
 import Password from "@Models/Password.entity";
 import Role from "@Models/Role.entity";
@@ -7,6 +6,9 @@ import Team from "@Models/Team.entity";
 import User from "@Models/User.entity";
 import UserStory from "@Models/UserStory.entity";
 import UserTeam from "@Models/UserTeam.entity";
+import AuthController from "@Services/Auth/auth.controller";
+import AuthModule from "@Services/Auth/auth.module";
+import AuthService from "@Services/Auth/auth.service";
 import RolesController from "@Services/Roles/roles.controller";
 import RolesModule from "@Services/Roles/roles.module";
 import RolesService from "@Services/Roles/roles.service";
@@ -35,7 +37,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 			entities: [User, Comment, Password, Role, Task, Team, UserStory, UserTeam],
 		}),
 	],
-	providers: [RolesService, UserService],
-	controllers: [RolesController, UserController],
+	providers: [RolesService, UserService, AuthService],
+	controllers: [RolesController, UserController, AuthController],
 })
 export default class AppModule {}

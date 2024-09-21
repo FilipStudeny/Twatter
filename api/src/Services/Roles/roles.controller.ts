@@ -1,10 +1,12 @@
 import Role from "@Models/Role.entity";
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 
 import CreateRoleDto from "./POST/CreateRoleCommand/CreateRoleDto";
 import RoleService from "./roles.service";
 
 @Controller("roles")
+@UseGuards(AuthGuard())
 export default class RolesController {
 	constructor(private readonly roleService: RoleService) {}
 
