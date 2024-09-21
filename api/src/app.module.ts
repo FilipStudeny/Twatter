@@ -6,22 +6,21 @@ import Team from "@Models/Team.entity";
 import User from "@Models/User.entity";
 import UserStory from "@Models/UserStory.entity";
 import UserTeam from "@Models/UserTeam.entity";
+import AuthController from "@Services/Auth/auth.controller";
 import AuthModule from "@Services/Auth/auth.module";
+import AuthService from "@Services/Auth/auth.service";
+import RolesController from "@Services/Roles/roles.controller";
 import RolesModule from "@Services/Roles/roles.module";
+import RolesService from "@Services/Roles/roles.service";
+import UserController from "@Services/User/user.controller";
 import UserModule from "@Services/User/user.module";
+import UserService from "@Services/User/user.service";
 import { Module } from "@nestjs/common";
 import { CqrsModule } from "@nestjs/cqrs";
-import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
-import { join } from "path";
 
 @Module({
 	imports: [
-		GraphQLModule.forRoot<ApolloDriverConfig>({
-			driver: ApolloDriver,
-			autoSchemaFile: join(process.cwd(), "src/schema.gql"),
-		}),
 		AuthModule,
 		CqrsModule,
 		RolesModule,
@@ -38,5 +37,7 @@ import { join } from "path";
 			entities: [User, Comment, Password, Role, Task, Team, UserStory, UserTeam],
 		}),
 	],
+	providers: [RolesService, UserService, AuthService],
+	controllers: [RolesController, UserController, AuthController],
 })
 export default class AppModule {}

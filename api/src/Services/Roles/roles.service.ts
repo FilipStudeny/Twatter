@@ -6,7 +6,6 @@ import { GetRoleByIdQuery } from "./GET/GetRoleQuery/GetRoleQuery";
 import { GetAllRolesQuery } from "./GET/GetRolesQuery/GetRolesQuery";
 import CreateRoleDto from "./POST/CreateRoleCommand/CreateRoleDto";
 import { CreateRoleCommand } from "./POST/CreateRoleCommand/CreteRoleCommand";
-import User from "@Models/User.entity";
 
 @Injectable()
 export default class RolesService {
@@ -15,9 +14,9 @@ export default class RolesService {
 		private readonly queryBus: QueryBus,
 	) {}
 
-	async createRole(dto: CreateRoleDto, user: User): Promise<Role> {
+	async createRole(dto: CreateRoleDto): Promise<Role> {
 		const { name } = dto;
-		return this.commandBus.execute(new CreateRoleCommand(name, user));
+		return this.commandBus.execute(new CreateRoleCommand(name));
 	}
 
 	async getRoleById(id: string): Promise<Role | null> {

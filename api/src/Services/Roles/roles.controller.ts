@@ -1,7 +1,5 @@
 import Role from "@Models/Role.entity";
-import User from "@Models/User.entity";
-import GetUser from "@Services/Auth/SHARED/GetUser.decorator";
-import { Body, Controller, Get, Logger, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 
 import CreateRoleDto from "./POST/CreateRoleCommand/CreateRoleDto";
@@ -10,8 +8,6 @@ import RoleService from "./roles.service";
 @Controller("roles")
 @UseGuards(AuthGuard())
 export default class RolesController {
-	private logger = new Logger("Role controller");
-
 	constructor(private readonly roleService: RoleService) {}
 
 	@Get(":id")
@@ -25,7 +21,7 @@ export default class RolesController {
 	}
 
 	@Post()
-	async createRole(@Body() createRoleDto: CreateRoleDto, @GetUser() user: User) {
-		return this.roleService.createRole(createRoleDto, user);
+	async createRole(@Body() createRoleDto: CreateRoleDto) {
+		return this.roleService.createRole(createRoleDto);
 	}
 }
