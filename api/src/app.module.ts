@@ -6,38 +6,53 @@ import Team from "@Models/Team.entity";
 import User from "@Models/User.entity";
 import UserStory from "@Models/UserStory.entity";
 import UserTeam from "@Models/UserTeam.entity";
-import AuthController from "@Services/Auth/auth.controller";
-import AuthModule from "@Services/Auth/auth.module";
-import AuthService from "@Services/Auth/auth.service";
-import RolesController from "@Services/Roles/roles.controller";
-import RolesModule from "@Services/Roles/roles.module";
-import RolesService from "@Services/Roles/roles.service";
-import UserController from "@Services/User/user.controller";
-import UserModule from "@Services/User/user.module";
-import UserService from "@Services/User/user.service";
+import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
+import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
+
+import UserModule from "./Services/user/user.module";
+import AuthModule from "./services/auth/auth.module";
+import { AutomapperModule } from "@automapper/nestjs";
+import { classes } from "@automapper/classes";
+import EntityMapper from "./app.mapper";
 
 @Module({
 	imports: [
+		UserModule,
 		AuthModule,
 		CqrsModule,
-		RolesModule,
-		UserModule,
+		ConfigModule.forRoot({
+			isGlobal: true,
+		}),
+		TypeOrmModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: (configService: ConfigService) => ({
+				type: "postgres",
+				host: configService.get<string>("DB_HOST"),
+				port: configService.get<number>("DB_PORT"),
+				username: configService.get<string>("DB_USERNAME"),
+				password: configService.get<string>("DB_PASSWORD"),
+				database: configService.get<string>("DB_DATABASE"),
+				synchronize: configService.get<boolean>("DB_SYNCHRONIZE"),
+				entities: [User, Comment, Password, Role, Task, Team, UserStory, UserTeam],
+			}),
+		}),
 
-		TypeOrmModule.forRoot({
-			type: "postgres",
-			host: "localhost",
-			port: 5432,
-			username: "root",
-			password: "root",
-			database: "task-manager",
-			synchronize: true,
-			entities: [User, Comment, Password, Role, Task, Team, UserStory, UserTeam],
+		AutomapperModule.forRoot({
+			strategyInitializer: classes(),
+		}),
+
+		// GRAPHQL
+		GraphQLModule.forRoot<ApolloDriverConfig>({
+			driver: ApolloDriver,
+			autoSchemaFile: "schema.gql",
+			context: ({ request }) => ({ request }),
 		}),
 	],
-	providers: [RolesService, UserService, AuthService],
-	controllers: [RolesController, UserController, AuthController],
+	providers: [EntityMapper],
 })
 export default class AppModule {}

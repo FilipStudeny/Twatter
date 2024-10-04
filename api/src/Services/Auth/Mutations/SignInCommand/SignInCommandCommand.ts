@@ -1,5 +1,5 @@
 import User from "@Models/User.entity";
-import JwtPayload from "@Services/Auth/SHARED/JwtPayload.interface";
+import JwtPayload from "@Services/Shared/JwtPayload.interface";
 import { UnauthorizedException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "@nestjs/jwt";
@@ -30,7 +30,7 @@ export class SignInCommandHandler implements ICommandHandler<SignInCommand> {
 		});
 
 		if (!user) {
-			throw new UnauthorizedException("Invalid credentials.");
+			throw new UnauthorizedException("Account doesn't exist. Create account.");
 		}
 
 		if (!user.password || !(await bcrypt.compare(password, user.password.passwordHash))) {

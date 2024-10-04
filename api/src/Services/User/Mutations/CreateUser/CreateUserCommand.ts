@@ -3,6 +3,7 @@ import User from "@Models/User.entity";
 import { ConflictException, InternalServerErrorException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
+import GenericResponse from "@Services/Shared/Responses/GenericResponse.type";
 import * as bcrypt from "bcrypt";
 import { EntityManager } from "typeorm";
 
@@ -19,7 +20,7 @@ export class CreateUserCommand {
 export class CreateUserCommandHandler implements ICommandHandler<CreateUserCommand> {
 	constructor(@InjectEntityManager() private readonly entityManager: EntityManager) {}
 
-	async execute(command: CreateUserCommand): Promise<void> {
+	async execute(command: CreateUserCommand): Promise<GenericResponse> {
 		const { email, firstName, lastName, password } = command;
 
 		const user = new User();
@@ -39,6 +40,7 @@ export class CreateUserCommandHandler implements ICommandHandler<CreateUserComma
 
 		try {
 			await this.entityManager.save(User, user);
+			return new GenericResponse("User created successfully", this.constructor.name);
 		} catch (error) {
 			if (error.code === "23505") {
 				throw new ConflictException("Email already exists.");

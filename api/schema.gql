@@ -1,0 +1,41 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type GenericResponse {
+  message: String
+  action: String
+}
+
+type UserListItemDto {
+  id: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+}
+
+type PaginatedUsersResponse {
+  message: String
+  action: String
+  total: Int
+  page: Int
+  limit: Int
+  items: [UserListItemDto!]
+}
+
+type Query {
+  hello: String!
+  getUser(id: String!): UserListItemDto!
+  getUsers(page: Int! = 1, limit: Int! = 10): PaginatedUsersResponse!
+}
+
+type Mutation {
+  CreateUser(createUser: CreateUserDto!): GenericResponse!
+}
+
+input CreateUserDto {
+  firstName: String!
+  lastName: String!
+  password: String!
+  email: String!
+}

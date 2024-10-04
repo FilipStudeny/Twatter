@@ -18,8 +18,9 @@
 		"forceConsistentCasingInFileNames": false,
 		"noFallthroughCasesInSwitch": false,
 		"paths": {
-			"@Models/*": ["src/Models/*"], // Points to "src/Models"
-			"@Services/*": ["src/Services/*"] // Points to "src/Services"
+			"@Models/*": ["src/Models/*"],
+			"@Services/*": ["src/Services/*"],
+			"@Shared/*": ["src/Services/Shared"]
 		}
   }
 }
