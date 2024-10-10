@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: task-manager
+      POSTGRES_DB: twatter
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

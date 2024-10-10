@@ -1,13 +1,13 @@
-import GenericResponse from "@Services/Shared/Responses/GenericResponse.type";
+import GenericResponse from "@Utils/Http/GenericResponse.type";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
-import { Args, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, ID, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
 
 import { CreateUserCommand } from "./Mutations/CreateUser/CreateUserCommand";
-import CreateUserDto from "./Mutations/CreateUser/CreateUserDto";
-import { GetUsersQuery } from "./Queries/GetUsers/GetUsersQuery";
-import PaginatedUsersResponse from "./Queries/GetUsers/PaginatedUserResponse.dto";
+import CreateUserDto from "./Mutations/CreateUser/CreateUserDto.dto";
 import { GetUserQuery } from "./Queries/GetUser/GetUserQuery";
-import UserListItemDto from "./Queries/GetUsers/UserListItem.dto";
+import { GetUsersQuery } from "./Queries/GetUsers/GetUsersQuery";
+import PaginatedUsersResponse from "./Queries/GetUsers/PaginatedUsersResponse.type";
+import UserListItemDto from "./Shared/UserListItem.dto";
 
 @Resolver()
 export default class UserResolver {
@@ -16,18 +16,20 @@ export default class UserResolver {
 		private readonly queryBus: QueryBus,
 	) {}
 
-	@Query((returns) => String)
+	// eslint-disable-next-line class-methods-use-this
+	@Query(() => String)
 	hello(): string {
 		return "Hello, World!";
 	}
 
-	// "fd65099b-c68d-4354-bcb2-de2c0341909a"
-
-	@Query((returns) => UserListItemDto)
-	async getUser(@Args("id") id: string): Promise<UserListItemDto> {
-		const user = await this.queryBus.execute(new GetUserQuery(id));
-		console.log(user);
-		return user;
+	@Query(() => UserListItemDto, { name: "user" })
+	async getUser(
+		@Args("id", { type: () => ID, nullable: true }) id?: string,
+		@Args("username", { type: () => String, nullable: true }) username?: string,
+		@Args("firstName", { type: () => String, nullable: true }) firstName?: string,
+		@Args("lastName", { type: () => String, nullable: true }) lastName?: string,
+	): Promise<UserListItemDto> {
+		return this.queryBus.execute(new GetUserQuery(id, username, firstName, lastName));
 	}
 
 	@Query(() => PaginatedUsersResponse)
@@ -35,17 +37,12 @@ export default class UserResolver {
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
 		@Args("limit", { type: () => Int, defaultValue: 10 }) limit: number,
 	) {
-		const t = await this.queryBus.execute(new GetUsersQuery(page, limit));
-		console.log(t);
-		return t;
+		return this.queryBus.execute(new GetUsersQuery(page, limit));
 	}
 
 	@Mutation(() => GenericResponse)
 	async CreateUser(@Args("createUser") dto: CreateUserDto): Promise<GenericResponse> {
-		const { email, firstName, lastName, password } = dto;
-		const response = await this.commandBus.execute(
-			new CreateUserCommand(firstName, lastName, password, email),
-		);
+		const response = await this.commandBus.execute(new CreateUserCommand(dto));
 		return response;
 	}
 }

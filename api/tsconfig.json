@@ -20,7 +20,10 @@
 		"paths": {
 			"@Models/*": ["src/Models/*"],
 			"@Services/*": ["src/Services/*"],
-			"@Shared/*": ["src/Services/Shared"]
+			"@Shared/*": ["src/Services/Shared"],
+			"@Utils/*": ["src/Utils/*"],
+			"@Enums/*": ["src/Models/Enums/*"]
+
 		}
   }
 }

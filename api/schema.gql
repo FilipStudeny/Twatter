@@ -2,16 +2,23 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type GenericResponse {
-  message: String
-  action: String
-}
-
 type UserListItemDto {
   id: String!
   email: String!
   firstName: String!
   lastName: String!
+  username: String!
+}
+
+type GenericResponse {
+  message: String
+  action: String
+}
+
+type SignInResponse {
+  message: String
+  action: String
+  token: String!
 }
 
 type PaginatedUsersResponse {
@@ -25,17 +32,25 @@ type PaginatedUsersResponse {
 
 type Query {
   hello: String!
-  getUser(id: String!): UserListItemDto!
+  user(id: ID, username: String, firstName: String, lastName: String): UserListItemDto!
   getUsers(page: Int! = 1, limit: Int! = 10): PaginatedUsersResponse!
 }
 
 type Mutation {
+  SignIn(signIn: SignInCredentialsDto!): SignInResponse!
   CreateUser(createUser: CreateUserDto!): GenericResponse!
+}
+
+input SignInCredentialsDto {
+  password: String!
+  passwordRepeat: String!
+  email: String!
 }
 
 input CreateUserDto {
   firstName: String!
   lastName: String!
   password: String!
+  repeatPassword: String!
   email: String!
 }

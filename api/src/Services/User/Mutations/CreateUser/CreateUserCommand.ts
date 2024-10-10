@@ -1,39 +1,45 @@
-import Password from "@Models/Password.entity";
-import User from "@Models/User.entity";
+import { Password } from "@Models/Password";
+import { User } from "@Models/User";
+import GenericResponse from "@Utils/Http/GenericResponse.type";
+import { Mapper } from "@automapper/core";
+import { InjectMapper } from "@automapper/nestjs";
 import { ConflictException, InternalServerErrorException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
-import GenericResponse from "@Services/Shared/Responses/GenericResponse.type";
 import * as bcrypt from "bcrypt";
+import { validate } from "class-validator";
 import { EntityManager } from "typeorm";
 
+import CreateUserDto from "./CreateUserDto.dto";
+
 export class CreateUserCommand {
-	constructor(
-		public firstName: string,
-		public lastName: string,
-		public password: string,
-		public email: string,
-	) {}
+	constructor(public createUserDto: CreateUserDto) {}
 }
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserCommandHandler implements ICommandHandler<CreateUserCommand> {
-	constructor(@InjectEntityManager() private readonly entityManager: EntityManager) {}
+	constructor(
+		@InjectEntityManager() private readonly entityManager: EntityManager,
+		@InjectMapper() private readonly mapper: Mapper,
+	) {}
 
 	async execute(command: CreateUserCommand): Promise<GenericResponse> {
-		const { email, firstName, lastName, password } = command;
+		const { createUserDto } = command;
 
-		const user = new User();
-		user.firstName = firstName;
-		user.lastName = lastName;
-		user.email = email;
+		const errors = await validate(createUserDto);
+		if (errors.length > 0) {
+			throw new ConflictException(
+				`Validation failed: ${errors.map((error) => error.toString()).join(", ")}`,
+			);
+		}
+
+		const user = this.mapper.map(createUserDto, CreateUserDto, User);
 
 		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(password, salt);
+		const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
 		const userPassword = new Password();
-		userPassword.user = user;
-		userPassword.passwordHash = hashedPassword;
+		userPassword.hash = hashedPassword;
 		userPassword.salt = salt;
 
 		user.password = userPassword;

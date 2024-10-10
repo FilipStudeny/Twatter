@@ -1,11 +1,18 @@
-import Comment from "@Models/Comment.entity";
-import Password from "@Models/Password.entity";
-import Role from "@Models/Role.entity";
-import Task from "@Models/Task.entity";
-import Team from "@Models/Team.entity";
-import User from "@Models/User.entity";
-import UserStory from "@Models/UserStory.entity";
-import UserTeam from "@Models/UserTeam.entity";
+import { AdminNotification } from "@Models/Administration/AdministrationNotification";
+import { Administrator } from "@Models/Administration/Administrator";
+import { BanStrike } from "@Models/Administration/BanStrike";
+import { Comment } from "@Models/Comment";
+import { Group } from "@Models/Group";
+import { Interest } from "@Models/Interest";
+import { Notification } from "@Models/Notification";
+import { Password } from "@Models/Password";
+import { Post } from "@Models/Post";
+import { Reaction } from "@Models/Reaction";
+import { Report } from "@Models/Report";
+import { User } from "@Models/User";
+import EntityMapper from "@Utils/EntityMapper.mapper";
+import { classes } from "@automapper/classes";
+import { AutomapperModule } from "@automapper/nestjs";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -13,16 +20,15 @@ import { CqrsModule } from "@nestjs/cqrs";
 import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import UserModule from "./Services/user/user.module";
-import AuthModule from "./services/auth/auth.module";
-import { AutomapperModule } from "@automapper/nestjs";
-import { classes } from "@automapper/classes";
-import EntityMapper from "./app.mapper";
+import { AuthModule } from "./Services/Auth/auth.module";
+import { PostModule } from "./Services/Post/post.module";
+import { UserModule } from "./Services/User/user.module";
 
 @Module({
 	imports: [
-		UserModule,
+		PostModule,
 		AuthModule,
+		UserModule,
 		CqrsModule,
 		ConfigModule.forRoot({
 			isGlobal: true,
@@ -38,7 +44,20 @@ import EntityMapper from "./app.mapper";
 				password: configService.get<string>("DB_PASSWORD"),
 				database: configService.get<string>("DB_DATABASE"),
 				synchronize: configService.get<boolean>("DB_SYNCHRONIZE"),
-				entities: [User, Comment, Password, Role, Task, Team, UserStory, UserTeam],
+				entities: [
+					Comment,
+					Group,
+					Interest,
+					Notification,
+					Password,
+					Post,
+					Reaction,
+					Report,
+					User,
+					AdminNotification,
+					Administrator,
+					BanStrike,
+				],
 			}),
 		}),
 

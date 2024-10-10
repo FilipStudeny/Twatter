@@ -18,7 +18,7 @@ module.exports = {
 			},
 		},
 	],
-	extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "airbnb", "prettier"],
+	extends: ["airbnb-base", "eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
 	ignorePatterns: ["dist", ".eslintrc.cjs"],
 	parser: "@typescript-eslint/parser",
 	parserOptions: {
@@ -27,6 +27,7 @@ module.exports = {
 		},
 		ecmaVersion: "latest",
 		sourceType: "module",
+		project: "./tsconfig.json",
 	},
 	plugins: ["prettier", "unused-imports"],
 	settings: {
@@ -43,7 +44,6 @@ module.exports = {
 		"@typescript-eslint/no-explicit-any": "off",
 		"no-unused-vars": "off",
 		"no-use-before-define": "off",
-		"import/prefer-default-export": 1,
 		"import/no-default-export": 0,
 		"@typescript-eslint/no-use-before-define": ["error"],
 		"import/no-unresolved": "off",
@@ -56,14 +56,8 @@ module.exports = {
 		"no-useless-constructor": "off",
 		"max-classes-per-file": "off",
 		"no-empty-function": "off",
-		"import/extensions": [
-			"error",
-			"ignorePackages",
-			{
-				js: "never",
-				ts: "never",
-			},
-		],
+		"import/prefer-default-export": "off",
+    	"import/extensions": ["error", "ignorePackages", { "js": "never", "jsx": "never", "ts": "never", "tsx": "never" }],
 		"import/order": [
 			"warn",
 			{

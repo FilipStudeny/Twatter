@@ -1,12 +1,12 @@
-import User from "@Models/User.entity";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { EntityManager } from "typeorm";
 
-import PaginatedUsersResponse from "./PaginatedUserResponse.dto";
-import UserListItemDto from "./UserListItem.dto";
+import UserListItemDto from "../../Shared/UserListItem.dto";
+import PaginatedUsersResponse from "./PaginatedUsersResponse.type";
+import { User } from "@Models/User";
 
 export class GetUsersQuery {
 	constructor(
@@ -26,22 +26,13 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 		const { page, limit } = query;
 		const skip = (page - 1) * limit;
 
-		// Fetch users with pagination
 		const [users, total] = await this.entityManager.findAndCount(User, {
 			skip,
 			take: limit,
 		});
 
-		// Map users to DTOs
 		const userDtos = this.mapper.mapArray(users, User, UserListItemDto);
 
-		// Automatically pass the handler's name (action) to PaginatedUsersResponse
-		return new PaginatedUsersResponse(
-			userDtos,
-			total,
-			page,
-			limit,
-			this.constructor.name,
-		);
+		return new PaginatedUsersResponse(userDtos, total, page, limit, this.constructor.name);
 	}
 }

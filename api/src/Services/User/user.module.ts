@@ -1,12 +1,14 @@
-import Password from "@Models/Password.entity";
-import User from "@Models/User.entity";
+import { Password } from "@Models/Password";
+import { User } from "@Models/User";
 import { Module } from "@nestjs/common";
 import { CqrsModule } from "@nestjs/cqrs";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import handlers from "./handlers";
+import { CreateUserCommandHandler } from "./Mutations/CreateUser/CreateUserCommand";
+import { GetUserQueryHandler } from "./Queries/GetUser/GetUserQuery";
+import GetUsersQueryHandler from "./Queries/GetUsers/GetUsersQuery";
 import UserResolver from "./user.resolver";
 
 @Module({
@@ -23,6 +25,6 @@ import UserResolver from "./user.resolver";
 		}),
 		TypeOrmModule.forFeature([User, Password]),
 	],
-	providers: [UserResolver, ...handlers],
+	providers: [UserResolver, CreateUserCommandHandler, GetUsersQueryHandler, GetUserQueryHandler],
 })
-export default class UserModule {}
+export class UserModule {}

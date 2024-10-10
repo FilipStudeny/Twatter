@@ -1,13 +1,17 @@
-import Password from "@Models/Password.entity";
-import User from "@Models/User.entity";
+/*
+https://docs.nestjs.com/modules
+*/
+
+import { Password } from "@Models/Password";
+import { User } from "@Models/User";
 import { Module } from "@nestjs/common";
 import { CqrsModule } from "@nestjs/cqrs";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
+import { SignInCommandHandler } from "./Mutations/SignIn/SignInCommand";
 import AuthResolver from "./auth.resolver";
-import handlers from "./handlers";
 
 @Module({
 	imports: [
@@ -23,6 +27,6 @@ import handlers from "./handlers";
 		}),
 		TypeOrmModule.forFeature([User, Password]),
 	],
-	providers: [AuthResolver, ...handlers],
+	providers: [AuthResolver, SignInCommandHandler],
 })
-export default class AuthModule {}
+export class AuthModule {}
