@@ -2,7 +2,7 @@ import GenericResponse from "@Utils/Http/GenericResponse.type";
 import { UseGuards } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { Args, ID, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { RouterGuard } from "src/Guards/RouteGuard.guard";
+import { Public, RouterGuard } from "src/Guards/RouteGuard.guard";
 
 import { CreateUserCommand } from "./Mutations/CreateUser/CreateUserCommand";
 import CreateUserDto from "./Mutations/CreateUser/CreateUserDto.dto";
@@ -12,6 +12,7 @@ import PaginatedUsersResponse from "./Queries/GetUsers/PaginatedUsersResponse.ty
 import UserListItemDto from "./Shared/UserListItem.dto";
 
 @Resolver()
+@UseGuards(RouterGuard)
 export default class UserResolver {
 	constructor(
 		private readonly commandBus: CommandBus,
@@ -24,6 +25,7 @@ export default class UserResolver {
 		return "Hello, World!";
 	}
 
+	@Public()
 	@Query(() => UserListItemDto, { name: "user" })
 	async getUser(
 		@Args("id", { type: () => ID, nullable: true }) id?: string,
@@ -34,7 +36,6 @@ export default class UserResolver {
 		return this.queryBus.execute(new GetUserQuery(id, username, firstName, lastName));
 	}
 
-	@UseGuards(RouterGuard)
 	@Query(() => PaginatedUsersResponse)
 	async getUsers(
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
