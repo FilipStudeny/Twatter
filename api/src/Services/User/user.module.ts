@@ -1,6 +1,7 @@
 import { Password } from "@Models/Password";
 import { User } from "@Models/User";
 import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
@@ -14,11 +15,14 @@ import UserResolver from "./user.resolver";
 @Module({
 	imports: [
 		CqrsModule,
-		JwtModule.register({
-			secret: "yx1csa65d4aw98f41e9asfd5as61fd3y1f5d1a6w8f49ea74t9af4a6sf1y65x1vdy6dg49awe4g7h49j4d9",
-			signOptions: {
-				expiresIn: 3600,
-			},
+		ConfigModule,
+		JwtModule.registerAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => ({
+				secret: configService.get<string>("JWT_SECRET"),
+				signOptions: { expiresIn: "1h" },
+			}),
 		}),
 		PassportModule.register({
 			defaultStrategy: "jwt",

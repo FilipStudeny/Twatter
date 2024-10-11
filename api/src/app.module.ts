@@ -23,6 +23,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./Services/Auth/auth.module";
 import { PostModule } from "./Services/Post/post.module";
 import { UserModule } from "./Services/User/user.module";
+import JwtStrategy from "@Utils/JWT/JwtStrategy.strategy";
 
 @Module({
 	imports: [
@@ -69,9 +70,9 @@ import { UserModule } from "./Services/User/user.module";
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			driver: ApolloDriver,
 			autoSchemaFile: "schema.gql",
-			context: ({ request }) => ({ request }),
+			context: ({ request, response }) => ({ request, response }),
 		}),
 	],
-	providers: [EntityMapper],
+	providers: [EntityMapper, JwtStrategy],
 })
 export default class AppModule {}

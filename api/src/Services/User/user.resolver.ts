@@ -1,6 +1,8 @@
 import GenericResponse from "@Utils/Http/GenericResponse.type";
+import { UseGuards } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { Args, ID, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { RouterGuard } from "src/Guards/RouteGuard.guard";
 
 import { CreateUserCommand } from "./Mutations/CreateUser/CreateUserCommand";
 import CreateUserDto from "./Mutations/CreateUser/CreateUserDto.dto";
@@ -32,6 +34,7 @@ export default class UserResolver {
 		return this.queryBus.execute(new GetUserQuery(id, username, firstName, lastName));
 	}
 
+	@UseGuards(RouterGuard)
 	@Query(() => PaginatedUsersResponse)
 	async getUsers(
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,

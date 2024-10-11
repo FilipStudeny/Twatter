@@ -1,5 +1,5 @@
 import { User } from "@Models/User";
-import JwtPayload from "@Services/Auth/Shared/JWT/JwtPayload.interface";
+import JwtPayload from "@Utils/JWT/JwtPayload.interface";
 import { ConflictException, UnauthorizedException } from "@nestjs/common";
 import { CommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "@nestjs/jwt";
@@ -46,7 +46,7 @@ export class SignInCommandHandler {
 		}
 
 		const payload: JwtPayload = { id: user.id, email: user.email };
-		const token: string = this.jwtService.sign(payload);
+		const token: string = await this.jwtService.signAsync(payload, { expiresIn: "1h" });
 
 		return new SignInResponse(token);
 	}
