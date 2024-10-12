@@ -38,10 +38,17 @@ type Query {
 }
 
 type Mutation {
+  CreatePost(createPost: CreatePostDto!): GenericResponse!
   SignIn(signIn: SignInCredentialsDto!): SignInResponse!
   refreshToken(refreshToken: String!): SignInResponse!
   logout(userId: String!): GenericResponse!
   CreateUser(createUser: CreateUserDto!): GenericResponse!
+}
+
+input CreatePostDto {
+  content: String!
+  interestId: String
+  groupId: String
 }
 
 input SignInCredentialsDto {

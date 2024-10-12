@@ -1,11 +1,20 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { Field, InputType } from "@nestjs/graphql";
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 
-export default class CreatePostDto {
-	@IsNotEmpty()
+@InputType()
+export class CreatePostDto {
+	@Field()
 	@IsString()
-	title: string;
-
 	@IsNotEmpty()
-	@IsString()
 	content: string;
+
+	@Field({ nullable: true })
+	@IsOptional()
+	@IsUUID()
+	interestId?: string;
+
+	@Field({ nullable: true })
+	@IsOptional()
+	@IsUUID()
+	groupId?: string;
 }

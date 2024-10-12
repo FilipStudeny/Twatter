@@ -28,7 +28,7 @@ export class User extends BaseEntity {
 	@JoinColumn()
 	password: Password;
 
-	@OneToMany(() => Post, (post) => post.creator)
+	@OneToMany(() => Post, (post) => post.creator, { cascade: true })
 	posts: Post[];
 
 	@OneToMany(() => Comment, (comment) => comment.creator)

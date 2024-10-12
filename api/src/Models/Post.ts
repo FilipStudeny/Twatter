@@ -1,18 +1,16 @@
 import { Entity, Column, ManyToOne, OneToMany } from "typeorm";
-import { BaseEntity } from "./BaseEntity";
-import { User } from "./User";
-import { Comment } from "./Comment";
-import { Reaction } from "./Reaction";
-import { Interest } from "./Interest";
-import { Group } from "./Group";
-import { Report } from "./Report";
+
 import { BanStrike } from "./Administration/BanStrike";
+import { BaseEntity } from "./BaseEntity";
+import { Comment } from "./Comment";
+import { Group } from "./Group";
+import { Interest } from "./Interest";
+import { Reaction } from "./Reaction";
+import { Report } from "./Report";
+import { User } from "./User";
 
 @Entity()
 export class Post extends BaseEntity {
-	@Column()
-	title: string;
-
 	@Column()
 	content: string;
 

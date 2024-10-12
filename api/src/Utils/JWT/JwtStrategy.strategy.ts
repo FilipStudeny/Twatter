@@ -21,7 +21,7 @@ export default class JwtStrategy extends PassportStrategy(Strategy) {
 		});
 	}
 
-	async validate(payload: JwtPayload): Promise<User> {
+	async validate(payload: JwtPayload): Promise<JwtPayload> {
 		const { id } = payload;
 
 		const user: User = await this.entityManager.findOne(User, { where: { id } });
@@ -30,6 +30,6 @@ export default class JwtStrategy extends PassportStrategy(Strategy) {
 			throw new NotFoundException();
 		}
 
-		return user;
+		return payload;
 	}
 }

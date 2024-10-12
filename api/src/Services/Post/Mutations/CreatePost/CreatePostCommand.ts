@@ -1,22 +1,25 @@
+import { Group } from "@Models/Group";
+import { Interest } from "@Models/Interest";
 import { Post } from "@Models/Post";
 import { User } from "@Models/User";
 import GenericResponse from "@Utils/Http/GenericResponse.type";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
-import { ConflictException, InternalServerErrorException } from "@nestjs/common";
+import { ConflictException, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { validate } from "class-validator";
 import { EntityManager } from "typeorm";
 
-import CreatePostDto from "./CreatePost.dto";
+import { CreatePostDto } from "./CreatePost.dto";
 
 export class CreatePostCommand {
 	constructor(
-		public createPostDto: CreatePostDto,
-		public creatorId: string,
+		public readonly createPostDto: CreatePostDto,
+		public readonly userId: string,
 	) {}
 }
+
 @CommandHandler(CreatePostCommand)
 export class CreatePostCommandHandler implements ICommandHandler<CreatePostCommand> {
 	constructor(
@@ -25,7 +28,8 @@ export class CreatePostCommandHandler implements ICommandHandler<CreatePostComma
 	) {}
 
 	async execute(command: CreatePostCommand): Promise<GenericResponse> {
-		const { createPostDto, creatorId } = command;
+		const { createPostDto, userId } = command;
+		const { content, interestId, groupId } = createPostDto;
 
 		const errors = await validate(createPostDto);
 		if (errors.length > 0) {
@@ -34,19 +38,54 @@ export class CreatePostCommandHandler implements ICommandHandler<CreatePostComma
 			);
 		}
 
-		const post = this.mapper.map(createPostDto, CreatePostDto, Post);
+		const user = await this.entityManager.findOne(User, {
+			where: { id: userId },
+			relations: ["posts"],
+		});
+		if (!user) {
+			throw new NotFoundException("User not found");
+		}
+
+		if (interestId) {
+			const interestExists = await this.entityManager.findOne(Interest, {
+				where: { id: interestId },
+				select: ["id"],
+			});
+			if (!interestExists) {
+				throw new NotFoundException("Interest not found");
+			}
+		}
+
+		if (groupId) {
+			const groupExists = await this.entityManager.findOne(Group, {
+				where: { id: groupId },
+				select: ["id"],
+			});
+			if (!groupExists) {
+				throw new NotFoundException("Group not found");
+			}
+		}
+
+		const post = new Post();
+		post.content = content;
+		post.creator = { id: userId } as User;
+		if (interestId) {
+			post.interest = { id: interestId } as Interest;
+		}
+		if (groupId) {
+			post.group = { id: groupId } as Group;
+		}
 
 		try {
-			const creator = await this.entityManager.findOne(User, { where: { id: creatorId } });
-			if (!creator) {
-				throw new ConflictException("Creator does not exist.");
-			}
-
-			post.creator = creator;
-
 			await this.entityManager.save(Post, post);
+
+			user.posts.push(post);
+			await this.entityManager.save(User, user);
 			return new GenericResponse("Post created successfully", this.constructor.name);
 		} catch (error) {
+			if (error.code === "23503") {
+				throw new NotFoundException("Invalid foreign key provided.");
+			}
 			throw new InternalServerErrorException("Something went wrong. Please try again.");
 		}
 	}

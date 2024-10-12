@@ -51,7 +51,7 @@ export class SignInCommandHandler {
 
 		const accessToken = await this.jwtService.signAsync(payload, {
 			secret: this.configService.get<string>("JWT_SECRET"),
-			expiresIn: "30s",
+			expiresIn: "24h",
 		});
 
 		const refreshToken = await this.jwtService.signAsync(payload, {

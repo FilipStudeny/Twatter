@@ -1,4 +1,6 @@
 import GenericResponse from "@Utils/Http/GenericResponse.type";
+import { CurrentUser } from "@Utils/JWT/CurrentUser";
+import JwtPayload from "@Utils/JWT/JwtPayload.interface";
 import { UseGuards } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { Args, ID, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
@@ -40,6 +42,7 @@ export default class UserResolver {
 	async getUsers(
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
 		@Args("limit", { type: () => Int, defaultValue: 10 }) limit: number,
+		@CurrentUser() user: JwtPayload,
 	) {
 		return this.queryBus.execute(new GetUsersQuery(page, limit));
 	}
