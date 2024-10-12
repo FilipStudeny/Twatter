@@ -11,6 +11,8 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
+import { LogoutCommandHandler } from "./Mutations/Logout/LoggoutCommand";
+import { RefreshTokenCommandHandler } from "./Mutations/RefreshToken/RefreshTokenCommand";
 import { SignInCommandHandler } from "./Mutations/SignIn/SignInCommand";
 import AuthResolver from "./auth.resolver";
 
@@ -31,6 +33,6 @@ import AuthResolver from "./auth.resolver";
 		}),
 		TypeOrmModule.forFeature([User, Password]),
 	],
-	providers: [AuthResolver, SignInCommandHandler],
+	providers: [AuthResolver, SignInCommandHandler, RefreshTokenCommandHandler, LogoutCommandHandler],
 })
 export class AuthModule {}

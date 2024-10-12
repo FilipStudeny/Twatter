@@ -58,4 +58,7 @@ export class User extends BaseEntity {
 
 	@OneToMany(() => BanStrike, (strike) => strike.user)
 	banStrikes: BanStrike[];
+
+	@Column({ unique: true, nullable: true })
+	refreshToken: string;
 }

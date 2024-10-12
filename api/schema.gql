@@ -18,7 +18,8 @@ type GenericResponse {
 type SignInResponse {
   message: String
   action: String
-  token: String!
+  accessToken: String!
+  refreshToken: String!
 }
 
 type PaginatedUsersResponse {
@@ -38,6 +39,8 @@ type Query {
 
 type Mutation {
   SignIn(signIn: SignInCredentialsDto!): SignInResponse!
+  refreshToken(refreshToken: String!): SignInResponse!
+  logout(userId: String!): GenericResponse!
   CreateUser(createUser: CreateUserDto!): GenericResponse!
 }
 

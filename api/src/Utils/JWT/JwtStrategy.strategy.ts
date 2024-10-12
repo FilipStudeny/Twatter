@@ -22,7 +22,6 @@ export default class JwtStrategy extends PassportStrategy(Strategy) {
 	}
 
 	async validate(payload: JwtPayload): Promise<User> {
-		console.log("Validating payload:", payload);
 		const { id } = payload;
 
 		const user: User = await this.entityManager.findOne(User, { where: { id } });
