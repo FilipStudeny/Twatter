@@ -81,6 +81,7 @@ type Query {
 }
 
 type Mutation {
+  CreateAdmin(createAdminDto: CreateAdminDto!): GenericResponse!
   createGroup(createGroupDto: CreateGroupDto!): GenericResponse!
   AddReaction(createOrUpdateReactionData: CreateOrUpdateReactionDto!): GenericResponse!
   CreateComment(createComment: CreateCommentDto!, postId: String!): GenericResponse!
@@ -90,6 +91,20 @@ type Mutation {
   refreshToken(refreshToken: String!): SignInResponse!
   logout(userId: String!): GenericResponse!
   CreateUser(createUser: CreateUserDto!): GenericResponse!
+}
+
+input CreateAdminDto {
+  username: String!
+  email: String!
+  password: String!
+  adminRole: AdminRole! = MODERATOR
+}
+
+"""Different types of roles available"""
+enum AdminRole {
+  MODERATOR
+  SUPERVISOR
+  ADMINISTRATOR
 }
 
 input CreateGroupDto {

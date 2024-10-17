@@ -1,3 +1,4 @@
+import { CreateAdminDto } from "@Services/Admin/Mutations/CreateAdmin/CreateAdmin.dto";
 import CommentDto from "@Services/Comment/Shared/Comment.dto";
 import CreateUserDto from "@Services/User/Mutations/CreateUser/CreateUserDto.dto";
 import UserListItemDto from "@Services/User/Shared/UserListItem.dto";
@@ -17,6 +18,7 @@ export default class EntityMapper extends AutomapperProfile {
 			CreateUserDto.createMap(mapper);
 			UserListItemDto.createMap(mapper);
 			CommentDto.createMap(mapper);
+			CreateAdminDto.createMap(mapper);
 		};
 	}
 }

@@ -28,6 +28,7 @@ import { CommentModule } from "./Services/Comment/comment.module";
 import { PostModule } from "./Services/Post/post.module";
 import { ReactionModule } from "./Services/Reaction/reaction.module";
 import { UserModule } from "./Services/User/user.module";
+import { AdminJwtStrategy } from "@Utils/JWT/AdminJwtStrategy.strategy";
 
 @Module({
 	imports: [
@@ -81,6 +82,6 @@ import { UserModule } from "./Services/User/user.module";
 			context: ({ request, response }) => ({ request, response }),
 		}),
 	],
-	providers: [EntityMapper, JwtStrategy],
+	providers: [EntityMapper, JwtStrategy, AdminJwtStrategy],
 })
 export default class AppModule {}

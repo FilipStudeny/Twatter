@@ -1,7 +1,14 @@
+import { registerEnumType } from "@nestjs/graphql";
+
 enum AdminRole {
 	MODERATOR = "moderator",
 	SUPERVISOR = "supervisor",
 	ADMINISTRATOR = "administrator",
 }
 
-export default AdminRole
+registerEnumType(AdminRole, {
+	name: "AdminRole",
+	description: "Different types of roles available",
+});
+
+export default AdminRole;

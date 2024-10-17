@@ -9,10 +9,10 @@ import { BanStrike } from "./BanStrike";
 
 @Entity()
 export class Administrator extends BaseEntity {
-	@Column()
+	@Column({ unique: true })
 	username: string;
 
-	@Column()
+	@Column({ unique: true })
 	email: string;
 
 	@Column({
