@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, OneToMany } from "typeorm";
+import { Entity, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from "typeorm";
 
 import { BanStrike } from "./Administration/BanStrike";
 import { BaseEntity } from "./BaseEntity";
@@ -34,4 +34,8 @@ export class Post extends BaseEntity {
 
 	@OneToMany(() => BanStrike, (strike) => strike.post)
 	strikes: BanStrike[];
+
+	@OneToOne(() => Comment, { nullable: true })
+	@JoinColumn()
+	pinnedComment: Comment;
 }

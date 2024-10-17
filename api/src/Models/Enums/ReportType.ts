@@ -6,4 +6,5 @@ enum ReportType {
 	OTHER,
 }
 
+
 export default ReportType;

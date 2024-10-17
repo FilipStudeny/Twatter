@@ -1,6 +1,6 @@
-import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
 import { User } from "@Models/User";
-import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
+import { Field, ObjectType } from "@nestjs/graphql";
 
 @ObjectType()
 export default class UserListItemDto {
@@ -42,8 +42,8 @@ export default class UserListItemDto {
 			),
 			forMember(
 				(dto) => dto.username,
-				mapFrom((entity) => entity.username)
-			)
+				mapFrom((entity) => entity.username),
+			),
 		);
 	}
 }

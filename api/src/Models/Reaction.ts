@@ -1,9 +1,10 @@
 import { Entity, Column, ManyToOne } from "typeorm";
+
 import { BaseEntity } from "./BaseEntity";
-import { User } from "./User";
-import { Post } from "./Post";
 import { Comment } from "./Comment";
 import ReactionType from "./Enums/ReactionType";
+import { Post } from "./Post";
+import { User } from "./User";
 
 @Entity()
 export class Reaction extends BaseEntity {

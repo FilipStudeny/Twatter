@@ -37,6 +37,12 @@ export class User extends BaseEntity {
 	@OneToMany(() => Reaction, (reaction) => reaction.user)
 	reactions: Reaction[];
 
+	@OneToMany(() => Group, (group) => group.owner)
+	createdGroups: Group[];
+
+	@ManyToMany(() => Group, (group) => group.moderators)
+	moderatedGroups: Group[];
+
 	@ManyToMany(() => Group, (group) => group.users)
 	groups: Group[];
 

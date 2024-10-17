@@ -1,3 +1,4 @@
+import CommentDto from "@Services/Comment/Shared/Comment.dto";
 import CreateUserDto from "@Services/User/Mutations/CreateUser/CreateUserDto.dto";
 import UserListItemDto from "@Services/User/Shared/UserListItem.dto";
 import { Mapper } from "@automapper/core";
@@ -15,6 +16,7 @@ export default class EntityMapper extends AutomapperProfile {
 		return (mapper: Mapper) => {
 			CreateUserDto.createMap(mapper);
 			UserListItemDto.createMap(mapper);
+			CommentDto.createMap(mapper);
 		};
 	}
 }

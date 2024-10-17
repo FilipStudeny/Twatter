@@ -1,10 +1,11 @@
 import { Entity, Column, ManyToOne, OneToMany } from "typeorm";
+
+import { BanStrike } from "./Administration/BanStrike";
 import { BaseEntity } from "./BaseEntity";
-import { User } from "./User";
 import { Post } from "./Post";
 import { Reaction } from "./Reaction";
 import { Report } from "./Report";
-import { BanStrike } from "./Administration/BanStrike";
+import { User } from "./User";
 
 @Entity()
 export class Comment extends BaseEntity {

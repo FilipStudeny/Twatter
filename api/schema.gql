@@ -2,6 +2,23 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type GenericResponse {
+  message: String
+  action: String
+}
+
+type CommentDto {
+  id: ID!
+  content: String!
+  creatorName: String!
+  createdAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type UserListItemDto {
   id: String!
   email: String!
@@ -10,16 +27,40 @@ type UserListItemDto {
   username: String!
 }
 
-type GenericResponse {
-  message: String
-  action: String
-}
-
 type SignInResponse {
   message: String
   action: String
   accessToken: String!
   refreshToken: String!
+}
+
+type PaginatedCommentsResponse {
+  message: String
+  action: String
+  total: Int
+  page: Int
+  limit: Int
+  items: [CommentDto!]
+}
+
+type ReactionsCountDto {
+  like: Int!
+  dislike: Int!
+  smile: Int!
+  angry: Int!
+  sad: Int!
+  love: Int!
+}
+
+type PostDetailDto {
+  id: String!
+  content: String!
+  creatorName: String!
+  creatorId: String!
+  commentsCount: Int!
+  reactions: ReactionsCountDto!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type PaginatedUsersResponse {
@@ -32,17 +73,54 @@ type PaginatedUsersResponse {
 }
 
 type Query {
+  GetComments(postId: String!, page: Int!, limit: Int!): PaginatedCommentsResponse!
+  GetPostDetail(postId: String!): PostDetailDto!
   hello: String!
   user(id: ID, username: String, firstName: String, lastName: String): UserListItemDto!
   getUsers(page: Int! = 1, limit: Int! = 10): PaginatedUsersResponse!
 }
 
 type Mutation {
+  createGroup(createGroupDto: CreateGroupDto!): GenericResponse!
+  AddReaction(createOrUpdateReactionData: CreateOrUpdateReactionDto!): GenericResponse!
+  CreateComment(createComment: CreateCommentDto!, postId: String!): GenericResponse!
+  PinComment(postId: String!, commentId: String!): GenericResponse!
   CreatePost(createPost: CreatePostDto!): GenericResponse!
   SignIn(signIn: SignInCredentialsDto!): SignInResponse!
   refreshToken(refreshToken: String!): SignInResponse!
   logout(userId: String!): GenericResponse!
   CreateUser(createUser: CreateUserDto!): GenericResponse!
+}
+
+input CreateGroupDto {
+  name: String!
+  interestId: String!
+}
+
+input CreateOrUpdateReactionDto {
+  reactionType: ReactionType!
+  targetId: String!
+  targetType: ReactionTargetType!
+}
+
+"""Different types of reactions available"""
+enum ReactionType {
+  LIKE
+  DISLIKE
+  SMILE
+  ANGRY
+  SAD
+  LOVE
+}
+
+"""Target type for the reaction, either POST or COMMENT"""
+enum ReactionTargetType {
+  POST
+  COMMENT
+}
+
+input CreateCommentDto {
+  content: String!
 }
 
 input CreatePostDto {

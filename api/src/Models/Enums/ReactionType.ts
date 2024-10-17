@@ -1,3 +1,5 @@
+import { registerEnumType } from "@nestjs/graphql";
+
 enum ReactionType {
 	LIKE = "like",
 	DISLIKE = "dislike",
@@ -7,4 +9,9 @@ enum ReactionType {
 	LOVE = "love",
 }
 
-export default  ReactionType;
+registerEnumType(ReactionType, {
+	name: "ReactionType",
+	description: "Different types of reactions available",
+});
+
+export default ReactionType;

@@ -10,9 +10,8 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { CreatePostCommandHandler } from "./Mutations/CreatePost/CreatePostCommand";
-import { GetPostDetailQueryHandler } from "./Queries/GetPostDetail/GetPostDetailQuery";
-import PostsResolver from "./post.resolver";
+import { CreateGroupCommandHandler } from "./Mutations/CreateGroup/CreateGroupCommand";
+import GroupResolver from "./group.resolver";
 
 @Module({
 	imports: [
@@ -31,6 +30,6 @@ import PostsResolver from "./post.resolver";
 		}),
 		TypeOrmModule.forFeature([User, Interest, Group, Post, Reaction]),
 	],
-	providers: [PostsResolver, CreatePostCommandHandler, GetPostDetailQueryHandler],
+	providers: [GroupResolver, CreateGroupCommandHandler],
 })
-export class PostModule {}
+export class GroupModule {}

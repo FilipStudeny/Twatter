@@ -1,7 +1,9 @@
+import AdminRole from "@Models/Enums/AdminRole";
 import { Entity, Column, OneToMany, OneToOne, JoinColumn } from "typeorm";
+
 import { BaseEntity } from "../BaseEntity";
-import { Report } from "../Report";
 import { Password } from "../Password";
+import { Report } from "../Report";
 import { AdminNotification } from "./AdministrationNotification";
 import { BanStrike } from "./BanStrike";
 
@@ -12,6 +14,13 @@ export class Administrator extends BaseEntity {
 
 	@Column()
 	email: string;
+
+	@Column({
+		type: "enum",
+		enum: AdminRole,
+		default: AdminRole.MODERATOR,
+	})
+	adminRole: AdminRole;
 
 	@OneToOne(() => Password, (password) => password.id, { cascade: true })
 	@JoinColumn()

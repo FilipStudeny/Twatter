@@ -1,3 +1,5 @@
+import { AdminModule } from "./Services/Admin/admin.module";
+import { GroupModule } from "./Services/Group/group.module";
 import { AdminNotification } from "@Models/Administration/AdministrationNotification";
 import { Administrator } from "@Models/Administration/Administrator";
 import { BanStrike } from "@Models/Administration/BanStrike";
@@ -11,6 +13,7 @@ import { Reaction } from "@Models/Reaction";
 import { Report } from "@Models/Report";
 import { User } from "@Models/User";
 import EntityMapper from "@Utils/EntityMapper.mapper";
+import JwtStrategy from "@Utils/JWT/JwtStrategy.strategy";
 import { classes } from "@automapper/classes";
 import { AutomapperModule } from "@automapper/nestjs";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
@@ -21,12 +24,17 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { AuthModule } from "./Services/Auth/auth.module";
+import { CommentModule } from "./Services/Comment/comment.module";
 import { PostModule } from "./Services/Post/post.module";
+import { ReactionModule } from "./Services/Reaction/reaction.module";
 import { UserModule } from "./Services/User/user.module";
-import JwtStrategy from "@Utils/JWT/JwtStrategy.strategy";
 
 @Module({
 	imports: [
+		AdminModule,
+		GroupModule,
+		ReactionModule,
+		CommentModule,
 		PostModule,
 		AuthModule,
 		UserModule,

@@ -1,6 +1,7 @@
-import { Field, ObjectType } from "@nestjs/graphql";
-import UserListItemDto from "../../Shared/UserListItem.dto";
 import PaginatedList from "@Utils/Http/PaginatedResponse.type";
+import { Field, ObjectType } from "@nestjs/graphql";
+
+import UserListItemDto from "../../Shared/UserListItem.dto";
 
 @ObjectType()
 export default class PaginatedUsersResponse extends PaginatedList {
