@@ -22,7 +22,7 @@ export default class AuthResolver {
 	}
 
 	@Mutation(() => SignInResponse)
-	async SignIn(@Args("signIn") dto: SignInCredentialsDto): Promise<SignInResponse> {
+	async SignInUser(@Args("signInUser") dto: SignInCredentialsDto): Promise<SignInResponse> {
 		const response = await this.commandBus.execute(new SignInCommand(dto));
 		return response;
 	}

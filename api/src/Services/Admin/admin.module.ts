@@ -12,6 +12,7 @@ import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { CreateAdminCommandHandler } from "./Mutations/CreateAdmin/CreateAdminCommand";
+import { SignInCommandHandler } from "./Mutations/SignIn/SignInCommand";
 import { AdminResolver } from "./admin.resolver";
 
 @Module({
@@ -31,6 +32,6 @@ import { AdminResolver } from "./admin.resolver";
 		}),
 		TypeOrmModule.forFeature([Administrator, Password]),
 	],
-	providers: [AdminResolver, CreateAdminCommandHandler],
+	providers: [AdminResolver, CreateAdminCommandHandler, SignInCommandHandler],
 })
 export class AdminModule {}

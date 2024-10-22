@@ -4,7 +4,7 @@ import JwtPayload from "@Utils/JWT/JwtPayload.interface";
 import { UseGuards } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { Args, ID, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { Public, RouterGuard } from "src/Guards/RouteGuard.guard";
+import { NoRoles, Public, Roles, RouterGuard } from "src/Guards/RouteGuard.guard";
 
 import { CreateUserCommand } from "./Mutations/CreateUser/CreateUserCommand";
 import CreateUserDto from "./Mutations/CreateUser/CreateUserDto.dto";
@@ -12,6 +12,7 @@ import { GetUserQuery } from "./Queries/GetUser/GetUserQuery";
 import { GetUsersQuery } from "./Queries/GetUsers/GetUsersQuery";
 import PaginatedUsersResponse from "./Queries/GetUsers/PaginatedUsersResponse.type";
 import UserListItemDto from "./Shared/UserListItem.dto";
+import AdminRole from "@Models/Enums/AdminRole";
 
 @Resolver()
 @UseGuards(RouterGuard)
@@ -39,6 +40,7 @@ export default class UserResolver {
 	}
 
 	@Query(() => PaginatedUsersResponse)
+	@NoRoles()
 	async getUsers(
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
 		@Args("limit", { type: () => Int, defaultValue: 10 }) limit: number,

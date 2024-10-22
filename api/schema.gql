@@ -81,16 +81,23 @@ type Query {
 }
 
 type Mutation {
+  SignInAdmin(signIn: SignInCredentialsDto!): SignInResponse!
   CreateAdmin(createAdminDto: CreateAdminDto!): GenericResponse!
   createGroup(createGroupDto: CreateGroupDto!): GenericResponse!
   AddReaction(createOrUpdateReactionData: CreateOrUpdateReactionDto!): GenericResponse!
   CreateComment(createComment: CreateCommentDto!, postId: String!): GenericResponse!
   PinComment(postId: String!, commentId: String!): GenericResponse!
   CreatePost(createPost: CreatePostDto!): GenericResponse!
-  SignIn(signIn: SignInCredentialsDto!): SignInResponse!
+  SignInUser(signInUser: SignInCredentialsDto!): SignInResponse!
   refreshToken(refreshToken: String!): SignInResponse!
   logout(userId: String!): GenericResponse!
   CreateUser(createUser: CreateUserDto!): GenericResponse!
+}
+
+input SignInCredentialsDto {
+  password: String!
+  passwordRepeat: String!
+  email: String!
 }
 
 input CreateAdminDto {
@@ -142,12 +149,6 @@ input CreatePostDto {
   content: String!
   interestId: String
   groupId: String
-}
-
-input SignInCredentialsDto {
-  password: String!
-  passwordRepeat: String!
-  email: String!
 }
 
 input CreateUserDto {
