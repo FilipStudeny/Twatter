@@ -1,12 +1,13 @@
 import { Entity, Column, ManyToOne, OneToMany } from "typeorm";
-import { BaseEntity } from "./BaseEntity";
-import { User } from "./User";
-import { Post } from "./Post";
-import { Comment } from "./Comment";
+
 import { Administrator } from "./Administration/Administrator";
-import ReportType from "./Enums/ReportType";
-import ReportStatus from "./Enums/ReportStatus";
 import { BanStrike } from "./Administration/BanStrike";
+import { BaseEntity } from "./BaseEntity";
+import { Comment } from "./Comment";
+import ReportStatus from "./Enums/ReportStatus";
+import ReportType from "./Enums/ReportType";
+import { Post } from "./Post";
+import { User } from "./User";
 
 @Entity()
 export class Report extends BaseEntity {

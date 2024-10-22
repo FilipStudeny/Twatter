@@ -1,5 +1,3 @@
-import { AdminModule } from "./Services/Admin/admin.module";
-import { GroupModule } from "./Services/Group/group.module";
 import { AdminNotification } from "@Models/Administration/AdministrationNotification";
 import { Administrator } from "@Models/Administration/Administrator";
 import { BanStrike } from "@Models/Administration/BanStrike";
@@ -13,6 +11,7 @@ import { Reaction } from "@Models/Reaction";
 import { Report } from "@Models/Report";
 import { User } from "@Models/User";
 import EntityMapper from "@Utils/EntityMapper.mapper";
+import { AdminJwtStrategy } from "@Utils/JWT/AdminJwtStrategy.strategy";
 import JwtStrategy from "@Utils/JWT/JwtStrategy.strategy";
 import { classes } from "@automapper/classes";
 import { AutomapperModule } from "@automapper/nestjs";
@@ -23,12 +22,13 @@ import { CqrsModule } from "@nestjs/cqrs";
 import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
+import { AdminModule } from "./Services/Admin/admin.module";
 import { AuthModule } from "./Services/Auth/auth.module";
 import { CommentModule } from "./Services/Comment/comment.module";
+import { GroupModule } from "./Services/Group/group.module";
 import { PostModule } from "./Services/Post/post.module";
 import { ReactionModule } from "./Services/Reaction/reaction.module";
 import { UserModule } from "./Services/User/user.module";
-import { AdminJwtStrategy } from "@Utils/JWT/AdminJwtStrategy.strategy";
 
 @Module({
 	imports: [

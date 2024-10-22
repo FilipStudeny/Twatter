@@ -22,7 +22,8 @@
 			"@Services/*": ["src/Services/*"],
 			"@Shared/*": ["src/Services/Shared"],
 			"@Utils/*": ["src/Utils/*"],
-			"@Enums/*": ["src/Models/Enums/*"]
+			"@Enums/*": ["src/Models/Enums/*"],
+			"@Builders/*": ["src/Models/Builders/*"]
 
 		}
   }
