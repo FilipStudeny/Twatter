@@ -1,6 +1,6 @@
 import { Password } from "@Models/Password";
 import { User } from "@Models/User";
-import GenericResponse from "@Utils/Http/GenericResponse.type";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
 import { ConflictException, InternalServerErrorException } from "@nestjs/common";
@@ -46,7 +46,7 @@ export class CreateUserCommandHandler implements ICommandHandler<CreateUserComma
 
 		try {
 			await this.entityManager.save(User, user);
-			return new GenericResponse("User created successfully", this.constructor.name);
+			return new GenericResponse("User created successfully");
 		} catch (error) {
 			if (error.code === "23505") {
 				throw new ConflictException("Email already exists.");

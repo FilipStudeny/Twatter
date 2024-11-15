@@ -1,7 +1,7 @@
-import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
 import { User } from "@Models/User";
-import { Field, InputType } from "@nestjs/graphql";
 import { Match } from "@Utils/MatchValidator";
+import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
+import { Field, InputType } from "@nestjs/graphql";
 import { IsString, IsNotEmpty, IsStrongPassword, MinLength, IsEmail } from "class-validator";
 
 @InputType()
@@ -26,7 +26,7 @@ export default class CreateUserDto {
 	@Field(() => String)
 	@IsString()
 	@IsNotEmpty()
-	@Match<CreateUserDto>('password')
+	@Match<CreateUserDto>("password")
 	repeatPassword: string;
 
 	@Field(() => String)

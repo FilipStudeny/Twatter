@@ -2,7 +2,7 @@ import { Group } from "@Models/Group";
 import { Interest } from "@Models/Interest";
 import { Post } from "@Models/Post";
 import { User } from "@Models/User";
-import GenericResponse from "@Utils/Http/GenericResponse.type";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
 import { ConflictException, InternalServerErrorException, NotFoundException } from "@nestjs/common";
@@ -81,7 +81,7 @@ export class CreatePostCommandHandler implements ICommandHandler<CreatePostComma
 
 			user.posts.push(post);
 			await this.entityManager.save(User, user);
-			return new GenericResponse("Post created successfully", this.constructor.name);
+			return new GenericResponse("Post created successfully");
 		} catch (error) {
 			if (error.code === "23503") {
 				throw new NotFoundException("Invalid foreign key provided.");

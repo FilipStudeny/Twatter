@@ -1,15 +1,14 @@
-import PaginatedList from "@Utils/Http/PaginatedResponse.type";
+import PaginatedList from "@Shared/Response/PaginatedResponse";
+import UserDetail from "@Shared/Response/UserDetail";
 import { Field, ObjectType } from "@nestjs/graphql";
-
-import UserListItemDto from "../../Shared/UserListItem.dto";
 
 @ObjectType()
 export default class PaginatedUsersResponse extends PaginatedList {
-	@Field(() => [UserListItemDto], { nullable: true })
-	items?: UserListItemDto[];
+	@Field(() => [UserDetail], { nullable: true })
+	items?: UserDetail[];
 
-	constructor(items?: UserListItemDto[], total?: number, page?: number, limit?: number, action?: string) {
-		super(total, page, limit, action);
+	constructor(items?: UserDetail[], total?: number, page?: number, limit?: number) {
+		super(total, page, limit);
 		this.items = items;
 	}
 }

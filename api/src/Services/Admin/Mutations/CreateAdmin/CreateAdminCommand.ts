@@ -1,6 +1,6 @@
 import { Administrator } from "@Models/Administration/Administrator";
 import { Password } from "@Models/Password";
-import GenericResponse from "@Utils/Http/GenericResponse.type";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
 import { ConflictException, InternalServerErrorException } from "@nestjs/common";
@@ -46,7 +46,7 @@ export class CreateAdminCommandHandler implements ICommandHandler<CreateAdminCom
 
 		try {
 			await this.entityManager.save(Administrator, admin);
-			return new GenericResponse("Administrator created successfully", this.constructor.name);
+			return new GenericResponse("Administrator created successfully");
 		} catch (error) {
 			if (error.code === "23505") {
 				// Unique constraint error

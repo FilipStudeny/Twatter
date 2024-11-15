@@ -1,6 +1,6 @@
 import { Comment } from "@Models/Comment";
 import { Post } from "@Models/Post";
-import GenericResponse from "@Utils/Http/GenericResponse.type";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { NotFoundException, ForbiddenException, InternalServerErrorException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
@@ -44,7 +44,7 @@ export class PinCommentCommandHandler implements ICommandHandler<PinCommentComma
 
 		try {
 			await this.entityManager.save(Post, post);
-			return new GenericResponse("Comment pinned successfully", this.constructor.name);
+			return new GenericResponse("Comment pinned successfully");
 		} catch {
 			throw new InternalServerErrorException("Something went wrong. Please try again.");
 		}

@@ -1,7 +1,8 @@
 import { CreateAdminDto } from "@Services/Admin/Mutations/CreateAdmin/CreateAdmin.dto";
 import CommentDto from "@Services/Comment/Shared/Comment.dto";
 import CreateUserDto from "@Services/User/Mutations/CreateUser/CreateUserDto.dto";
-import UserListItemDto from "@Services/User/Shared/UserListItem.dto";
+import { PostDetail } from "@Shared/Response/PostDetail";
+import UserListItemDto from "@Shared/Response/UserDetail";
 import { Mapper } from "@automapper/core";
 import { AutomapperProfile, InjectMapper } from "@automapper/nestjs";
 import { Injectable } from "@nestjs/common";
@@ -19,6 +20,8 @@ export default class EntityMapper extends AutomapperProfile {
 			UserListItemDto.createMap(mapper);
 			CommentDto.createMap(mapper);
 			CreateAdminDto.createMap(mapper);
+			PostDetail.createMap(mapper);
+			
 		};
 	}
 }

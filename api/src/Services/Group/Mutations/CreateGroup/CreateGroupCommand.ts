@@ -1,7 +1,7 @@
 import { Group } from "@Models/Group";
 import { Interest } from "@Models/Interest";
 import { User } from "@Models/User";
-import GenericResponse from "@Utils/Http/GenericResponse.type";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { NotFoundException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
@@ -52,6 +52,6 @@ export class CreateGroupCommandHandler implements ICommandHandler<CreateGroupCom
 		// Save the group
 		await this.entityManager.save(group);
 
-		return new GenericResponse("Group created", this.constructor.name);
+		return new GenericResponse("Group created");
 	}
 }

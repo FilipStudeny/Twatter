@@ -1,12 +1,12 @@
+import SignInCredentials from "@Shared/Input/SignInCredentials";
+import { SignInResponse } from "@Shared/Response/SignInResponse";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 
-import { SignInCommand } from "./Mutations/SignIn/SignInCommand";
-import SignInCredentialsDto from "./Mutations/SignIn/SignInCreadentials.dto";
-import { SignInResponse } from "./Mutations/SignIn/SignInResponse";
-import GenericResponse from "@Utils/Http/GenericResponse.type";
 import { LogoutCommand } from "./Mutations/Logout/LoggoutCommand";
 import { RefreshTokenCommand } from "./Mutations/RefreshToken/RefreshTokenCommand";
+import { SignInCommand } from "./Mutations/SignIn/SignInCommand";
 
 @Resolver()
 export default class AuthResolver {
@@ -22,7 +22,7 @@ export default class AuthResolver {
 	}
 
 	@Mutation(() => SignInResponse)
-	async SignInUser(@Args("signInUser") dto: SignInCredentialsDto): Promise<SignInResponse> {
+	async SignInUser(@Args("signInUser") dto: SignInCredentials): Promise<SignInResponse> {
 		const response = await this.commandBus.execute(new SignInCommand(dto));
 		return response;
 	}
@@ -36,6 +36,6 @@ export default class AuthResolver {
 	@Mutation(() => GenericResponse)
 	async logout(@Args("userId") userId: string): Promise<GenericResponse> {
 		await this.commandBus.execute(new LogoutCommand(userId));
-		return new GenericResponse("Logout successful", "LogoutResponse");
+		return new GenericResponse("Logout successful");
 	}
 }

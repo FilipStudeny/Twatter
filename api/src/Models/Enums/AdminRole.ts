@@ -4,6 +4,8 @@ enum AdminRole {
 	MODERATOR = "moderator",
 	SUPERVISOR = "supervisor",
 	ADMINISTRATOR = "administrator",
+	ADMIN = "ADMIN",
+	SUPER_ADMIN = "SUPER_ADMIN",
 }
 
 registerEnumType(AdminRole, {

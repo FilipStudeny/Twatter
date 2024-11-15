@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 
 @ObjectType()
-export class ReactionsCountDto {
+export class ReactionsCount {
 	@Field(() => Int)
 	like: number = 0;
 

@@ -12,6 +12,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { CreatePostCommandHandler } from "./Mutations/CreatePost/CreatePostCommand";
 import { GetPostDetailQueryHandler } from "./Queries/GetPostDetail/GetPostDetailQuery";
+import { GetPostGraphDataQueryHandler } from "./Queries/GetPostGraphData/GetPostGraphDataQuery";
+import GetPostsListQueryHandler from "./Queries/GetPostsList/GetPostsListQuery";
 import PostsResolver from "./post.resolver";
 
 @Module({
@@ -31,6 +33,12 @@ import PostsResolver from "./post.resolver";
 		}),
 		TypeOrmModule.forFeature([User, Interest, Group, Post, Reaction]),
 	],
-	providers: [PostsResolver, CreatePostCommandHandler, GetPostDetailQueryHandler],
+	providers: [
+		PostsResolver,
+		CreatePostCommandHandler,
+		GetPostDetailQueryHandler,
+		GetPostGraphDataQueryHandler,
+		GetPostsListQueryHandler,
+	],
 })
 export class PostModule {}

@@ -217,7 +217,7 @@ async function seedComments(connection: Connection, users: User[], posts: Post[]
 
 /**
  * Seeds reactions into the "reaction" table.
- * Reactions will be seeded for some posts and comments, but not all.
+ * Each user will react to multiple posts and comments.
  * @param connection The database connection.
  * @param users Array of users to associate reactions with.
  * @param posts Array of posts to associate reactions with.
@@ -227,44 +227,70 @@ async function seedReactions(connection: Connection, users: User[], posts: Post[
 	const reactions = [];
 	const reactionTypes = ["like", "dislike", "smile", "angry", "sad", "love"];
 
-	// Seed reactions for posts
-	posts.forEach((post) => {
-		// Randomly decide whether to add a reaction to this post
-		if (Math.random() > 0.5) {
-			// 50% chance of adding a reaction to a post
-			const randomUser = users[Math.floor(Math.random() * users.length)];
+	/**
+	 * Returns a random subset of the array.
+	 * @param arr The array to sample from.
+	 * @param n The number of elements to select.
+	 */
+	function getRandomSubarray<T>(arr: T[], n: number): T[] {
+		const shuffled = arr.slice(0);
+		let i = arr.length;
+		const min = i - n;
+		let temp: T;
+		let index: number;
+
+		while (i-- > min) {
+			index = Math.floor((i + 1) * Math.random());
+			temp = shuffled[index];
+			shuffled[index] = shuffled[i];
+			shuffled[i] = temp;
+		}
+		return shuffled.slice(min);
+	}
+
+	// For each user, have them react to multiple posts
+	users.forEach((user) => {
+		// Decide how many posts this user will react to
+		const numberOfPostReactions = Math.floor(Math.random() * (posts.length / 2)) + 1; // At least 1 reaction
+		// Get a random subset of posts
+		const postsToReactTo = getRandomSubarray(posts, numberOfPostReactions);
+
+		postsToReactTo.forEach((post) => {
 			const randomReactionType = reactionTypes[Math.floor(Math.random() * reactionTypes.length)];
 
 			const reaction = new Reaction();
 			reaction.type = randomReactionType as ReactionType;
-			reaction.user = randomUser;
+			reaction.user = user;
 			reaction.post = post;
 
 			reactions.push(reaction);
-		}
+		});
 	});
 
-	// Seed reactions for comments
-	comments.forEach((comment) => {
-		// Randomly decide whether to add a reaction to this comment
-		if (Math.random() > 0.5) {
-			// 50% chance of adding a reaction to a comment
-			const randomUser = users[Math.floor(Math.random() * users.length)];
+	// For each user, have them react to multiple comments
+	users.forEach((user) => {
+		// Decide how many comments this user will react to
+		const numberOfCommentReactions = Math.floor(Math.random() * (comments.length / 2)) + 1; // At least 1 reaction
+		// Get a random subset of comments
+		const commentsToReactTo = getRandomSubarray(comments, numberOfCommentReactions);
+
+		commentsToReactTo.forEach((comment) => {
 			const randomReactionType = reactionTypes[Math.floor(Math.random() * reactionTypes.length)];
 
 			const reaction = new Reaction();
 			reaction.type = randomReactionType as ReactionType;
-			reaction.user = randomUser;
+			reaction.user = user;
 			reaction.comment = comment;
 
 			reactions.push(reaction);
-		}
+		});
 	});
 
 	// Save all reactions to the database
 	await connection.manager.save(reactions);
 	console.log("Reactions have been inserted into the database.");
 }
+
 /**
  * Seeds reports into the "report" table.
  * Reports will be seeded for 3 users, 5 posts, and 5 comments.

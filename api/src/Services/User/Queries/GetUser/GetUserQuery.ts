@@ -1,21 +1,21 @@
 // GetUserQueryHandler.ts
+import { User } from "@Models/User";
+import UserDetail from "@Shared/Response/UserDetail";
+import { Mapper } from "@automapper/core";
+import { InjectMapper } from "@automapper/nestjs";
+import { NotFoundException, BadRequestException } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { EntityManager } from "typeorm";
-import { User } from "@Models/User";
-import { InjectMapper } from "@automapper/nestjs";
-import { Mapper } from "@automapper/core";
-import { NotFoundException, BadRequestException } from "@nestjs/common";
-import UserListItemDto from "@Services/User/Shared/UserListItem.dto";
 
 // GetUserQuery.ts
 export class GetUserQuery {
-  constructor(
-    public readonly id?: string,
-    public readonly username?: string,
-    public readonly firstName?: string,
-    public readonly lastName?: string,
-  ) {}
+	constructor(
+		public readonly id?: string,
+		public readonly username?: string,
+		public readonly firstName?: string,
+		public readonly lastName?: string,
+	) {}
 }
 
 @QueryHandler(GetUserQuery)
@@ -25,7 +25,7 @@ export class GetUserQueryHandler implements IQueryHandler<GetUserQuery> {
 		@InjectMapper() private readonly mapper: Mapper,
 	) {}
 
-	async execute(query: GetUserQuery): Promise<UserListItemDto> {
+	async execute(query: GetUserQuery): Promise<UserDetail> {
 		const { id, username, firstName, lastName } = query;
 
 		if (!id && !username && !firstName && !lastName) {
@@ -56,7 +56,7 @@ export class GetUserQueryHandler implements IQueryHandler<GetUserQuery> {
 			throw new NotFoundException("User not found.");
 		}
 
-		const userDto = this.mapper.map(user, User, UserListItemDto);
+		const userDto = this.mapper.map(user, User, UserDetail);
 
 		return userDto;
 	}

@@ -1,4 +1,6 @@
 import { User } from "@Models/User";
+import SignInCredentials from "@Shared/Input/SignInCredentials";
+import { SignInResponse } from "@Shared/Response/SignInResponse";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
 import { ConflictException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
@@ -9,11 +11,8 @@ import * as bcrypt from "bcrypt";
 import { validate } from "class-validator";
 import { EntityManager } from "typeorm";
 
-import SignInCredentialsDto from "./SignInCreadentials.dto";
-import { SignInResponse } from "./SignInResponse";
-
 export class SignInCommand {
-	constructor(public credentialsDto: SignInCredentialsDto) {}
+	constructor(public credentialsDto: SignInCredentials) {}
 }
 
 @CommandHandler(SignInCommand)

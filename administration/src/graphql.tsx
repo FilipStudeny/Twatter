@@ -18,9 +18,11 @@ export type Scalars = {
 
 /** Different types of roles available */
 export enum AdminRole {
+  Admin = 'ADMIN',
   Administrator = 'ADMINISTRATOR',
   Moderator = 'MODERATOR',
-  Supervisor = 'SUPERVISOR'
+  Supervisor = 'SUPERVISOR',
+  SuperAdmin = 'SUPER_ADMIN'
 }
 
 export type CommentDto = {
@@ -72,6 +74,13 @@ export type GenericResponse = {
   action?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
 };
+
+/** Filter options for the graph data */
+export enum GraphFilter {
+  Day = 'Day',
+  Month = 'Month',
+  Year = 'Year'
+}
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -177,10 +186,17 @@ export type PostDetailDto = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type PostGraphDataDto = {
+  __typename?: 'PostGraphDataDto';
+  count: Scalars['Int']['output'];
+  period: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   GetComments: PaginatedCommentsResponse;
   GetPostDetail: PostDetailDto;
+  getPostsStatistics: Array<PostGraphDataDto>;
   getUsers: PaginatedUsersResponse;
   hello: Scalars['String']['output'];
   user: UserListItemDto;
@@ -196,6 +212,13 @@ export type QueryGetCommentsArgs = {
 
 export type QueryGetPostDetailArgs = {
   postId: Scalars['String']['input'];
+};
+
+
+export type QueryGetPostsStatisticsArgs = {
+  filter: GraphFilter;
+  weekNumber?: InputMaybe<Scalars['Int']['input']>;
+  year?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

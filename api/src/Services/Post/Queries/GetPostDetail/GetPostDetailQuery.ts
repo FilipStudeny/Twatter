@@ -1,14 +1,14 @@
-import { Comment } from "@Models/Comment";
-import ReactionType from "@Models/Enums/ReactionType";
 import { Post } from "@Models/Post";
-import { Reaction } from "@Models/Reaction";
+import { PostDetail } from "@Shared/Response/PostDetail";
+import { ReactionsCount } from "@Shared/Response/ReactionsCount";
+import { Mapper } from "@automapper/core";
+import { InjectMapper } from "@automapper/nestjs";
 import { NotFoundException } from "@nestjs/common";
 import { QueryHandler, IQueryHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { EntityManager } from "typeorm";
-
-import { PostDetailDto } from "./PostDetail.dto";
-import { ReactionsCountDto } from "./ReactionsCount.dto";
+import UserDetail from "@Shared/Response/UserDetail";
+import { InterestDetail } from "@Shared/Response/InterestDetail";
 
 export class GetPostDetailQuery {
 	constructor(public readonly postId: string) {}
@@ -16,44 +16,83 @@ export class GetPostDetailQuery {
 
 @QueryHandler(GetPostDetailQuery)
 export class GetPostDetailQueryHandler implements IQueryHandler<GetPostDetailQuery> {
-	constructor(@InjectEntityManager() private readonly entityManager: EntityManager) {}
+	constructor(
+		@InjectEntityManager() private readonly entityManager: EntityManager,
+		@InjectMapper() private readonly mapper: Mapper,
+	) {}
 
-	// ... previous imports and setup
-
-	async execute(query: GetPostDetailQuery): Promise<PostDetailDto> {
+	async execute(query: GetPostDetailQuery): Promise<PostDetail> {
 		const { postId } = query;
 
-		// Fetch the post with counts using subqueries in the SELECT clause
 		const postWithCounts = await this.entityManager
 			.createQueryBuilder(Post, "post")
-			.leftJoinAndSelect("post.creator", "creator")
-			.addSelect(["creator.id", "creator.username", "creator.firstName", "creator.lastName"])
-			.addSelect(
-				(subQuery) =>
-					subQuery
-						.select("COUNT(comment.id)")
-						.from(Comment, "comment")
-						.where('comment."postId" = post.id'),
-				"comments_count",
-			)
-			.addSelect(
-				(subQuery) =>
-					subQuery
-						.select(
-							"COALESCE(CAST(JSON_AGG(JSON_BUILD_OBJECT('type', rc.type, 'count', rc.count)) AS TEXT), '[]')",
+			.leftJoin("post.creator", "creator")
+			.leftJoin("post.interest", "interest")
+			.leftJoin(
+				(qb) =>
+					qb
+						.select('reaction."postId"', "postId")
+						.addSelect(
+							`SUM(CASE WHEN reaction.type = 'like' THEN 1 ELSE 0 END)`,
+							"like_count",
 						)
-						.from(
-							(qb) =>
-								qb
-									.select("reaction.type", "type")
-									.addSelect("COUNT(reaction.id)", "count")
-									.from(Reaction, "reaction")
-									.where('reaction."postId" = post.id')
-									.groupBy("reaction.type"),
-							"rc",
-						),
+						.addSelect(
+							`SUM(CASE WHEN reaction.type = 'dislike' THEN 1 ELSE 0 END)`,
+							"dislike_count",
+						)
+						.addSelect(
+							`SUM(CASE WHEN reaction.type = 'smile' THEN 1 ELSE 0 END)`,
+							"smile_count",
+						)
+						.addSelect(
+							`SUM(CASE WHEN reaction.type = 'angry' THEN 1 ELSE 0 END)`,
+							"angry_count",
+						)
+						.addSelect(
+							`SUM(CASE WHEN reaction.type = 'sad' THEN 1 ELSE 0 END)`,
+							"sad_count",
+						)
+						.addSelect(
+							`SUM(CASE WHEN reaction.type = 'love' THEN 1 ELSE 0 END)`,
+							"love_count",
+						)
+						.from("reaction", "reaction")
+						.where('reaction."postId" = :postId', { postId })
+						.groupBy('reaction."postId"'),
 				"reactions_counts",
+				'reactions_counts."postId" = post.id',
 			)
+			.leftJoin(
+				(qb) =>
+					qb
+						.select('comment."postId"', "postId")
+						.addSelect("COUNT(comment.id)", "comments_count")
+						.from("comment", "comment")
+						.where('comment."postId" = :postId', { postId })
+						.groupBy('comment."postId"'),
+				"comments_counts",
+				'comments_counts."postId" = post.id',
+			)
+			.select([
+				'post.id AS "post_id"',
+				'post.content AS "post_content"',
+				'post."createdAt" AS "post_createdAt"',
+				'post."updatedAt" AS "post_updatedAt"',
+				'post."pinnedCommentId" AS "post_pinnedCommentId"',
+				'creator.id AS "creator_id"',
+				'creator.username AS "creator_username"',
+				'creator."firstName" AS "creator_firstName"',
+				'creator."lastName" AS "creator_lastName"',
+				'interest.id AS "interest_id"',
+				'interest.name AS "interest_name"',
+				'COALESCE(reactions_counts.like_count, 0) AS "like_count"',
+				'COALESCE(reactions_counts.dislike_count, 0) AS "dislike_count"',
+				'COALESCE(reactions_counts.smile_count, 0) AS "smile_count"',
+				'COALESCE(reactions_counts.angry_count, 0) AS "angry_count"',
+				'COALESCE(reactions_counts.sad_count, 0) AS "sad_count"',
+				'COALESCE(reactions_counts.love_count, 0) AS "love_count"',
+				'COALESCE(comments_counts.comments_count, 0) AS "comments_count"',
+			])
 			.where("post.id = :postId", { postId })
 			.getRawOne();
 
@@ -61,57 +100,43 @@ export class GetPostDetailQueryHandler implements IQueryHandler<GetPostDetailQue
 			throw new NotFoundException("Post not found");
 		}
 
-		// Extract post fields
-		const postEntity = {
-			id: postWithCounts.post_id,
-			content: postWithCounts.post_content,
-			createdAt: postWithCounts.post_createdAt,
-			updatedAt: postWithCounts.post_updatedAt,
-		} as Post;
+		// Build the PostDetail response
+		const postDetail = new PostDetail();
+		postDetail.id = postWithCounts.post_id;
+		postDetail.content = postWithCounts.post_content;
+		postDetail.createdAt = postWithCounts.post_createdAt;
+		postDetail.updatedAt = postWithCounts.post_updatedAt;
+		postDetail.isPinned = !!postWithCounts.post_pinnedCommentId;
 
-		// Extract creator information
-		const creatorId = postWithCounts.creator_id;
-		const creatorName = postWithCounts.creator_username?.trim()
-			? postWithCounts.creator_username
-			: `${postWithCounts.creator_firstName} ${postWithCounts.creator_lastName}`;
+		// Assign creator details
+		const creator = new UserDetail();
+		creator.id = postWithCounts.creator_id;
+		creator.username = postWithCounts.creator_username;
+		creator.firstName = postWithCounts.creator_firstName;
+		creator.lastName = postWithCounts.creator_lastName;
+		postDetail.creator = creator;
 
-		// Extract comments count
-		const commentsCount = parseInt(postWithCounts.comments_count || "0", 10);
-
-		// Extract reactions counts
-		let reactionsCountsArray = [];
-		if (postWithCounts.reactions_counts) {
-			try {
-				reactionsCountsArray = JSON.parse(postWithCounts.reactions_counts);
-			} catch (error) {
-				console.error("Failed to parse reactions_counts:", error);
-				reactionsCountsArray = [];
-			}
+		// Assign interest details if available
+		if (postWithCounts.interest_id && postWithCounts.interest_name) {
+			const interest = new InterestDetail();
+			interest.id = postWithCounts.interest_id;
+			interest.name = postWithCounts.interest_name;
+			postDetail.interest = interest;
 		}
 
-		// Build the ReactionsCountDto
-		const reactionsCountDto = new ReactionsCountDto();
+		// Assign comments count
+		postDetail.commentsCount = parseInt(postWithCounts.comments_count || "0", 10);
 
-		reactionsCountsArray.forEach((rc: { type: ReactionType; count: string }) => {
-			const { type } = rc;
-			const count = parseInt(rc.count, 10);
+		// Assign reactions counts
+		const reactionsCount = new ReactionsCount();
+		reactionsCount.like = parseInt(postWithCounts.like_count || "0", 10);
+		reactionsCount.dislike = parseInt(postWithCounts.dislike_count || "0", 10);
+		reactionsCount.smile = parseInt(postWithCounts.smile_count || "0", 10);
+		reactionsCount.angry = parseInt(postWithCounts.angry_count || "0", 10);
+		reactionsCount.sad = parseInt(postWithCounts.sad_count || "0", 10);
+		reactionsCount.love = parseInt(postWithCounts.love_count || "0", 10);
+		postDetail.reactions = reactionsCount;
 
-			if (type === ReactionType.LIKE) {
-				reactionsCountDto.like = count;
-			} else if (type === ReactionType.DISLIKE) {
-				reactionsCountDto.dislike = count;
-			} else if (type === ReactionType.SMILE) {
-				reactionsCountDto.smile = count;
-			} else if (type === ReactionType.ANGRY) {
-				reactionsCountDto.angry = count;
-			} else if (type === ReactionType.SAD) {
-				reactionsCountDto.sad = count;
-			} else if (type === ReactionType.LOVE) {
-				reactionsCountDto.love = count;
-			}
-		});
-
-		// Return the PostDetailDto with the computed values
-		return new PostDetailDto(postEntity, creatorName, creatorId, commentsCount, reactionsCountDto);
+		return postDetail;
 	}
 }

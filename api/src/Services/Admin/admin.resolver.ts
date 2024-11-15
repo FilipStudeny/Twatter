@@ -1,14 +1,14 @@
-import { SignInResponse } from "@Services/Auth/Mutations/SignIn/SignInResponse";
-import GenericResponse from "@Utils/Http/GenericResponse.type";
+import SignInCredentials from "@Shared/Input/SignInCredentials";
+import { SignInResponse } from "@Shared/Response/SignInResponse";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { UseGuards } from "@nestjs/common";
 import { CommandBus } from "@nestjs/cqrs";
 import { Resolver, Mutation, Args } from "@nestjs/graphql";
-import { PublicAdmin, RouterGuard } from "src/Guards/RouteGuard.guard";
+import { Public, PublicAdmin, RouterGuard } from "src/Guards/RouteGuard.guard";
 
 import { CreateAdminDto } from "./Mutations/CreateAdmin/CreateAdmin.dto";
 import { CreateAdminCommand } from "./Mutations/CreateAdmin/CreateAdminCommand";
 import { SignInCommand } from "./Mutations/SignIn/SignInCommand";
-import SignInCredentialsDto from "@Services/Auth/Mutations/SignIn/SignInCreadentials.dto";
 
 @Resolver()
 @UseGuards(RouterGuard)
@@ -17,7 +17,8 @@ export class AdminResolver {
 
 	@Mutation(() => SignInResponse)
 	@PublicAdmin()
-	async SignInAdmin(@Args("signIn") dto: SignInCredentialsDto): Promise<SignInResponse> {
+	@Public()
+	async SignInAdmin(@Args("signIn") dto: SignInCredentials): Promise<SignInResponse> {
 		const response = await this.commandBus.execute(new SignInCommand(dto));
 		return response;
 	}

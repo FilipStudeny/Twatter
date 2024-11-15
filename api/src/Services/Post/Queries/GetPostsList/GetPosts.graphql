@@ -1,0 +1,63 @@
+query GetPosts($page: Int = 1, $limit: Int = 10) {
+	getPosts(page: $page, limit: $limit) {
+		items {
+			id
+			content
+			creator {
+				id
+				username
+				postsCount
+			}
+			reactions {
+				like
+				dislike
+				sad
+				smile
+				angry
+				love
+			}
+			interest {
+				name
+			}
+			commentsCount
+			createdAt
+		}
+		total
+		page
+		limit
+	}
+}
+
+
+query GetPostsDetailsList($page: Int = 1, $limit: Int = 10) {
+	getPosts(page: $page, limit: $limit) {
+		items {
+			id
+			content
+			creator {
+				id
+				username
+			}
+			reactions {
+				like
+				dislike
+				sad
+				smile
+				angry
+				love
+			}
+			interest {
+				name
+			}
+			group {
+				id
+				name
+			}
+			commentsCount
+			createdAt
+		}
+		total
+		page
+		limit
+	}
+}

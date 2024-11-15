@@ -1,7 +1,7 @@
 import { Comment } from "@Models/Comment";
 import { Post } from "@Models/Post";
 import { User } from "@Models/User";
-import GenericResponse from "@Utils/Http/GenericResponse.type";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
 import { ConflictException, NotFoundException, InternalServerErrorException } from "@nestjs/common";
@@ -64,7 +64,7 @@ export class CreateCommentCommandHandler implements ICommandHandler<CreateCommen
 
 			post.comments.push(comment);
 			await this.entityManager.save(Post, post);
-			return new GenericResponse("Comment added successfully", this.constructor.name);
+			return new GenericResponse("Comment added successfully");
 		} catch {
 			throw new InternalServerErrorException("Something went wrong. Please try again.");
 		}

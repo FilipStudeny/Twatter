@@ -1,18 +1,15 @@
-import GenericResponse from "@Utils/Http/GenericResponse.type";
-import { CurrentUser } from "@Utils/JWT/CurrentUser";
-import JwtPayload from "@Utils/JWT/JwtPayload.interface";
+import GenericResponse from "@Shared/Response/GenericResponse";
+import UserDetail from "@Shared/Response/UserDetail";
 import { UseGuards } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { Args, ID, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { NoRoles, Public, Roles, RouterGuard } from "src/Guards/RouteGuard.guard";
+import { NoRoles, Public, RouterGuard } from "src/Guards/RouteGuard.guard";
 
 import { CreateUserCommand } from "./Mutations/CreateUser/CreateUserCommand";
 import CreateUserDto from "./Mutations/CreateUser/CreateUserDto.dto";
 import { GetUserQuery } from "./Queries/GetUser/GetUserQuery";
 import { GetUsersQuery } from "./Queries/GetUsers/GetUsersQuery";
 import PaginatedUsersResponse from "./Queries/GetUsers/PaginatedUsersResponse.type";
-import UserListItemDto from "./Shared/UserListItem.dto";
-import AdminRole from "@Models/Enums/AdminRole";
 
 @Resolver()
 @UseGuards(RouterGuard)
@@ -29,13 +26,13 @@ export default class UserResolver {
 	}
 
 	@Public()
-	@Query(() => UserListItemDto, { name: "user" })
+	@Query(() => UserDetail, { name: "user" })
 	async getUser(
 		@Args("id", { type: () => ID, nullable: true }) id?: string,
 		@Args("username", { type: () => String, nullable: true }) username?: string,
 		@Args("firstName", { type: () => String, nullable: true }) firstName?: string,
 		@Args("lastName", { type: () => String, nullable: true }) lastName?: string,
-	): Promise<UserListItemDto> {
+	): Promise<UserDetail> {
 		return this.queryBus.execute(new GetUserQuery(id, username, firstName, lastName));
 	}
 
@@ -44,7 +41,6 @@ export default class UserResolver {
 	async getUsers(
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
 		@Args("limit", { type: () => Int, defaultValue: 10 }) limit: number,
-		@CurrentUser() user: JwtPayload,
 	) {
 		return this.queryBus.execute(new GetUsersQuery(page, limit));
 	}

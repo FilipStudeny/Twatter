@@ -3,7 +3,7 @@ import ReactionTargetType from "@Models/Enums/ReactionTarget";
 import { Post } from "@Models/Post";
 import { Reaction } from "@Models/Reaction";
 import { User } from "@Models/User";
-import GenericResponse from "@Utils/Http/GenericResponse.type";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { NotFoundException, InternalServerErrorException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
@@ -49,10 +49,7 @@ export class CreateOrUpdateReactionCommandHandler implements ICommandHandler<Cre
 			});
 
 			if (reaction && reaction.type === reactionType) {
-				return new GenericResponse(
-					"You have already reacted with this type to this post.",
-					this.constructor.name,
-				);
+				return new GenericResponse("You have already reacted with this type to this post.");
 			}
 
 			if (!reaction) {
@@ -77,10 +74,7 @@ export class CreateOrUpdateReactionCommandHandler implements ICommandHandler<Cre
 			});
 
 			if (reaction && reaction.type === reactionType) {
-				return new GenericResponse(
-					"You have already reacted with this type to this comment.",
-					this.constructor.name,
-				);
+				return new GenericResponse("You have already reacted with this type to this comment.");
 			}
 			if (!reaction) {
 				// Create a new reaction if none exists for this comment
@@ -98,7 +92,7 @@ export class CreateOrUpdateReactionCommandHandler implements ICommandHandler<Cre
 
 		try {
 			await this.entityManager.save(Reaction, reaction);
-			return new GenericResponse("Reaction added or updated successfully", this.constructor.name);
+			return new GenericResponse("Reaction added or updated successfully");
 		} catch {
 			throw new InternalServerErrorException("Something went wrong. Please try again.");
 		}

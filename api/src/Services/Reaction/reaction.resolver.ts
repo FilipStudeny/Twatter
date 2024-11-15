@@ -1,4 +1,4 @@
-import GenericResponse from "@Utils/Http/GenericResponse.type";
+import GenericResponse from "@Shared/Response/GenericResponse";
 import { CurrentUser } from "@Utils/JWT/CurrentUser";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
 import { UseGuards } from "@nestjs/common";

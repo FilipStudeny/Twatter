@@ -11,8 +11,11 @@ import {
 	VideoCameraOutlined,
 	CloseOutlined, // Import the CloseOutlined icon
 } from "@ant-design/icons";
-import { Button, Layout as PreLayout, Menu, theme, MenuProps, Drawer, Grid } from "antd";
+import { Button, Layout as PreLayout, Menu, theme, MenuProps, Drawer, Grid, Typography } from "antd";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { AppRoutes } from "../constants/appRoutes.router";
 
 const { Header, Sider, Content } = PreLayout;
 const { useBreakpoint } = Grid;
@@ -47,6 +50,7 @@ const Layout = () => {
 	const [collapsed, setCollapsed] = useState(false);
 	const [drawerVisible, setDrawerVisible] = useState(false);
 	const screens = useBreakpoint();
+	const navigate = useNavigate();
 
 	const {
 		token: { colorBgContainer, borderRadiusLG },
@@ -109,19 +113,50 @@ const Layout = () => {
 						transition: "margin 0.2s",
 					}}
 				>
-					<Header style={{ padding: 0, background: colorBgContainer }}>
-						{!isMobile && (
+					<Header
+						style={{
+							padding: "0 16px",
+							background: colorBgContainer,
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "space-between",
+						}}
+					>
+						<div style={{ display: "flex", alignItems: "center" }}>
 							<Button
 								type='text'
-								icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-								onClick={() => setCollapsed(!collapsed)}
+								icon={
+									isMobile ? (
+										drawerVisible ? (
+											<MenuFoldOutlined />
+										) : (
+											<MenuUnfoldOutlined />
+										)
+									) : collapsed ? (
+										<MenuUnfoldOutlined />
+									) : (
+										<MenuFoldOutlined />
+									)
+								}
+								onClick={isMobile ? toggleDrawer : () => setCollapsed(!collapsed)}
 								style={{
 									fontSize: "16px",
 									width: 64,
 									height: 64,
 								}}
 							/>
-						)}
+							<Typography.Title level={4} style={{ margin: 0 }}>
+								My App
+							</Typography.Title>
+						</div>
+						<div>
+							<Button type='link' onClick={() => navigate(AppRoutes.SignIn.path)}>
+								Sign In
+							</Button>
+							<Button type='primary' style={{ marginLeft: 8 }}>
+								Register
+							</Button>
+						</div>
 					</Header>
 					<Content
 						style={{

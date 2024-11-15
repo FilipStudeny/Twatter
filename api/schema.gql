@@ -14,36 +14,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type UserListItemDto {
-  id: String!
-  email: String!
-  firstName: String!
-  lastName: String!
-  username: String!
-}
-
-type GenericResponse {
-  message: String
-  action: String
-}
-
-type SignInResponse {
-  message: String
-  action: String
-  accessToken: String!
-  refreshToken: String!
-}
-
-type PaginatedCommentsResponse {
-  message: String
-  action: String
-  total: Int
-  page: Int
-  limit: Int
-  items: [CommentDto!]
-}
-
-type ReactionsCountDto {
+type ReactionsCount {
   like: Int!
   dislike: Int!
   smile: Int!
@@ -52,49 +23,143 @@ type ReactionsCountDto {
   love: Int!
 }
 
-type PostDetailDto {
+type UserDetail {
+  id: String
+  email: String
+  firstName: String
+  lastName: String
+  username: String
+  postsCount: Int
+  commentsCount: Int
+  likesCount: Int
+  joinedGroupsCount: Int
+  banStrikesCount: Int
+  sentNotificationsCount: Int
+  filedReportsCount: Int
+  receivedReportsCount: Int
+  friendsCount: Int
+  moderatedGroupsCount: Int
+  createdGroupsCount: Int
+}
+
+type CommentDetail {
   id: String!
   content: String!
-  creatorName: String!
+  creator: UserDetail!
   creatorId: String!
-  commentsCount: Int!
-  reactions: ReactionsCountDto!
+  postId: String!
+  reactionsCount: Int!
+  reactions: ReactionsCount!
+  reportsCount: Int!
+  strikesCount: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
-type PaginatedUsersResponse {
+type InterestDetail {
+  id: String
+  name: String
+  postsCount: Int
+  groupsCount: Int
+  posts: [PostDetail!]
+  groups: [GroupDetail!]
+}
+
+type GroupDetail {
+  id: String!
+  name: String!
+  interest: InterestDetail!
+  owner: UserDetail!
+  moderators: [UserDetail!]!
+  users: [UserDetail!]!
+  membersCount: Int!
+  posts: [PostDetail!]!
+  postsCount: Int!
+}
+
+type PostDetail {
+  id: String!
+  content: String!
+  creator: UserDetail!
+  commentsCount: Int
+  reactions: ReactionsCount
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  interest: InterestDetail
+  group: GroupDetail
+  reportsCount: Int
+  strikesCount: Int
+  pinnedComment: CommentDetail
+  isPinned: Boolean
+}
+
+type GenericResponse {
   message: String
-  action: String
+}
+
+type SignInResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type PaginatedCommentsResponse {
   total: Int
   page: Int
   limit: Int
-  items: [UserListItemDto!]
+  items: [CommentDto!]
+}
+
+type PostGraphDataDto {
+  period: String!
+  count: Int!
+}
+
+type PaginatedPostsListResponse {
+  total: Int
+  page: Int
+  limit: Int
+  items: [PostDetail!]
+}
+
+type PaginatedUsersResponse {
+  total: Int
+  page: Int
+  limit: Int
+  items: [UserDetail!]
 }
 
 type Query {
   GetComments(postId: String!, page: Int!, limit: Int!): PaginatedCommentsResponse!
-  GetPostDetail(postId: String!): PostDetailDto!
+  GetPostDetail(postId: String!): PostDetail!
+  getPostsStatistics(filter: GraphFilter!, year: Int, weekNumber: Int): [PostGraphDataDto!]!
+  getPosts(page: Int! = 1, limit: Int! = 10): PaginatedPostsListResponse!
   hello: String!
-  user(id: ID, username: String, firstName: String, lastName: String): UserListItemDto!
+  user(id: ID, username: String, firstName: String, lastName: String): UserDetail!
   getUsers(page: Int! = 1, limit: Int! = 10): PaginatedUsersResponse!
 }
 
+"""Filter options for the graph data"""
+enum GraphFilter {
+  Day
+  Month
+  Year
+}
+
 type Mutation {
-  SignInAdmin(signIn: SignInCredentialsDto!): SignInResponse!
+  SignInAdmin(signIn: SignInCredentials!): SignInResponse!
   CreateAdmin(createAdminDto: CreateAdminDto!): GenericResponse!
   createGroup(createGroupDto: CreateGroupDto!): GenericResponse!
   AddReaction(createOrUpdateReactionData: CreateOrUpdateReactionDto!): GenericResponse!
   CreateComment(createComment: CreateCommentDto!, postId: String!): GenericResponse!
   PinComment(postId: String!, commentId: String!): GenericResponse!
   CreatePost(createPost: CreatePostDto!): GenericResponse!
-  SignInUser(signInUser: SignInCredentialsDto!): SignInResponse!
+  SignInUser(signInUser: SignInCredentials!): SignInResponse!
   refreshToken(refreshToken: String!): SignInResponse!
   logout(userId: String!): GenericResponse!
   CreateUser(createUser: CreateUserDto!): GenericResponse!
 }
 
-input SignInCredentialsDto {
+input SignInCredentials {
   password: String!
   passwordRepeat: String!
   email: String!
@@ -112,6 +177,8 @@ enum AdminRole {
   MODERATOR
   SUPERVISOR
   ADMINISTRATOR
+  ADMIN
+  SUPER_ADMIN
 }
 
 input CreateGroupDto {

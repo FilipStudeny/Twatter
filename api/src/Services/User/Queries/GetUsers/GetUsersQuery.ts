@@ -1,12 +1,12 @@
+import { User } from "@Models/User";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { EntityManager } from "typeorm";
 
-import UserListItemDto from "../../Shared/UserListItem.dto";
 import PaginatedUsersResponse from "./PaginatedUsersResponse.type";
-import { User } from "@Models/User";
+import UserListItemDto from "../../../../Shared/Response/UserDetail";
 
 export class GetUsersQuery {
 	constructor(
@@ -33,6 +33,6 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 
 		const userDtos = this.mapper.mapArray(users, User, UserListItemDto);
 
-		return new PaginatedUsersResponse(userDtos, total, page, limit, this.constructor.name);
+		return new PaginatedUsersResponse(userDtos, total, page, limit);
 	}
 }

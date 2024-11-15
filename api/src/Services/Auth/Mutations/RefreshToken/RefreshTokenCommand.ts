@@ -1,4 +1,5 @@
 import { User } from "@Models/User";
+import { SignInResponse } from "@Shared/Response/SignInResponse";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
 import { UnauthorizedException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
@@ -7,8 +8,6 @@ import { JwtService } from "@nestjs/jwt";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import * as bcrypt from "bcrypt";
 import { EntityManager } from "typeorm";
-
-import { SignInResponse } from "../SignIn/SignInResponse";
 
 export class RefreshTokenCommand {
 	constructor(public readonly refreshToken: string) {}

@@ -37,6 +37,6 @@ export default class GetPostCommentsQueryHandler implements IQueryHandler<GetPos
 
 		const commentDtos = this.mapper.mapArray(comments, Comment, CommentListItemDto);
 
-		return new PaginatedCommentsResponse(commentDtos, total, page, limit, this.constructor.name);
+		return new PaginatedCommentsResponse(commentDtos, total, page, limit);
 	}
 }

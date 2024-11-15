@@ -1,6 +1,6 @@
 import { Administrator } from "@Models/Administration/Administrator";
-import SignInCredentialsDto from "@Services/Auth/Mutations/SignIn/SignInCreadentials.dto";
-import { SignInResponse } from "@Services/Auth/Mutations/SignIn/SignInResponse";
+import SignInCredentials from "@Shared/Input/SignInCredentials";
+import { SignInResponse } from "@Shared/Response/SignInResponse";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
 import { ConflictException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
@@ -12,7 +12,7 @@ import { validate } from "class-validator";
 import { EntityManager } from "typeorm";
 
 export class SignInCommand {
-	constructor(public credentialsDto: SignInCredentialsDto) {}
+	constructor(public credentialsDto: SignInCredentials) {}
 }
 
 @CommandHandler(SignInCommand)

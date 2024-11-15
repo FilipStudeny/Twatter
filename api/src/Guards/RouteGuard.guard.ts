@@ -13,13 +13,13 @@ export const IS_PUBLIC_ADMIN_KEY = "isPublicAdmin";
 export const PublicAdmin = () => SetMetadata(IS_PUBLIC_ADMIN_KEY, true);
 
 export const ROLES_KEY = "roles";
-export const Roles = (...roles: AdminRole[]) => SetMetadata(ROLES_KEY, roles);
+export const AdminOnly = (...roles: AdminRole[]) => SetMetadata(ROLES_KEY, roles);
 
 export const NO_ROLES_KEY = "noRoles";
 export const NoRoles = () => SetMetadata(NO_ROLES_KEY, true);
 
 @Injectable()
-export class RouterGuard extends AuthGuard(["jwt", "admin-jwt"]) {
+export class RouterGuard extends AuthGuard(["admin-jwt", "jwt"]) {
 	constructor(private reflector: Reflector) {
 		super();
 	}
@@ -30,55 +30,46 @@ export class RouterGuard extends AuthGuard(["jwt", "admin-jwt"]) {
 	}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		// Check if the route is marked as PublicAdmin
-		const isPublicAdmin = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_ADMIN_KEY, [
+		const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
 			context.getHandler(),
 			context.getClass(),
 		]);
 
-		if (isPublicAdmin) {
+		if (isPublic) {
 			return true;
 		}
 
-		// Check if the route is marked as NoRoles
-		const noRolesRequired = this.reflector.getAllAndOverride<boolean>(NO_ROLES_KEY, [
-			context.getHandler(),
-			context.getClass(),
-		]);
+		// Proceed with authentication
+		const canActivate = (await super.canActivate(context)) as boolean;
+		if (!canActivate) return false;
 
-		// If @NoRoles is present, allow access without role checks
-		if (noRolesRequired) {
-			return true;
-		}
-
-		// Proceed with role checks if @NoRoles is not present
 		const requiredRoles = this.reflector.getAllAndOverride<AdminRole[]>(ROLES_KEY, [
 			context.getHandler(),
 			context.getClass(),
 		]);
 
-		// Default guard behavior if no roles are specified
-		if (!requiredRoles) {
-			return super.canActivate(context) as Promise<boolean>;
+		const request = this.getRequest(context);
+		const user = request.user as JwtPayload;
+
+		if (!user) {
+			throw new UnauthorizedException("User not authenticated");
 		}
 
-		// Authenticate and authorize based on roles
-		const canActivate = (await super.canActivate(context)) as boolean;
-		if (!canActivate) return false;
+		if (requiredRoles) {
+			// Admin roles are required for this route
+			if (!user.adminRole) {
+				throw new UnauthorizedException("Admin authentication required");
+			}
 
-		const request = this.getRequest(context);
-		const { user } = request;
+			if (!requiredRoles.includes(user.adminRole)) {
+				throw new UnauthorizedException("User does not have the required admin role");
+			}
 
-		// Check if the user has one of the required roles
-		if (user && requiredRoles.includes(user.adminRole)) {
+			// Admin with the required role can access the route
 			return true;
 		}
 
-		// If the user is not an admin, check for regular user authentication
-		if (!user || !user.id) {
-			throw new UnauthorizedException("You must be authenticated as a user or an admin");
-		}
-
+		// If no roles are required, allow any authenticated user (admin or regular user)
 		return true;
 	}
 }
