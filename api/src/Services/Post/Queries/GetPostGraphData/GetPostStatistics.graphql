@@ -1,0 +1,6 @@
+query GetPostStatistics{
+	getPostsStatistics(filter: Month, year: 2024) {
+		period
+		count
+	}
+}

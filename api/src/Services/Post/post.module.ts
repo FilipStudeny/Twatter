@@ -13,7 +13,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { CreatePostCommandHandler } from "./Mutations/CreatePost/CreatePostCommand";
 import { GetPostDetailQueryHandler } from "./Queries/GetPostDetail/GetPostDetailQuery";
 import { GetPostGraphDataQueryHandler } from "./Queries/GetPostGraphData/GetPostGraphDataQuery";
-import GetPostsListQueryHandler from "./Queries/GetPostsList/GetPostsListQuery";
+import { GetPostsListQueryHandler } from "./Queries/GetPostsList/GetPostsListQuery";
 import PostsResolver from "./post.resolver";
 
 @Module({

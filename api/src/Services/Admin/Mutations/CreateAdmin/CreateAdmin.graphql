@@ -1,0 +1,5 @@
+mutation CreateAdmin($createAdmin: CreateAdminDto!) {
+	CreateAdmin(createAdminDto: $createAdmin) {
+		message
+	}
+}

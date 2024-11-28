@@ -1,0 +1,5 @@
+mutation CreateGroup($createGroupDto: CreateGroupDto!) {
+	createGroup(createGroupDto: $createGroupDto) {
+		message
+	}
+}

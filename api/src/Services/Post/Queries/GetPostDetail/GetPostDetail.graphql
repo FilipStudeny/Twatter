@@ -1,0 +1,30 @@
+query GetPostDetail($postId: String!) {
+	GetPostDetail(postId: $postId) {
+		id
+		content
+		creator {
+			id
+			email
+			likesCount
+			commentsCount
+		}
+		reactions {
+			like
+			dislike
+			smile
+			angry
+			sad
+			love
+		}
+		interest {
+			id
+			name
+			postsCount
+		}
+		group {
+			id
+			name
+			postsCount
+		}
+	}
+}

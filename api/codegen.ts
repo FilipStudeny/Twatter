@@ -5,7 +5,7 @@ const config: CodegenConfig = {
 	schema: "./schema.gql",
 	documents: "src/**/*.graphql",
 	generates: {
-		"./src/gql.ts": {
+		"../shared/gql.ts": {
 			plugins: ["typescript", "typescript-operations", "typescript-react-query"],
 			config: {
 				fetcher: "graphql-request",

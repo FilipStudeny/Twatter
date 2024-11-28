@@ -1,0 +1,6 @@
+mutation SignInAdmin($signIn: SignInCredentials!) {
+	SignInAdmin(signIn: $signIn) {
+		accessToken
+		refreshToken
+	}
+}

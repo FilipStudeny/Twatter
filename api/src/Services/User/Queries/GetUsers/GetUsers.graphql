@@ -1,0 +1,13 @@
+query GetUsers($page: Int = 1, $limit: Int = 10) {
+	getUsers(page: $page, limit: $limit) {
+		items {
+			id
+			email
+			firstName
+			lastName
+		}
+		total
+		page
+		limit
+	}
+}

@@ -1,0 +1,5 @@
+mutation PinComment($postId: String!, $commentId: String!) {
+	PinComment(postId: $postId, commentId: $commentId) {
+		message
+	}
+}

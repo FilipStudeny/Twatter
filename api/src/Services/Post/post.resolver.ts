@@ -5,8 +5,10 @@ import { CurrentUser } from "@Utils/JWT/CurrentUser";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
 import { UseGuards } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
-import { Args, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { RouterGuard, AdminOnly, PublicAdmin, NoRoles } from "src/Guards/RouteGuard.guard";
+import { Args, Info, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { GraphQLResolveInfo } from "graphql";
+import * as graphqlFields from "graphql-fields";
+import { RouterGuard, AdminOnly, PublicAdmin, NoRoles, Public } from "src/Guards/RouteGuard.guard";
 
 import { CreatePostDto } from "./Mutations/CreatePost/CreatePost.dto";
 import { CreatePostCommand } from "./Mutations/CreatePost/CreatePostCommand";
@@ -52,10 +54,15 @@ export default class PostsResolver {
 
 	@Query(() => PaginatedPostsListResponse)
 	@NoRoles()
+	@Public()
 	async getPosts(
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
 		@Args("limit", { type: () => Int, defaultValue: 10 }) limit: number,
+		@Info() info: GraphQLResolveInfo,
 	) {
-		return this.queryBus.execute(new GetPostsListQuery(page, limit));
+		// Extract requested fields
+		const fields = graphqlFields(info);
+		// Dispatch the query with requested fields
+		return this.queryBus.execute(new GetPostsListQuery(page, limit, fields.items));
 	}
 }

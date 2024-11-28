@@ -1,0 +1,9 @@
+{
+	"schema": "./schema.gql",
+	"documents": "./src/Services/**/*.graphql",
+	"extensions": {
+		"languageService": {
+			"useSchemaFileDefinitions": true
+		}
+	}
+}

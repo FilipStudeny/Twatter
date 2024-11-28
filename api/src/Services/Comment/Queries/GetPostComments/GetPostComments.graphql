@@ -1,0 +1,13 @@
+query GetPostComments($postId: String!, $page: Int!, $limit: Int!) {
+	GetPostComments(postId: $postId, page: $page, limit: $limit) {
+		items {
+			id
+			content
+			creatorName
+			createdAt
+		}
+		total
+		page
+		limit
+	}
+}

@@ -21,7 +21,7 @@ export default class CommentsResolver {
 	) {}
 
 	@Query(() => PaginatedCommentsResponse)
-	async GetComments(
+	async GetPostComments(
 		@Args("postId") postId: string,
 		@Args("page", { type: () => Int }) page: number,
 		@Args("limit", { type: () => Int }) limit: number,

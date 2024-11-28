@@ -1,4 +1,4 @@
-query GetPosts($page: Int = 1, $limit: Int = 10) {
+query GetPostsList($page: Int = 1, $limit: Int = 10) {
 	getPosts(page: $page, limit: $limit) {
 		items {
 			id
@@ -6,7 +6,7 @@ query GetPosts($page: Int = 1, $limit: Int = 10) {
 			creator {
 				id
 				username
-				postsCount
+
 			}
 			reactions {
 				like
@@ -17,6 +17,11 @@ query GetPosts($page: Int = 1, $limit: Int = 10) {
 				love
 			}
 			interest {
+				id
+				name
+			}
+			group {
+				id
 				name
 			}
 			commentsCount
@@ -29,7 +34,7 @@ query GetPosts($page: Int = 1, $limit: Int = 10) {
 }
 
 
-query GetPostsDetailsList($page: Int = 1, $limit: Int = 10) {
+query GetAdministrationPostsList($page: Int = 1, $limit: Int = 10) {
 	getPosts(page: $page, limit: $limit) {
 		items {
 			id
@@ -37,6 +42,8 @@ query GetPostsDetailsList($page: Int = 1, $limit: Int = 10) {
 			creator {
 				id
 				username
+				firstName
+				lastName
 			}
 			reactions {
 				like
@@ -47,14 +54,28 @@ query GetPostsDetailsList($page: Int = 1, $limit: Int = 10) {
 				love
 			}
 			interest {
+				id
 				name
 			}
 			group {
 				id
 				name
 			}
+			pinnedComment {
+				id
+				content
+				creator {
+					id
+					username
+					firstName
+					lastName
+				}
+			}
 			commentsCount
 			createdAt
+			updatedAt
+			reportsCount
+			strikesCount
 		}
 		total
 		page

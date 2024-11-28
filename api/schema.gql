@@ -129,7 +129,7 @@ type PaginatedUsersResponse {
 }
 
 type Query {
-  GetComments(postId: String!, page: Int!, limit: Int!): PaginatedCommentsResponse!
+  GetPostComments(postId: String!, page: Int!, limit: Int!): PaginatedCommentsResponse!
   GetPostDetail(postId: String!): PostDetail!
   getPostsStatistics(filter: GraphFilter!, year: Int, weekNumber: Int): [PostGraphDataDto!]!
   getPosts(page: Int! = 1, limit: Int! = 10): PaginatedPostsListResponse!

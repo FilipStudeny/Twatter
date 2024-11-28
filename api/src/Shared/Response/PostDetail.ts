@@ -66,7 +66,7 @@ export class PostDetail {
 	) {
 		this.id = id;
 		this.content = content;
-		this.creator = creator
+		this.creator = creator;
 		this.commentsCount = commentsCount;
 		this.reactions = reactions;
 		this.createdAt = createdAt;

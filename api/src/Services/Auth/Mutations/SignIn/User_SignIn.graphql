@@ -1,0 +1,6 @@
+mutation SignInUser($signInUser: SignInCredentials!) {
+	SignInUser(signInUser: $signInUser) {
+		accessToken
+		refreshToken
+	}
+}
