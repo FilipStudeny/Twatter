@@ -58,11 +58,10 @@ export default class PostsResolver {
 	async getPosts(
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
 		@Args("limit", { type: () => Int, defaultValue: 10 }) limit: number,
+		@Args("creatorId", { type: () => String, nullable: true }) creatorId: string,
 		@Info() info: GraphQLResolveInfo,
 	) {
-		// Extract requested fields
 		const fields = graphqlFields(info);
-		// Dispatch the query with requested fields
-		return this.queryBus.execute(new GetPostsListQuery(page, limit, fields.items));
+		return this.queryBus.execute(new GetPostsListQuery(page, limit, fields.items, creatorId));
 	}
 }

@@ -21,7 +21,6 @@ export default class EntityMapper extends AutomapperProfile {
 			CommentDto.createMap(mapper);
 			CreateAdminDto.createMap(mapper);
 			PostDetail.createMap(mapper);
-			
 		};
 	}
 }

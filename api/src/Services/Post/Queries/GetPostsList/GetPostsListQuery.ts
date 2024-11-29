@@ -15,6 +15,7 @@ export class GetPostsListQuery {
 		public readonly page: number,
 		public readonly limit: number,
 		public readonly requestedFields: PostDetail,
+		public readonly ownerId?: string,
 	) {}
 }
 
@@ -23,12 +24,16 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 	constructor(@InjectEntityManager() private readonly entityManager: EntityManager) {}
 
 	async execute(query: GetPostsListQuery): Promise<PaginatedPostsListResponse> {
-		const { page, limit, requestedFields } = query;
+		const { page, limit, requestedFields, ownerId } = query;
 		const skip = (page - 1) * limit;
 
 		const qb = this.entityManager.createQueryBuilder("post", "post");
 
 		qb.select(['post.id AS "post_id"']);
+
+		if (ownerId) {
+			qb.where("post.creatorId = :ownerId", { ownerId });
+		}
 
 		if (requestedFields.content) {
 			qb.addSelect('post.content AS "post_content"');
@@ -248,6 +253,7 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 		qb.offset(skip).limit(limit);
 
 		const postsWithCounts = await qb.getRawMany();
+		console.log(postsWithCounts);
 
 		// Extract total count from the first row (since it's the same for all)
 		const total = postsWithCounts.length > 0 ? parseInt(postsWithCounts[0].total_count, 10) : 0;
