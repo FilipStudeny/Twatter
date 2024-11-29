@@ -1,9 +1,7 @@
-import { CommentDetail } from "@Shared/Response/CommentDetail";
-import { GroupDetail } from "@Shared/Response/GroupDetail";
-import { InterestDetail } from "@Shared/Response/InterestDetail";
+import { DbResponse } from "@Shared/DbResponse";
 import { PostDetail } from "@Shared/Response/PostDetail";
-import { ReactionsCount } from "@Shared/Response/ReactionsCount";
-import UserDetail from "@Shared/Response/UserDetail";
+import { Mapper } from "@automapper/core";
+import { InjectMapper } from "@automapper/nestjs";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { EntityManager } from "typeorm";
@@ -21,7 +19,10 @@ export class GetPostsListQuery {
 
 @QueryHandler(GetPostsListQuery)
 export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery> {
-	constructor(@InjectEntityManager() private readonly entityManager: EntityManager) {}
+	constructor(
+		@InjectEntityManager() private readonly entityManager: EntityManager,
+		@InjectMapper() private readonly mapper: Mapper,
+	) {}
 
 	async execute(query: GetPostsListQuery): Promise<PaginatedPostsListResponse> {
 		const { page, limit, requestedFields, ownerId } = query;
@@ -252,134 +253,15 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 		qb.orderBy('post."createdAt"', "DESC");
 		qb.offset(skip).limit(limit);
 
-		const postsWithCounts = await qb.getRawMany();
+		const postsWithCounts: DbResponse[] = await qb.getRawMany();
 		console.log(postsWithCounts);
+		console.log(postsWithCounts.length)
 
 		// Extract total count from the first row (since it's the same for all)
 		const total = postsWithCounts.length > 0 ? parseInt(postsWithCounts[0].total_count, 10) : 0;
-
-		const postDetails = postsWithCounts.map((postWithCounts) => {
-			const postDetail = new PostDetail();
-
-			postDetail.id = postWithCounts.post_id;
-
-			if (requestedFields.content) {
-				postDetail.content = postWithCounts.post_content;
-			}
-
-			if (requestedFields.createdAt) {
-				postDetail.createdAt = postWithCounts.post_createdAt;
-			}
-
-			if (requestedFields.updatedAt) {
-				postDetail.updatedAt = postWithCounts.post_updatedAt;
-			}
-
-			if (requestedFields.isPinned) {
-				postDetail.isPinned = !!postWithCounts.post_pinnedCommentId;
-			}
-
-			if (requestedFields.creator) {
-				const creator = new UserDetail();
-				if (requestedFields.creator.id) {
-					creator.id = postWithCounts.creator_id;
-				}
-				if (requestedFields.creator.username) {
-					creator.username = postWithCounts.creator_username;
-				}
-				if (requestedFields.creator.firstName) {
-					creator.firstName = postWithCounts.creator_firstName;
-				}
-				if (requestedFields.creator.lastName) {
-					creator.lastName = postWithCounts.creator_lastName;
-				}
-				postDetail.creator = creator;
-			}
-
-			if (requestedFields.interest && postWithCounts.interest_id) {
-				const interest = new InterestDetail();
-				if (requestedFields.interest.id) {
-					interest.id = postWithCounts.interest_id;
-				}
-				if (requestedFields.interest.name) {
-					interest.name = postWithCounts.interest_name;
-				}
-				postDetail.interest = interest;
-			}
-
-			if (requestedFields.reactions) {
-				const reactionsCount = new ReactionsCount();
-				if (requestedFields.reactions.like) {
-					reactionsCount.like = parseInt(postWithCounts.like_count || "0", 10);
-				}
-				if (requestedFields.reactions.dislike) {
-					reactionsCount.dislike = parseInt(postWithCounts.dislike_count || "0", 10);
-				}
-				if (requestedFields.reactions.smile) {
-					reactionsCount.smile = parseInt(postWithCounts.smile_count || "0", 10);
-				}
-				if (requestedFields.reactions.angry) {
-					reactionsCount.angry = parseInt(postWithCounts.angry_count || "0", 10);
-				}
-				if (requestedFields.reactions.sad) {
-					reactionsCount.sad = parseInt(postWithCounts.sad_count || "0", 10);
-				}
-				if (requestedFields.reactions.love) {
-					reactionsCount.love = parseInt(postWithCounts.love_count || "0", 10);
-				}
-				postDetail.reactions = reactionsCount;
-			}
-
-			if (requestedFields.commentsCount) {
-				postDetail.commentsCount = parseInt(postWithCounts.comments_count || "0", 10);
-			}
-
-			if (requestedFields.group && postWithCounts.group_id) {
-				const group = new GroupDetail();
-				if (requestedFields.group.id) {
-					group.id = postWithCounts.group_id;
-				}
-				if (requestedFields.group.name) {
-					group.name = postWithCounts.group_name;
-				}
-				postDetail.group = group;
-			}
-
-			if (requestedFields.pinnedComment && postWithCounts.pinnedComment_id) {
-				const pinnedComment = new CommentDetail();
-				if (requestedFields.pinnedComment.id) {
-					pinnedComment.id = postWithCounts.pinnedComment_id;
-				}
-				if (requestedFields.pinnedComment.content) {
-					pinnedComment.content = postWithCounts.pinnedComment_content;
-				}
-
-				if (requestedFields.pinnedComment.creator) {
-					const pinnedCommentCreator = new UserDetail();
-					if (requestedFields.pinnedComment.creator.id) {
-						pinnedCommentCreator.id = postWithCounts.pinnedComment_creator_id;
-					}
-					if (requestedFields.pinnedComment.creator.username) {
-						pinnedCommentCreator.username =
-							postWithCounts.pinnedComment_creator_username;
-					}
-					pinnedComment.creator = pinnedCommentCreator;
-				}
-
-				postDetail.pinnedComment = pinnedComment;
-			}
-
-			if (requestedFields.reportsCount) {
-				postDetail.reportsCount = parseInt(postWithCounts.reports_count || "0", 10);
-			}
-
-			if (requestedFields.strikesCount) {
-				postDetail.strikesCount = parseInt(postWithCounts.strikes_count || "0", 10);
-			}
-
-			return postDetail;
-		});
-
-		return new PaginatedPostsListResponse(postDetails, total, page, limit);
+		const posts = postsWithCounts.map((postWithCounts) =>
+			this.mapper.map(postWithCounts, DbResponse, PostDetail),
+		);
+		return new PaginatedPostsListResponse(posts, total, page, limit);
 	}
 }

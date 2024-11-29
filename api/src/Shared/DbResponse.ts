@@ -3,11 +3,11 @@ export class DbResponse {
 
 	post_content: string;
 
-	post_createdAt: string;
+	post_createdAt: Date;
 
-	post_updatedAt: string;
+	post_updatedAt: Date;
 
-	post_pinnedCommentId: string | null;
+	post_pinnedCommentId: string;
 
 	creator_id: string;
 
@@ -21,6 +21,24 @@ export class DbResponse {
 
 	interest_name: string;
 
+	comments_count: string;
+
+	group_id: string | null;
+
+	group_name: string | null;
+
+	pinnedComment_id: string;
+
+	pinnedComment_creator_id: string;
+
+	pinnedComment_creator_username: string;
+
+	reports_count: string;
+
+	strikes_count: string;
+
+	total_count: string;
+
 	like_count: string;
 
 	dislike_count: string;
@@ -33,23 +51,5 @@ export class DbResponse {
 
 	love_count: string;
 
-	comments_count: string;
-
-	group_id: string | null;
-
-	group_name: string | null;
-
-	pinnedComment_id: string | null;
-
-	pinnedComment_content: string | null;
-
-	pinnedComment_creator_id: string | null;
-
-	pinnedComment_creator_username: string | null;
-
-	reports_count: string;
-
-	strikes_count: string;
-
-	total_count: string;
+	pinnedComment_content: string;
 }
