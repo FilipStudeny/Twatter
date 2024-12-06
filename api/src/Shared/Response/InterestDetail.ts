@@ -1,7 +1,6 @@
+import { DbResponse } from "@Shared/DbResponse";
+import { Mapper, createMap, forMember, mapFrom } from "@automapper/core";
 import { Field, ObjectType, Int } from "@nestjs/graphql";
-
-import { GroupDetail } from "./GroupDetail";
-import { PostDetail } from "./PostDetail";
 
 @ObjectType()
 export class InterestDetail {
@@ -17,9 +16,27 @@ export class InterestDetail {
 	@Field(() => Int, { nullable: true })
 	groupsCount: number;
 
-	@Field(() => [PostDetail], { nullable: true })
-	posts: PostDetail[];
-
-	@Field(() => [GroupDetail], { nullable: true })
-	groups: GroupDetail[];
+	static createMap(mapper: Mapper): void {
+		createMap(
+			mapper,
+			DbResponse,
+			InterestDetail,
+			forMember(
+				(destination) => destination.id,
+				mapFrom((source) => source.interest_id),
+			),
+			forMember(
+				(destination) => destination.name,
+				mapFrom((source) => source.interest_name),
+			),
+			forMember(
+				(destination) => destination.groupsCount,
+				mapFrom((source) => parseInt(source.groups_count || "0", 10)),
+			),
+			forMember(
+				(destination) => destination.postsCount,
+				mapFrom((source) => parseInt(source.posts_count || "0", 10)),
+			),
+		);
+	}
 }

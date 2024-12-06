@@ -1,13 +1,13 @@
 import GenericResponse from "@Shared/Response/GenericResponse";
-import UserDetail from "@Shared/Response/UserDetail";
 import { UseGuards } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
-import { Args, ID, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { NoRoles, Public, RouterGuard } from "src/Guards/RouteGuard.guard";
+import { Args, Info, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { GraphQLResolveInfo } from "graphql";
+import * as graphqlFields from "graphql-fields";
+import { Public, RouterGuard } from "src/Guards/RouteGuard.guard";
 
 import { CreateUserCommand } from "./Mutations/CreateUser/CreateUserCommand";
 import CreateUserDto from "./Mutations/CreateUser/CreateUserDto.dto";
-import { GetUserQuery } from "./Queries/GetUser/GetUserQuery";
 import { GetUsersQuery } from "./Queries/GetUsers/GetUsersQuery";
 import PaginatedUsersResponse from "./Queries/GetUsers/PaginatedUsersResponse.type";
 
@@ -25,24 +25,17 @@ export default class UserResolver {
 		return "Hello, World!";
 	}
 
-	@Public()
-	@Query(() => UserDetail, { name: "user" })
-	async getUser(
-		@Args("id", { type: () => ID, nullable: true }) id?: string,
-		@Args("username", { type: () => String, nullable: true }) username?: string,
-		@Args("firstName", { type: () => String, nullable: true }) firstName?: string,
-		@Args("lastName", { type: () => String, nullable: true }) lastName?: string,
-	): Promise<UserDetail> {
-		return this.queryBus.execute(new GetUserQuery(id, username, firstName, lastName));
-	}
-
 	@Query(() => PaginatedUsersResponse)
-	@NoRoles()
+	@Public()
 	async getUsers(
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
 		@Args("limit", { type: () => Int, defaultValue: 10 }) limit: number,
+		@Args("userId", { type: () => String, nullable: true }) userId: string,
+		@Args("groupId", { type: () => String, nullable: true }) groupId: string,
+		@Info() info: GraphQLResolveInfo,
 	) {
-		return this.queryBus.execute(new GetUsersQuery(page, limit));
+		const fields = graphqlFields(info);
+		return this.queryBus.execute(new GetUsersQuery(page, limit, fields.items, userId, groupId));
 	}
 
 	@Mutation(() => GenericResponse)

@@ -1,10 +1,51 @@
-query GetUsers($page: Int = 1, $limit: Int = 10) {
+query GetUsersList($page: Int = 1, $limit: Int = 10) {
 	getUsers(page: $page, limit: $limit) {
 		items {
 			id
 			email
 			firstName
 			lastName
+		}
+		total
+		page
+		limit
+	}
+}
+
+query GetUser($userId: String) {
+	getUsers(userId: $userId){
+		items{
+			id
+			username
+			firstName
+			lastName
+			email
+			friendsCount
+			createdAt
+			updatedAt
+			joinedGroupsCount
+			likesCount
+			commentsCount
+		}
+	}
+}
+
+query GetUsersWithAdministartionList($page: Int = 1, $limit: Int = 10) {
+	getUsers(page: $page, limit: $limit) {
+		items {
+			id
+			username
+			firstName
+			lastName
+			email
+			createdAt
+			updatedAt
+			banStrikesCount
+			filedReportsCount
+			banStrikesCount
+			receivedReportsCount
+			createdGroupsCount
+			moderatedGroupsCount
 		}
 		total
 		page

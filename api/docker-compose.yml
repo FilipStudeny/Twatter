@@ -23,6 +23,23 @@ services:
       - "8080:80"
     depends_on:
       - postgres
+      
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web interface to view emails
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379" # Default Redis port
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
 
 volumes:
   postgres_data:
+  redis_data:

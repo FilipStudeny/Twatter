@@ -1,4 +1,4 @@
-import { Post } from "@Models/Post";
+import { DbResponse } from "@Shared/DbResponse";
 import { ReactionsCount } from "@Shared/Response/ReactionsCount";
 import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
 import { Field, Int, ObjectType } from "@nestjs/graphql";
@@ -82,42 +82,114 @@ export class PostDetail {
 	static createMap(mapper: Mapper): void {
 		createMap(
 			mapper,
-			Post,
+			DbResponse,
 			PostDetail,
-			// Map standard fields
 			forMember(
 				(destination) => destination.id,
-				mapFrom((source) => source.id),
+				mapFrom((source) => source.post_id),
 			),
 			forMember(
 				(destination) => destination.content,
-				mapFrom((source) => source.content),
+				mapFrom((source) => source.post_content),
 			),
 			forMember(
 				(destination) => destination.createdAt,
-				mapFrom((source) => source.createdAt),
+				mapFrom((source) => source.post_createdAt),
 			),
 			forMember(
 				(destination) => destination.updatedAt,
-				mapFrom((source) => source.updatedAt),
+				mapFrom((source) => source.post_updatedAt),
 			),
 			forMember(
 				(destination) => destination.isPinned,
-				mapFrom((source) => !!source.pinnedComment),
+				mapFrom((source) => !!source.post_pinnedCommentId),
 			),
 
-			// Map counts, handling possible undefined arrays
+			// Map creator
+			forMember(
+				(destination) => destination.creator,
+				mapFrom(
+					(source) =>
+						({
+							id: source.creator_id,
+							username: source.creator_username,
+							firstName: source.creator_firstName,
+							lastName: source.creator_lastName,
+						}) as UserDetail,
+				),
+			),
+
+			// Map interest
+			forMember(
+				(destination) => destination.interest,
+				mapFrom((source) =>
+					source.interest_id
+						? ({
+								id: source.interest_id,
+								name: source.interest_name,
+							} as InterestDetail)
+						: undefined,
+				),
+			),
+
+			// Map reactions
+			forMember(
+				(destination) => destination.reactions,
+				mapFrom(
+					(source) =>
+						({
+							like: parseInt(source.like_count || "0", 10),
+							dislike: parseInt(source.dislike_count || "0", 10),
+							smile: parseInt(source.smile_count || "0", 10),
+							angry: parseInt(source.angry_count || "0", 10),
+							sad: parseInt(source.sad_count || "0", 10),
+							love: parseInt(source.love_count || "0", 10),
+						}) as ReactionsCount,
+				),
+			),
+
+			// Map pinned comment
+			forMember(
+				(destination) => destination.pinnedComment,
+				mapFrom((source) =>
+					source.pinnedComment_id
+						? ({
+								id: source.pinnedComment_id,
+								content: source.pinnedComment_content,
+								creator: {
+									id: source.pinnedComment_creator_id,
+									username: source.pinnedComment_creator_username,
+								} as UserDetail,
+							} as CommentDetail)
+						: undefined,
+				),
+			),
+
+			// Map group
+			forMember(
+				(destination) => destination.group,
+				mapFrom((source) =>
+					source.group_id
+						? ({
+								id: source.group_id,
+								name: source.group_name,
+							} as GroupDetail)
+						: undefined,
+				),
+			),
+
+			// Map counts
 			forMember(
 				(destination) => destination.commentsCount,
-				mapFrom((source) => source.comments?.length ?? 0),
+				mapFrom((source) => parseInt(source.comments_count || "0", 10)),
 			),
 			forMember(
 				(destination) => destination.reportsCount,
-				mapFrom((source) => source.reports?.length ?? 0),
+				mapFrom((source) => parseInt(source.reports_count || "0", 10)),
 			),
 			forMember(
 				(destination) => destination.strikesCount,
-				mapFrom((source) => source.strikes?.length ?? 0),
+				mapFrom((source) => parseInt(source.strikes_count || "0", 10)),
 			),
 		);
 	}

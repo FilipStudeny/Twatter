@@ -1,6 +1,8 @@
 export class DbResponse {
 	post_id: string;
 
+	comment_id: string;
+
 	post_content: string;
 
 	post_createdAt: Date;
@@ -52,4 +54,46 @@ export class DbResponse {
 	love_count: string;
 
 	pinnedComment_content: string;
+
+	user_id: string;
+
+	user_email: string;
+
+	user_firstName: string;
+
+	user_lastName: string;
+
+	user_username: string;
+
+	posts_count: string;
+
+	likes_count: string;
+
+	joinedGroups_count: string;
+
+	banStrikes_count: string;
+
+	sentNotifications_count: string;
+
+	filedReports_count: string;
+
+	receivedReports_count: string;
+
+	friends_count: string;
+
+	moderatedGroups_count: string;
+
+	createdGroups_count: string;
+
+	user_updatedAt: Date;
+
+	user_createdAt: Date;
+
+	comment_content: string;
+
+	comment_updatedAt: Date;
+
+	comment_createdAt: Date;
+
+	groups_count: string;
 }

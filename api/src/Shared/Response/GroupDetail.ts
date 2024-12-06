@@ -1,7 +1,6 @@
 import { Field, ObjectType, Int } from "@nestjs/graphql";
 
 import { InterestDetail } from "./InterestDetail";
-import { PostDetail } from "./PostDetail";
 import UserDetail from "./UserDetail";
 
 @ObjectType()
@@ -26,9 +25,6 @@ export class GroupDetail {
 
 	@Field(() => Int)
 	membersCount: number;
-
-	@Field(() => [PostDetail])
-	posts: PostDetail[];
 
 	@Field(() => Int)
 	postsCount: number;

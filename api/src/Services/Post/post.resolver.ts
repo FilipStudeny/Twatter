@@ -1,6 +1,5 @@
 import AdminRole from "@Models/Enums/AdminRole";
 import GenericResponse from "@Shared/Response/GenericResponse";
-import { PostDetail } from "@Shared/Response/PostDetail";
 import { CurrentUser } from "@Utils/JWT/CurrentUser";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
 import { UseGuards } from "@nestjs/common";
@@ -8,11 +7,10 @@ import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { Args, Info, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { GraphQLResolveInfo } from "graphql";
 import * as graphqlFields from "graphql-fields";
-import { RouterGuard, AdminOnly, PublicAdmin, NoRoles, Public } from "src/Guards/RouteGuard.guard";
+import { RouterGuard, AdminOnly, NoRoles, Public } from "src/Guards/RouteGuard.guard";
 
 import { CreatePostDto } from "./Mutations/CreatePost/CreatePost.dto";
 import { CreatePostCommand } from "./Mutations/CreatePost/CreatePostCommand";
-import { GetPostDetailQuery } from "./Queries/GetPostDetail/GetPostDetailQuery";
 import { GetPostGraphDataQuery, GraphFilter } from "./Queries/GetPostGraphData/GetPostGraphDataQuery";
 import { PostGraphDataDto } from "./Queries/GetPostGraphData/PostGraphData.dto";
 import { GetPostsListQuery } from "./Queries/GetPostsList/GetPostsListQuery";
@@ -25,12 +23,6 @@ export default class PostsResolver {
 		private readonly commandBus: CommandBus,
 		private readonly queryBus: QueryBus,
 	) {}
-
-	@Query(() => PostDetail)
-	@PublicAdmin()
-	async GetPostDetail(@Args("postId") postId: string): Promise<PostDetail> {
-		return this.queryBus.execute(new GetPostDetailQuery(postId));
-	}
 
 	@Mutation(() => GenericResponse)
 	@AdminOnly(AdminRole.ADMINISTRATOR) // Restrict to ADMINISTRATOR role only
@@ -56,12 +48,18 @@ export default class PostsResolver {
 	@NoRoles()
 	@Public()
 	async getPosts(
-		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
-		@Args("limit", { type: () => Int, defaultValue: 10 }) limit: number,
+		@Args("page", { type: () => Int }) page: number,
+		@Args("limit", { type: () => Int }) limit: number,
 		@Args("creatorId", { type: () => String, nullable: true }) creatorId: string,
+		@Args("postId", { type: () => String, nullable: true }) postId: string,
+		@Args("interestId", { type: () => String, nullable: true }) interestId: string,
+		@Args("groupId", { type: () => String, nullable: true }) groupId: string,
+
 		@Info() info: GraphQLResolveInfo,
 	) {
 		const fields = graphqlFields(info);
-		return this.queryBus.execute(new GetPostsListQuery(page, limit, fields.items, creatorId));
+		return this.queryBus.execute(
+			new GetPostsListQuery(page, limit, fields.items, creatorId, postId, interestId, groupId),
+		);
 	}
 }

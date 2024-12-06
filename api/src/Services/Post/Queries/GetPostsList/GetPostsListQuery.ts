@@ -13,7 +13,11 @@ export class GetPostsListQuery {
 		public readonly page: number,
 		public readonly limit: number,
 		public readonly requestedFields: PostDetail,
-		public readonly ownerId?: string,
+
+		public readonly creatorId?: string,
+		public readonly postId?: string,
+		public readonly interestId?: string,
+		public readonly groupId?: string,
 	) {}
 }
 
@@ -25,15 +29,28 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 	) {}
 
 	async execute(query: GetPostsListQuery): Promise<PaginatedPostsListResponse> {
-		const { page, limit, requestedFields, ownerId } = query;
+		const { page, limit, requestedFields, creatorId, groupId, interestId, postId } = query;
 		const skip = (page - 1) * limit;
 
 		const qb = this.entityManager.createQueryBuilder("post", "post");
 
+		console.log(requestedFields)
 		qb.select(['post.id AS "post_id"']);
 
-		if (ownerId) {
-			qb.where("post.creatorId = :ownerId", { ownerId });
+		if (postId) {
+			qb.where("post.id = :postId", { postId });
+		} else {
+			if (creatorId) {
+				qb.andWhere("post.creatorId = :creatorId", { creatorId });
+			}
+
+			if (interestId) {
+				qb.andWhere("post.interestId = :interestId", { interestId });
+			}
+
+			if (groupId) {
+				qb.andWhere("post.groupId = :groupId", { groupId });
+			}
 		}
 
 		if (requestedFields.content) {
@@ -254,10 +271,7 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 		qb.offset(skip).limit(limit);
 
 		const postsWithCounts: DbResponse[] = await qb.getRawMany();
-		console.log(postsWithCounts);
-		console.log(postsWithCounts.length)
 
-		// Extract total count from the first row (since it's the same for all)
 		const total = postsWithCounts.length > 0 ? parseInt(postsWithCounts[0].total_count, 10) : 0;
 		const posts = postsWithCounts.map((postWithCounts) =>
 			this.mapper.map(postWithCounts, DbResponse, PostDetail),

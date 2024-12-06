@@ -11,7 +11,6 @@ import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { CreatePostCommandHandler } from "./Mutations/CreatePost/CreatePostCommand";
-import { GetPostDetailQueryHandler } from "./Queries/GetPostDetail/GetPostDetailQuery";
 import { GetPostGraphDataQueryHandler } from "./Queries/GetPostGraphData/GetPostGraphDataQuery";
 import { GetPostsListQueryHandler } from "./Queries/GetPostsList/GetPostsListQuery";
 import PostsResolver from "./post.resolver";
@@ -33,12 +32,6 @@ import PostsResolver from "./post.resolver";
 		}),
 		TypeOrmModule.forFeature([User, Interest, Group, Post, Reaction]),
 	],
-	providers: [
-		PostsResolver,
-		CreatePostCommandHandler,
-		GetPostDetailQueryHandler,
-		GetPostGraphDataQueryHandler,
-		GetPostsListQueryHandler,
-	],
+	providers: [PostsResolver, CreatePostCommandHandler, GetPostGraphDataQueryHandler, GetPostsListQueryHandler],
 })
 export class PostModule {}

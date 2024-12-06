@@ -8,7 +8,6 @@ import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { CreateUserCommandHandler } from "./Mutations/CreateUser/CreateUserCommand";
-import { GetUserQueryHandler } from "./Queries/GetUser/GetUserQuery";
 import GetUsersQueryHandler from "./Queries/GetUsers/GetUsersQuery";
 import UserResolver from "./user.resolver";
 
@@ -29,6 +28,6 @@ import UserResolver from "./user.resolver";
 		}),
 		TypeOrmModule.forFeature([User, Password]),
 	],
-	providers: [UserResolver, CreateUserCommandHandler, GetUsersQueryHandler, GetUserQueryHandler],
+	providers: [UserResolver, CreateUserCommandHandler, GetUsersQueryHandler],
 })
 export class UserModule {}

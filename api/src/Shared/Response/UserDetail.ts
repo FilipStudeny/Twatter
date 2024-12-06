@@ -1,125 +1,145 @@
-import { User } from "@Models/User";
+import { DbResponse } from "@Shared/DbResponse";
 import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
-import { Field, ObjectType, Int } from "@nestjs/graphql";
+import { Field, ObjectType } from "@nestjs/graphql";
 
 @ObjectType()
 export default class UserDetail {
-	@Field(() => String, { nullable: true })
-	id?: string;
+	@Field()
+	id: string;
 
-	@Field(() => String, { nullable: true })
-	email?: string;
+	@Field()
+	email: string;
 
-	@Field(() => String, { nullable: true })
-	firstName?: string;
+	@Field()
+	firstName: string;
 
-	@Field(() => String, { nullable: true })
-	lastName?: string;
+	@Field()
+	lastName: string;
 
-	@Field(() => String, { nullable: true })
-	username?: string;
+	@Field()
+	username: string;
 
-	@Field(() => Int, { nullable: true })
-	postsCount?: number;
+	@Field()
+	postsCount: number;
 
-	@Field(() => Int, { nullable: true })
-	commentsCount?: number;
+	@Field()
+	commentsCount: number;
 
-	@Field(() => Int, { nullable: true })
-	likesCount?: number;
+	@Field()
+	likesCount: number;
 
-	@Field(() => Int, { nullable: true })
-	joinedGroupsCount?: number;
+	@Field()
+	joinedGroupsCount: number;
 
-	@Field(() => Int, { nullable: true })
-	banStrikesCount?: number;
+	@Field()
+	banStrikesCount: number;
 
-	@Field(() => Int, { nullable: true })
-	sentNotificationsCount?: number;
+	@Field()
+	sentNotificationsCount: number;
 
-	@Field(() => Int, { nullable: true })
-	filedReportsCount?: number;
+	@Field()
+	filedReportsCount: number;
 
-	@Field(() => Int, { nullable: true })
-	receivedReportsCount?: number;
+	@Field()
+	receivedReportsCount: number;
 
-	@Field(() => Int, { nullable: true })
-	friendsCount?: number;
+	@Field()
+	friendsCount: number;
 
-	@Field(() => Int, { nullable: true })
-	moderatedGroupsCount?: number;
+	@Field()
+	moderatedGroupsCount: number;
 
-	@Field(() => Int, { nullable: true })
-	createdGroupsCount?: number;
+	@Field()
+	createdGroupsCount: number;
+
+	@Field()
+	createdAt: Date;
+
+	@Field()
+	updatedAt: Date;
 
 	static createMap(mapper: Mapper): void {
 		createMap(
 			mapper,
-			User,
+			DbResponse,
 			UserDetail,
 			forMember(
-				(dto) => dto.id,
-				mapFrom((entity) => entity.id),
+				(destination) => destination.id,
+				mapFrom((source) => source.user_id),
 			),
 			forMember(
-				(dto) => dto.email,
-				mapFrom((entity) => entity.email),
+				(destionation) => destionation.email,
+				mapFrom((source) => source.user_email),
 			),
 			forMember(
-				(dto) => dto.firstName,
-				mapFrom((entity) => entity.firstName),
+				(destination) => destination.firstName,
+				mapFrom((source) => source.user_firstName),
 			),
 			forMember(
-				(dto) => dto.lastName,
-				mapFrom((entity) => entity.lastName),
+				(destination) => destination.lastName,
+				mapFrom((source) => source.user_lastName),
 			),
 			forMember(
-				(dto) => dto.username,
-				mapFrom((entity) => entity.username),
+				(destionation) => destionation.username,
+				mapFrom((source) => source.user_username),
 			),
+
 			forMember(
-				(dto) => dto.postsCount,
-				mapFrom((entity) => entity.posts.length),
+				(destionation) => destionation.postsCount,
+				mapFrom((source) => parseInt(source.posts_count, 10)),
 			),
+
 			forMember(
-				(dto) => dto.commentsCount,
-				mapFrom((entity) => entity.comments.length),
+				(destionation) => destionation.commentsCount,
+				mapFrom((source) => parseInt(source.comments_count, 10)),
 			),
+
 			forMember(
-				(dto) => dto.likesCount,
-				mapFrom((entity) => entity.reactions.filter((r) => r.type === "like").length),
+				(destionation) => destionation.joinedGroupsCount,
+				mapFrom((source) => parseInt(source.joinedGroups_count, 10)),
 			),
+
 			forMember(
-				(dto) => dto.joinedGroupsCount,
-				mapFrom((entity) => entity.groups.length),
+				(destionation) => destionation.banStrikesCount,
+				mapFrom((source) => parseInt(source.banStrikes_count, 10)),
 			),
+
 			forMember(
-				(dto) => dto.banStrikesCount,
-				mapFrom((entity) => entity.banStrikes.length),
+				(destionation) => destionation.sentNotificationsCount,
+				mapFrom((source) => parseInt(source.sentNotifications_count, 10)),
 			),
-			forMember(
-				(dto) => dto.sentNotificationsCount,
-				mapFrom((entity) => entity.sentNotifications.length),
-			),
+
 			forMember(
 				(dto) => dto.filedReportsCount,
-				mapFrom((entity) => entity.reportsFiled.length),
+				mapFrom((entity) => parseInt(entity.filedReports_count, 10)),
+			),
+
+			forMember(
+				(destionation) => destionation.receivedReportsCount,
+				mapFrom((source) => parseInt(source.receivedReports_count, 10)),
+			),
+
+			forMember(
+				(destionation) => destionation.friendsCount,
+				mapFrom((source) => parseInt(source.friends_count, 10)),
+			),
+
+			forMember(
+				(destionation) => destionation.moderatedGroupsCount,
+				mapFrom((source) => parseInt(source.moderatedGroups_count, 10)),
+			),
+
+			forMember(
+				(destionation) => destionation.createdGroupsCount,
+				mapFrom((source) => parseInt(source.createdGroups_count, 10)),
 			),
 			forMember(
-				(dto) => dto.receivedReportsCount,
-				mapFrom((entity) => entity.reportsAgainst.length),
+				(destination) => destination.updatedAt,
+				mapFrom((source) => source.user_updatedAt),
 			),
 			forMember(
-				(dto) => dto.friendsCount,
-				mapFrom((entity) => entity.friends.length),
-			),
-			forMember(
-				(dto) => dto.moderatedGroupsCount,
-				mapFrom((entity) => entity.moderatedGroups.length),
-			),
-			forMember(
-				(dto) => dto.createdGroupsCount,
-				mapFrom((entity) => entity.createdGroups.length),
+				(destination) => destination.createdAt,
+				mapFrom((source) => source.user_createdAt),
 			),
 		);
 	}

@@ -12,7 +12,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { CreateCommentCommandHandler } from "./Mutations/CreateComment/CreateCommentCommand";
 import { PinCommentCommandHandler } from "./Mutations/PinComment/PinCommentCommand";
-import GetPostCommentsQueryHandler from "./Queries/GetPostComments/GetPostCommentsQuery";
+import { GetCommentsListQueryHandler } from "./Queries/GetCommentsList/GetCommentsListQuery";
 import CommentsResolver from "./comment.resolver";
 
 @Module({
@@ -20,8 +20,8 @@ import CommentsResolver from "./comment.resolver";
 	providers: [
 		CommentsResolver,
 		CreateCommentCommandHandler,
-		GetPostCommentsQueryHandler,
 		PinCommentCommandHandler,
+		GetCommentsListQueryHandler,
 	],
 })
 export class CommentModule {}

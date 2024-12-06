@@ -1,3 +1,4 @@
+import { RedisModule } from "./Services/redis.module";
 import { AdminNotification } from "@Models/Administration/AdministrationNotification";
 import { Administrator } from "@Models/Administration/Administrator";
 import { BanStrike } from "@Models/Administration/BanStrike";
@@ -25,13 +26,18 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AdminModule } from "./Services/Admin/admin.module";
 import { AuthModule } from "./Services/Auth/auth.module";
 import { CommentModule } from "./Services/Comment/comment.module";
+import { EmailModule } from "./Services/Email/email.module";
 import { GroupModule } from "./Services/Group/group.module";
+import { InterestModule } from "./Services/Interest/interest.module";
 import { PostModule } from "./Services/Post/post.module";
 import { ReactionModule } from "./Services/Reaction/reaction.module";
 import { UserModule } from "./Services/User/user.module";
 
 @Module({
 	imports: [
+		RedisModule,
+		EmailModule,
+		InterestModule,
 		AdminModule,
 		GroupModule,
 		ReactionModule,
@@ -74,6 +80,8 @@ import { UserModule } from "./Services/User/user.module";
 		AutomapperModule.forRoot({
 			strategyInitializer: classes(),
 		}),
+
+		// Redis Module
 
 		// GRAPHQL
 		GraphQLModule.forRoot<ApolloDriverConfig>({
