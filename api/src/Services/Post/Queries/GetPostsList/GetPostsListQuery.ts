@@ -34,7 +34,6 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 
 		const qb = this.entityManager.createQueryBuilder("post", "post");
 
-		console.log(requestedFields)
 		qb.select(['post.id AS "post_id"']);
 
 		if (postId) {

@@ -17,6 +17,7 @@ export class GetUsersQuery {
 		public readonly requestedFields: UserDetail,
 		public readonly userId?: string,
 		public readonly groupId?: string,
+		public readonly getAll?: boolean,
 	) {}
 }
 
@@ -28,7 +29,7 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 	) {}
 
 	async execute(query: GetUsersQuery): Promise<PaginatedUsersResponse> {
-		const { page, limit, requestedFields, userId, groupId } = query;
+		const { page, limit, requestedFields, userId, groupId, getAll } = query;
 		const skip = (page - 1) * limit;
 
 		const qb = this.entityManager.createQueryBuilder(User, "user");
@@ -137,7 +138,10 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 
 		qb.groupBy(groupByFields.join(", "));
 		qb.orderBy("user.username", "ASC");
-		qb.offset(skip).limit(limit);
+
+		if (!getAll) {
+			qb.offset(skip).limit(limit);
+		}
 
 		const usersWithCounts: DbResponse[] = await qb.getRawMany();
 		const total = usersWithCounts.length > 0 ? parseInt(usersWithCounts[0].total_count, 10) : 0;

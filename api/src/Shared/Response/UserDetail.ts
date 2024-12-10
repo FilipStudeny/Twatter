@@ -16,7 +16,7 @@ export default class UserDetail {
 	@Field()
 	lastName: string;
 
-	@Field()
+	@Field({ nullable: true })
 	username: string;
 
 	@Field()

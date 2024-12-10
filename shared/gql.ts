@@ -45,18 +45,10 @@ export type CommentDetail = {
   id: Scalars['String']['output'];
   postId: Scalars['String']['output'];
   reactions: ReactionsCount;
-  reactionsCount: Scalars['Int']['output'];
-  reportsCount: Scalars['Int']['output'];
-  strikesCount: Scalars['Int']['output'];
+  reactionsCount: Scalars['Float']['output'];
+  reportsCount: Scalars['Float']['output'];
+  strikesCount: Scalars['Float']['output'];
   updatedAt: Scalars['DateTime']['output'];
-};
-
-export type CommentDto = {
-  __typename?: 'CommentDto';
-  content: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  creatorName: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
 };
 
 export type CreateAdminDto = {
@@ -87,14 +79,6 @@ export type CreatePostDto = {
   interestId?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type CreateUserDto = {
-  email: Scalars['String']['input'];
-  firstName: Scalars['String']['input'];
-  lastName: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-  repeatPassword: Scalars['String']['input'];
-};
-
 export type GenericResponse = {
   __typename?: 'GenericResponse';
   message?: Maybe<Scalars['String']['output']>;
@@ -115,18 +99,15 @@ export type GroupDetail = {
   moderators: Array<UserDetail>;
   name: Scalars['String']['output'];
   owner: UserDetail;
-  posts: Array<PostDetail>;
   postsCount: Scalars['Int']['output'];
   users: Array<UserDetail>;
 };
 
 export type InterestDetail = {
   __typename?: 'InterestDetail';
-  groups?: Maybe<Array<GroupDetail>>;
   groupsCount?: Maybe<Scalars['Int']['output']>;
   id?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  posts?: Maybe<Array<PostDetail>>;
   postsCount?: Maybe<Scalars['Int']['output']>;
 };
 
@@ -136,13 +117,15 @@ export type Mutation = {
   CreateAdmin: GenericResponse;
   CreateComment: GenericResponse;
   CreatePost: GenericResponse;
-  CreateUser: GenericResponse;
   PinComment: GenericResponse;
   SignInAdmin: SignInResponse;
   SignInUser: SignInResponse;
+  SignOutUser: GenericResponse;
+  SignUpUser: GenericResponse;
   createGroup: GenericResponse;
-  logout: GenericResponse;
+  forgotPassword: GenericResponse;
   refreshToken: SignInResponse;
+  resetPassword: GenericResponse;
 };
 
 
@@ -167,11 +150,6 @@ export type MutationCreatePostArgs = {
 };
 
 
-export type MutationCreateUserArgs = {
-  createUser: CreateUserDto;
-};
-
-
 export type MutationPinCommentArgs = {
   commentId: Scalars['String']['input'];
   postId: Scalars['String']['input'];
@@ -188,13 +166,23 @@ export type MutationSignInUserArgs = {
 };
 
 
+export type MutationSignOutUserArgs = {
+  userId: Scalars['String']['input'];
+};
+
+
+export type MutationSignUpUserArgs = {
+  signUp: SignUpUserData;
+};
+
+
 export type MutationCreateGroupArgs = {
   createGroupDto: CreateGroupDto;
 };
 
 
-export type MutationLogoutArgs = {
-  userId: Scalars['String']['input'];
+export type MutationForgotPasswordArgs = {
+  email: Scalars['String']['input'];
 };
 
 
@@ -202,9 +190,22 @@ export type MutationRefreshTokenArgs = {
   refreshToken: Scalars['String']['input'];
 };
 
-export type PaginatedCommentsResponse = {
-  __typename?: 'PaginatedCommentsResponse';
-  items?: Maybe<Array<CommentDto>>;
+
+export type MutationResetPasswordArgs = {
+  resetPassword: ResetPasswordInput;
+};
+
+export type PaginatedCommentsListResponse = {
+  __typename?: 'PaginatedCommentsListResponse';
+  items?: Maybe<Array<CommentDetail>>;
+  limit?: Maybe<Scalars['Int']['output']>;
+  page?: Maybe<Scalars['Int']['output']>;
+  total?: Maybe<Scalars['Int']['output']>;
+};
+
+export type PaginatedInterestsListResponse = {
+  __typename?: 'PaginatedInterestsListResponse';
+  items?: Maybe<Array<InterestDetail>>;
   limit?: Maybe<Scalars['Int']['output']>;
   page?: Maybe<Scalars['Int']['output']>;
   total?: Maybe<Scalars['Int']['output']>;
@@ -251,31 +252,38 @@ export type PostGraphDataDto = {
 
 export type Query = {
   __typename?: 'Query';
-  GetPostComments: PaginatedCommentsResponse;
-  GetPostDetail: PostDetail;
+  getCommentsList: PaginatedCommentsListResponse;
+  getInterests: PaginatedInterestsListResponse;
   getPosts: PaginatedPostsListResponse;
   getPostsStatistics: Array<PostGraphDataDto>;
   getUsers: PaginatedUsersResponse;
   hello: Scalars['String']['output'];
-  user: UserDetail;
 };
 
 
-export type QueryGetPostCommentsArgs = {
+export type QueryGetCommentsListArgs = {
+  creatorId?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   limit: Scalars['Int']['input'];
   page: Scalars['Int']['input'];
-  postId: Scalars['String']['input'];
+  postId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type QueryGetPostDetailArgs = {
-  postId: Scalars['String']['input'];
+export type QueryGetInterestsArgs = {
+  interestId?: InputMaybe<Scalars['String']['input']>;
+  limit?: Scalars['Int']['input'];
+  page?: Scalars['Int']['input'];
 };
 
 
 export type QueryGetPostsArgs = {
-  limit?: Scalars['Int']['input'];
-  page?: Scalars['Int']['input'];
+  creatorId?: InputMaybe<Scalars['String']['input']>;
+  groupId?: InputMaybe<Scalars['String']['input']>;
+  interestId?: InputMaybe<Scalars['String']['input']>;
+  limit: Scalars['Int']['input'];
+  page: Scalars['Int']['input'];
+  postId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -287,16 +295,11 @@ export type QueryGetPostsStatisticsArgs = {
 
 
 export type QueryGetUsersArgs = {
+  getAll?: InputMaybe<Scalars['Boolean']['input']>;
+  groupId?: InputMaybe<Scalars['String']['input']>;
   limit?: Scalars['Int']['input'];
   page?: Scalars['Int']['input'];
-};
-
-
-export type QueryUserArgs = {
-  firstName?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  lastName?: InputMaybe<Scalars['String']['input']>;
-  username?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Target type for the reaction, either POST or COMMENT */
@@ -325,6 +328,13 @@ export type ReactionsCount = {
   smile: Scalars['Int']['output'];
 };
 
+export type ResetPasswordInput = {
+  email: Scalars['String']['input'];
+  newPassword: Scalars['String']['input'];
+  repeatPassword: Scalars['String']['input'];
+  token: Scalars['String']['input'];
+};
+
 export type SignInCredentials = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
@@ -337,23 +347,33 @@ export type SignInResponse = {
   refreshToken: Scalars['String']['output'];
 };
 
+export type SignUpUserData = {
+  email: Scalars['String']['input'];
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  repeatPassword: Scalars['String']['input'];
+};
+
 export type UserDetail = {
   __typename?: 'UserDetail';
-  banStrikesCount?: Maybe<Scalars['Int']['output']>;
-  commentsCount?: Maybe<Scalars['Int']['output']>;
-  createdGroupsCount?: Maybe<Scalars['Int']['output']>;
-  email?: Maybe<Scalars['String']['output']>;
-  filedReportsCount?: Maybe<Scalars['Int']['output']>;
-  firstName?: Maybe<Scalars['String']['output']>;
-  friendsCount?: Maybe<Scalars['Int']['output']>;
-  id?: Maybe<Scalars['String']['output']>;
-  joinedGroupsCount?: Maybe<Scalars['Int']['output']>;
-  lastName?: Maybe<Scalars['String']['output']>;
-  likesCount?: Maybe<Scalars['Int']['output']>;
-  moderatedGroupsCount?: Maybe<Scalars['Int']['output']>;
-  postsCount?: Maybe<Scalars['Int']['output']>;
-  receivedReportsCount?: Maybe<Scalars['Int']['output']>;
-  sentNotificationsCount?: Maybe<Scalars['Int']['output']>;
+  banStrikesCount: Scalars['Float']['output'];
+  commentsCount: Scalars['Float']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdGroupsCount: Scalars['Float']['output'];
+  email: Scalars['String']['output'];
+  filedReportsCount: Scalars['Float']['output'];
+  firstName: Scalars['String']['output'];
+  friendsCount: Scalars['Float']['output'];
+  id: Scalars['String']['output'];
+  joinedGroupsCount: Scalars['Float']['output'];
+  lastName: Scalars['String']['output'];
+  likesCount: Scalars['Float']['output'];
+  moderatedGroupsCount: Scalars['Float']['output'];
+  postsCount: Scalars['Float']['output'];
+  receivedReportsCount: Scalars['Float']['output'];
+  sentNotificationsCount: Scalars['Float']['output'];
+  updatedAt: Scalars['DateTime']['output'];
   username?: Maybe<Scalars['String']['output']>;
 };
 
@@ -378,13 +398,6 @@ export type RefreshTokenMutationVariables = Exact<{
 
 export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'SignInResponse', accessToken: string, refreshToken: string } };
 
-export type SignInUserMutationVariables = Exact<{
-  signInUser: SignInCredentials;
-}>;
-
-
-export type SignInUserMutation = { __typename?: 'Mutation', SignInUser: { __typename?: 'SignInResponse', accessToken: string, refreshToken: string } };
-
 export type CreateCommentMutationVariables = Exact<{
   createComment: CreateCommentDto;
   postId: Scalars['String']['input'];
@@ -401,15 +414,6 @@ export type PinCommentMutationVariables = Exact<{
 
 export type PinCommentMutation = { __typename?: 'Mutation', PinComment: { __typename?: 'GenericResponse', message?: string | null } };
 
-export type GetPostCommentsQueryVariables = Exact<{
-  postId: Scalars['String']['input'];
-  page: Scalars['Int']['input'];
-  limit: Scalars['Int']['input'];
-}>;
-
-
-export type GetPostCommentsQuery = { __typename?: 'Query', GetPostComments: { __typename?: 'PaginatedCommentsResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'CommentDto', id: string, content: string, creatorName: string, createdAt: any }> | null } };
-
 export type CreateGroupMutationVariables = Exact<{
   createGroupDto: CreateGroupDto;
 }>;
@@ -424,65 +428,26 @@ export type CreatePostMutationVariables = Exact<{
 
 export type CreatePostMutation = { __typename?: 'Mutation', CreatePost: { __typename?: 'GenericResponse', message?: string | null } };
 
-export type GetPostDetailQueryVariables = Exact<{
-  postId: Scalars['String']['input'];
-}>;
-
-
-export type GetPostDetailQuery = { __typename?: 'Query', GetPostDetail: { __typename?: 'PostDetail', id: string, content: string, creator: { __typename?: 'UserDetail', id?: string | null, email?: string | null, likesCount?: number | null, commentsCount?: number | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null, postsCount?: number | null } | null, group?: { __typename?: 'GroupDetail', id: string, name: string, postsCount: number } | null } };
-
 export type GetPostStatisticsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetPostStatisticsQuery = { __typename?: 'Query', getPostsStatistics: Array<{ __typename?: 'PostGraphDataDto', period: string, count: number }> };
 
-export type GetPostsQueryVariables = Exact<{
+export type GetPostsListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type GetPostsQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'PostDetail', id: string, content: string, commentsCount?: number | null, createdAt: any, creator: { __typename?: 'UserDetail', id?: string | null, username?: string | null, postsCount?: number | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', name?: string | null } | null }> | null } };
+export type GetPostsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'PostDetail', id: string, content: string, commentsCount?: number | null, createdAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id: string, name: string } | null }> | null } };
 
-export type GetPostsDetailsListQueryVariables = Exact<{
+export type GetAdministrationPostsListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type GetPostsDetailsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'PostDetail', id: string, content: string, commentsCount?: number | null, createdAt: any, creator: { __typename?: 'UserDetail', id?: string | null, username?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', name?: string | null } | null, group?: { __typename?: 'GroupDetail', id: string, name: string } | null }> | null } };
-
-export type AddReactionMutationVariables = Exact<{
-  createOrUpdateReactionData: CreateOrUpdateReactionDto;
-}>;
-
-
-export type AddReactionMutation = { __typename?: 'Mutation', AddReaction: { __typename?: 'GenericResponse', message?: string | null } };
-
-export type CreateUserMutationVariables = Exact<{
-  createUser: CreateUserDto;
-}>;
-
-
-export type CreateUserMutation = { __typename?: 'Mutation', CreateUser: { __typename?: 'GenericResponse', message?: string | null } };
-
-export type GetUserQueryVariables = Exact<{
-  id?: InputMaybe<Scalars['ID']['input']>;
-  username?: InputMaybe<Scalars['String']['input']>;
-  firstName?: InputMaybe<Scalars['String']['input']>;
-  lastName?: InputMaybe<Scalars['String']['input']>;
-}>;
-
-
-export type GetUserQuery = { __typename?: 'Query', user: { __typename?: 'UserDetail', id?: string | null, email?: string | null, firstName?: string | null, lastName?: string | null } };
-
-export type GetUsersQueryVariables = Exact<{
-  page?: InputMaybe<Scalars['Int']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type GetUsersQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'UserDetail', id?: string | null, email?: string | null, firstName?: string | null, lastName?: string | null }> | null } };
+export type GetAdministrationPostsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'PostDetail', id: string, content: string, commentsCount?: number | null, createdAt: any, updatedAt: any, reportsCount?: number | null, strikesCount?: number | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName: string, lastName: string }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id: string, name: string } | null, pinnedComment?: { __typename?: 'CommentDetail', id: string, content: string, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName: string, lastName: string } } | null }> | null } };
 
 
 
@@ -504,9 +469,11 @@ export const useCreateAdminMutation = <
     ) => {
     
     return useMutation<CreateAdminMutation, TError, CreateAdminMutationVariables, TContext>(
-      ['CreateAdmin'],
-      (variables?: CreateAdminMutationVariables) => fetcher<CreateAdminMutation, CreateAdminMutationVariables>(client, CreateAdminDocument, variables, headers)(),
-      options
+      {
+    mutationKey: ['CreateAdmin'],
+    mutationFn: (variables?: CreateAdminMutationVariables) => fetcher<CreateAdminMutation, CreateAdminMutationVariables>(client, CreateAdminDocument, variables, headers)(),
+    ...options
+  }
     )};
 
 
@@ -531,9 +498,11 @@ export const useSignInAdminMutation = <
     ) => {
     
     return useMutation<SignInAdminMutation, TError, SignInAdminMutationVariables, TContext>(
-      ['SignInAdmin'],
-      (variables?: SignInAdminMutationVariables) => fetcher<SignInAdminMutation, SignInAdminMutationVariables>(client, SignInAdminDocument, variables, headers)(),
-      options
+      {
+    mutationKey: ['SignInAdmin'],
+    mutationFn: (variables?: SignInAdminMutationVariables) => fetcher<SignInAdminMutation, SignInAdminMutationVariables>(client, SignInAdminDocument, variables, headers)(),
+    ...options
+  }
     )};
 
 
@@ -558,40 +527,15 @@ export const useRefreshTokenMutation = <
     ) => {
     
     return useMutation<RefreshTokenMutation, TError, RefreshTokenMutationVariables, TContext>(
-      ['RefreshToken'],
-      (variables?: RefreshTokenMutationVariables) => fetcher<RefreshTokenMutation, RefreshTokenMutationVariables>(client, RefreshTokenDocument, variables, headers)(),
-      options
+      {
+    mutationKey: ['RefreshToken'],
+    mutationFn: (variables?: RefreshTokenMutationVariables) => fetcher<RefreshTokenMutation, RefreshTokenMutationVariables>(client, RefreshTokenDocument, variables, headers)(),
+    ...options
+  }
     )};
 
 
 useRefreshTokenMutation.fetcher = (client: GraphQLClient, variables: RefreshTokenMutationVariables, headers?: RequestInit['headers']) => fetcher<RefreshTokenMutation, RefreshTokenMutationVariables>(client, RefreshTokenDocument, variables, headers);
-
-export const SignInUserDocument = `
-    mutation SignInUser($signInUser: SignInCredentials!) {
-  SignInUser(signInUser: $signInUser) {
-    accessToken
-    refreshToken
-  }
-}
-    `;
-
-export const useSignInUserMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(
-      client: GraphQLClient,
-      options?: UseMutationOptions<SignInUserMutation, TError, SignInUserMutationVariables, TContext>,
-      headers?: RequestInit['headers']
-    ) => {
-    
-    return useMutation<SignInUserMutation, TError, SignInUserMutationVariables, TContext>(
-      ['SignInUser'],
-      (variables?: SignInUserMutationVariables) => fetcher<SignInUserMutation, SignInUserMutationVariables>(client, SignInUserDocument, variables, headers)(),
-      options
-    )};
-
-
-useSignInUserMutation.fetcher = (client: GraphQLClient, variables: SignInUserMutationVariables, headers?: RequestInit['headers']) => fetcher<SignInUserMutation, SignInUserMutationVariables>(client, SignInUserDocument, variables, headers);
 
 export const CreateCommentDocument = `
     mutation CreateComment($createComment: CreateCommentDto!, $postId: String!) {
@@ -611,9 +555,11 @@ export const useCreateCommentMutation = <
     ) => {
     
     return useMutation<CreateCommentMutation, TError, CreateCommentMutationVariables, TContext>(
-      ['CreateComment'],
-      (variables?: CreateCommentMutationVariables) => fetcher<CreateCommentMutation, CreateCommentMutationVariables>(client, CreateCommentDocument, variables, headers)(),
-      options
+      {
+    mutationKey: ['CreateComment'],
+    mutationFn: (variables?: CreateCommentMutationVariables) => fetcher<CreateCommentMutation, CreateCommentMutationVariables>(client, CreateCommentDocument, variables, headers)(),
+    ...options
+  }
     )};
 
 
@@ -637,50 +583,15 @@ export const usePinCommentMutation = <
     ) => {
     
     return useMutation<PinCommentMutation, TError, PinCommentMutationVariables, TContext>(
-      ['PinComment'],
-      (variables?: PinCommentMutationVariables) => fetcher<PinCommentMutation, PinCommentMutationVariables>(client, PinCommentDocument, variables, headers)(),
-      options
+      {
+    mutationKey: ['PinComment'],
+    mutationFn: (variables?: PinCommentMutationVariables) => fetcher<PinCommentMutation, PinCommentMutationVariables>(client, PinCommentDocument, variables, headers)(),
+    ...options
+  }
     )};
 
 
 usePinCommentMutation.fetcher = (client: GraphQLClient, variables: PinCommentMutationVariables, headers?: RequestInit['headers']) => fetcher<PinCommentMutation, PinCommentMutationVariables>(client, PinCommentDocument, variables, headers);
-
-export const GetPostCommentsDocument = `
-    query GetPostComments($postId: String!, $page: Int!, $limit: Int!) {
-  GetPostComments(postId: $postId, page: $page, limit: $limit) {
-    items {
-      id
-      content
-      creatorName
-      createdAt
-    }
-    total
-    page
-    limit
-  }
-}
-    `;
-
-export const useGetPostCommentsQuery = <
-      TData = GetPostCommentsQuery,
-      TError = unknown
-    >(
-      client: GraphQLClient,
-      variables: GetPostCommentsQueryVariables,
-      options?: UseQueryOptions<GetPostCommentsQuery, TError, TData>,
-      headers?: RequestInit['headers']
-    ) => {
-    
-    return useQuery<GetPostCommentsQuery, TError, TData>(
-      ['GetPostComments', variables],
-      fetcher<GetPostCommentsQuery, GetPostCommentsQueryVariables>(client, GetPostCommentsDocument, variables, headers),
-      options
-    )};
-
-useGetPostCommentsQuery.getKey = (variables: GetPostCommentsQueryVariables) => ['GetPostComments', variables];
-
-
-useGetPostCommentsQuery.fetcher = (client: GraphQLClient, variables: GetPostCommentsQueryVariables, headers?: RequestInit['headers']) => fetcher<GetPostCommentsQuery, GetPostCommentsQueryVariables>(client, GetPostCommentsDocument, variables, headers);
 
 export const CreateGroupDocument = `
     mutation CreateGroup($createGroupDto: CreateGroupDto!) {
@@ -700,9 +611,11 @@ export const useCreateGroupMutation = <
     ) => {
     
     return useMutation<CreateGroupMutation, TError, CreateGroupMutationVariables, TContext>(
-      ['CreateGroup'],
-      (variables?: CreateGroupMutationVariables) => fetcher<CreateGroupMutation, CreateGroupMutationVariables>(client, CreateGroupDocument, variables, headers)(),
-      options
+      {
+    mutationKey: ['CreateGroup'],
+    mutationFn: (variables?: CreateGroupMutationVariables) => fetcher<CreateGroupMutation, CreateGroupMutationVariables>(client, CreateGroupDocument, variables, headers)(),
+    ...options
+  }
     )};
 
 
@@ -726,67 +639,15 @@ export const useCreatePostMutation = <
     ) => {
     
     return useMutation<CreatePostMutation, TError, CreatePostMutationVariables, TContext>(
-      ['CreatePost'],
-      (variables?: CreatePostMutationVariables) => fetcher<CreatePostMutation, CreatePostMutationVariables>(client, CreatePostDocument, variables, headers)(),
-      options
+      {
+    mutationKey: ['CreatePost'],
+    mutationFn: (variables?: CreatePostMutationVariables) => fetcher<CreatePostMutation, CreatePostMutationVariables>(client, CreatePostDocument, variables, headers)(),
+    ...options
+  }
     )};
 
 
 useCreatePostMutation.fetcher = (client: GraphQLClient, variables: CreatePostMutationVariables, headers?: RequestInit['headers']) => fetcher<CreatePostMutation, CreatePostMutationVariables>(client, CreatePostDocument, variables, headers);
-
-export const GetPostDetailDocument = `
-    query GetPostDetail($postId: String!) {
-  GetPostDetail(postId: $postId) {
-    id
-    content
-    creator {
-      id
-      email
-      likesCount
-      commentsCount
-    }
-    reactions {
-      like
-      dislike
-      smile
-      angry
-      sad
-      love
-    }
-    interest {
-      id
-      name
-      postsCount
-    }
-    group {
-      id
-      name
-      postsCount
-    }
-  }
-}
-    `;
-
-export const useGetPostDetailQuery = <
-      TData = GetPostDetailQuery,
-      TError = unknown
-    >(
-      client: GraphQLClient,
-      variables: GetPostDetailQueryVariables,
-      options?: UseQueryOptions<GetPostDetailQuery, TError, TData>,
-      headers?: RequestInit['headers']
-    ) => {
-    
-    return useQuery<GetPostDetailQuery, TError, TData>(
-      ['GetPostDetail', variables],
-      fetcher<GetPostDetailQuery, GetPostDetailQueryVariables>(client, GetPostDetailDocument, variables, headers),
-      options
-    )};
-
-useGetPostDetailQuery.getKey = (variables: GetPostDetailQueryVariables) => ['GetPostDetail', variables];
-
-
-useGetPostDetailQuery.fetcher = (client: GraphQLClient, variables: GetPostDetailQueryVariables, headers?: RequestInit['headers']) => fetcher<GetPostDetailQuery, GetPostDetailQueryVariables>(client, GetPostDetailDocument, variables, headers);
 
 export const GetPostStatisticsDocument = `
     query GetPostStatistics {
@@ -803,14 +664,16 @@ export const useGetPostStatisticsQuery = <
     >(
       client: GraphQLClient,
       variables?: GetPostStatisticsQueryVariables,
-      options?: UseQueryOptions<GetPostStatisticsQuery, TError, TData>,
+      options?: Omit<UseQueryOptions<GetPostStatisticsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetPostStatisticsQuery, TError, TData>['queryKey'] },
       headers?: RequestInit['headers']
     ) => {
     
     return useQuery<GetPostStatisticsQuery, TError, TData>(
-      variables === undefined ? ['GetPostStatistics'] : ['GetPostStatistics', variables],
-      fetcher<GetPostStatisticsQuery, GetPostStatisticsQueryVariables>(client, GetPostStatisticsDocument, variables, headers),
-      options
+      {
+    queryKey: variables === undefined ? ['GetPostStatistics'] : ['GetPostStatistics', variables],
+    queryFn: fetcher<GetPostStatisticsQuery, GetPostStatisticsQueryVariables>(client, GetPostStatisticsDocument, variables, headers),
+    ...options
+  }
     )};
 
 useGetPostStatisticsQuery.getKey = (variables?: GetPostStatisticsQueryVariables) => variables === undefined ? ['GetPostStatistics'] : ['GetPostStatistics', variables];
@@ -818,61 +681,8 @@ useGetPostStatisticsQuery.getKey = (variables?: GetPostStatisticsQueryVariables)
 
 useGetPostStatisticsQuery.fetcher = (client: GraphQLClient, variables?: GetPostStatisticsQueryVariables, headers?: RequestInit['headers']) => fetcher<GetPostStatisticsQuery, GetPostStatisticsQueryVariables>(client, GetPostStatisticsDocument, variables, headers);
 
-export const GetPostsDocument = `
-    query GetPosts($page: Int = 1, $limit: Int = 10) {
-  getPosts(page: $page, limit: $limit) {
-    items {
-      id
-      content
-      creator {
-        id
-        username
-        postsCount
-      }
-      reactions {
-        like
-        dislike
-        sad
-        smile
-        angry
-        love
-      }
-      interest {
-        name
-      }
-      commentsCount
-      createdAt
-    }
-    total
-    page
-    limit
-  }
-}
-    `;
-
-export const useGetPostsQuery = <
-      TData = GetPostsQuery,
-      TError = unknown
-    >(
-      client: GraphQLClient,
-      variables?: GetPostsQueryVariables,
-      options?: UseQueryOptions<GetPostsQuery, TError, TData>,
-      headers?: RequestInit['headers']
-    ) => {
-    
-    return useQuery<GetPostsQuery, TError, TData>(
-      variables === undefined ? ['GetPosts'] : ['GetPosts', variables],
-      fetcher<GetPostsQuery, GetPostsQueryVariables>(client, GetPostsDocument, variables, headers),
-      options
-    )};
-
-useGetPostsQuery.getKey = (variables?: GetPostsQueryVariables) => variables === undefined ? ['GetPosts'] : ['GetPosts', variables];
-
-
-useGetPostsQuery.fetcher = (client: GraphQLClient, variables?: GetPostsQueryVariables, headers?: RequestInit['headers']) => fetcher<GetPostsQuery, GetPostsQueryVariables>(client, GetPostsDocument, variables, headers);
-
-export const GetPostsDetailsListDocument = `
-    query GetPostsDetailsList($page: Int = 1, $limit: Int = 10) {
+export const GetPostsListDocument = `
+    query GetPostsList($page: Int = 1, $limit: Int = 10) {
   getPosts(page: $page, limit: $limit) {
     items {
       id
@@ -890,6 +700,7 @@ export const GetPostsDetailsListDocument = `
         love
       }
       interest {
+        id
         name
       }
       group {
@@ -906,119 +717,72 @@ export const GetPostsDetailsListDocument = `
 }
     `;
 
-export const useGetPostsDetailsListQuery = <
-      TData = GetPostsDetailsListQuery,
+export const useGetPostsListQuery = <
+      TData = GetPostsListQuery,
       TError = unknown
     >(
       client: GraphQLClient,
-      variables?: GetPostsDetailsListQueryVariables,
-      options?: UseQueryOptions<GetPostsDetailsListQuery, TError, TData>,
+      variables?: GetPostsListQueryVariables,
+      options?: Omit<UseQueryOptions<GetPostsListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetPostsListQuery, TError, TData>['queryKey'] },
       headers?: RequestInit['headers']
     ) => {
     
-    return useQuery<GetPostsDetailsListQuery, TError, TData>(
-      variables === undefined ? ['GetPostsDetailsList'] : ['GetPostsDetailsList', variables],
-      fetcher<GetPostsDetailsListQuery, GetPostsDetailsListQueryVariables>(client, GetPostsDetailsListDocument, variables, headers),
-      options
-    )};
-
-useGetPostsDetailsListQuery.getKey = (variables?: GetPostsDetailsListQueryVariables) => variables === undefined ? ['GetPostsDetailsList'] : ['GetPostsDetailsList', variables];
-
-
-useGetPostsDetailsListQuery.fetcher = (client: GraphQLClient, variables?: GetPostsDetailsListQueryVariables, headers?: RequestInit['headers']) => fetcher<GetPostsDetailsListQuery, GetPostsDetailsListQueryVariables>(client, GetPostsDetailsListDocument, variables, headers);
-
-export const AddReactionDocument = `
-    mutation AddReaction($createOrUpdateReactionData: CreateOrUpdateReactionDto!) {
-  AddReaction(createOrUpdateReactionData: $createOrUpdateReactionData) {
-    message
+    return useQuery<GetPostsListQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetPostsList'] : ['GetPostsList', variables],
+    queryFn: fetcher<GetPostsListQuery, GetPostsListQueryVariables>(client, GetPostsListDocument, variables, headers),
+    ...options
   }
-}
-    `;
-
-export const useAddReactionMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(
-      client: GraphQLClient,
-      options?: UseMutationOptions<AddReactionMutation, TError, AddReactionMutationVariables, TContext>,
-      headers?: RequestInit['headers']
-    ) => {
-    
-    return useMutation<AddReactionMutation, TError, AddReactionMutationVariables, TContext>(
-      ['AddReaction'],
-      (variables?: AddReactionMutationVariables) => fetcher<AddReactionMutation, AddReactionMutationVariables>(client, AddReactionDocument, variables, headers)(),
-      options
     )};
 
-
-useAddReactionMutation.fetcher = (client: GraphQLClient, variables: AddReactionMutationVariables, headers?: RequestInit['headers']) => fetcher<AddReactionMutation, AddReactionMutationVariables>(client, AddReactionDocument, variables, headers);
-
-export const CreateUserDocument = `
-    mutation CreateUser($createUser: CreateUserDto!) {
-  CreateUser(createUser: $createUser) {
-    message
-  }
-}
-    `;
-
-export const useCreateUserMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(
-      client: GraphQLClient,
-      options?: UseMutationOptions<CreateUserMutation, TError, CreateUserMutationVariables, TContext>,
-      headers?: RequestInit['headers']
-    ) => {
-    
-    return useMutation<CreateUserMutation, TError, CreateUserMutationVariables, TContext>(
-      ['CreateUser'],
-      (variables?: CreateUserMutationVariables) => fetcher<CreateUserMutation, CreateUserMutationVariables>(client, CreateUserDocument, variables, headers)(),
-      options
-    )};
+useGetPostsListQuery.getKey = (variables?: GetPostsListQueryVariables) => variables === undefined ? ['GetPostsList'] : ['GetPostsList', variables];
 
 
-useCreateUserMutation.fetcher = (client: GraphQLClient, variables: CreateUserMutationVariables, headers?: RequestInit['headers']) => fetcher<CreateUserMutation, CreateUserMutationVariables>(client, CreateUserDocument, variables, headers);
+useGetPostsListQuery.fetcher = (client: GraphQLClient, variables?: GetPostsListQueryVariables, headers?: RequestInit['headers']) => fetcher<GetPostsListQuery, GetPostsListQueryVariables>(client, GetPostsListDocument, variables, headers);
 
-export const GetUserDocument = `
-    query GetUser($id: ID, $username: String, $firstName: String, $lastName: String) {
-  user(id: $id, username: $username, firstName: $firstName, lastName: $lastName) {
-    id
-    email
-    firstName
-    lastName
-  }
-}
-    `;
-
-export const useGetUserQuery = <
-      TData = GetUserQuery,
-      TError = unknown
-    >(
-      client: GraphQLClient,
-      variables?: GetUserQueryVariables,
-      options?: UseQueryOptions<GetUserQuery, TError, TData>,
-      headers?: RequestInit['headers']
-    ) => {
-    
-    return useQuery<GetUserQuery, TError, TData>(
-      variables === undefined ? ['GetUser'] : ['GetUser', variables],
-      fetcher<GetUserQuery, GetUserQueryVariables>(client, GetUserDocument, variables, headers),
-      options
-    )};
-
-useGetUserQuery.getKey = (variables?: GetUserQueryVariables) => variables === undefined ? ['GetUser'] : ['GetUser', variables];
-
-
-useGetUserQuery.fetcher = (client: GraphQLClient, variables?: GetUserQueryVariables, headers?: RequestInit['headers']) => fetcher<GetUserQuery, GetUserQueryVariables>(client, GetUserDocument, variables, headers);
-
-export const GetUsersDocument = `
-    query GetUsers($page: Int = 1, $limit: Int = 10) {
-  getUsers(page: $page, limit: $limit) {
+export const GetAdministrationPostsListDocument = `
+    query GetAdministrationPostsList($page: Int = 1, $limit: Int = 10) {
+  getPosts(page: $page, limit: $limit) {
     items {
       id
-      email
-      firstName
-      lastName
+      content
+      creator {
+        id
+        username
+        firstName
+        lastName
+      }
+      reactions {
+        like
+        dislike
+        sad
+        smile
+        angry
+        love
+      }
+      interest {
+        id
+        name
+      }
+      group {
+        id
+        name
+      }
+      pinnedComment {
+        id
+        content
+        creator {
+          id
+          username
+          firstName
+          lastName
+        }
+      }
+      commentsCount
+      createdAt
+      updatedAt
+      reportsCount
+      strikesCount
     }
     total
     page
@@ -1027,23 +791,25 @@ export const GetUsersDocument = `
 }
     `;
 
-export const useGetUsersQuery = <
-      TData = GetUsersQuery,
+export const useGetAdministrationPostsListQuery = <
+      TData = GetAdministrationPostsListQuery,
       TError = unknown
     >(
       client: GraphQLClient,
-      variables?: GetUsersQueryVariables,
-      options?: UseQueryOptions<GetUsersQuery, TError, TData>,
+      variables?: GetAdministrationPostsListQueryVariables,
+      options?: Omit<UseQueryOptions<GetAdministrationPostsListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAdministrationPostsListQuery, TError, TData>['queryKey'] },
       headers?: RequestInit['headers']
     ) => {
     
-    return useQuery<GetUsersQuery, TError, TData>(
-      variables === undefined ? ['GetUsers'] : ['GetUsers', variables],
-      fetcher<GetUsersQuery, GetUsersQueryVariables>(client, GetUsersDocument, variables, headers),
-      options
+    return useQuery<GetAdministrationPostsListQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetAdministrationPostsList'] : ['GetAdministrationPostsList', variables],
+    queryFn: fetcher<GetAdministrationPostsListQuery, GetAdministrationPostsListQueryVariables>(client, GetAdministrationPostsListDocument, variables, headers),
+    ...options
+  }
     )};
 
-useGetUsersQuery.getKey = (variables?: GetUsersQueryVariables) => variables === undefined ? ['GetUsers'] : ['GetUsers', variables];
+useGetAdministrationPostsListQuery.getKey = (variables?: GetAdministrationPostsListQueryVariables) => variables === undefined ? ['GetAdministrationPostsList'] : ['GetAdministrationPostsList', variables];
 
 
-useGetUsersQuery.fetcher = (client: GraphQLClient, variables?: GetUsersQueryVariables, headers?: RequestInit['headers']) => fetcher<GetUsersQuery, GetUsersQueryVariables>(client, GetUsersDocument, variables, headers);
+useGetAdministrationPostsListQuery.fetcher = (client: GraphQLClient, variables?: GetAdministrationPostsListQueryVariables, headers?: RequestInit['headers']) => fetcher<GetAdministrationPostsListQuery, GetAdministrationPostsListQueryVariables>(client, GetAdministrationPostsListDocument, variables, headers);

@@ -1,5 +1,0 @@
-mutation CreateUser($createUser: CreateUserDto!) {
-	CreateUser(createUser: $createUser) {
-		message
-	}
-}

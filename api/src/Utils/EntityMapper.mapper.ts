@@ -1,6 +1,5 @@
 import { CreateAdminDto } from "@Services/Admin/Mutations/CreateAdmin/CreateAdmin.dto";
 import SignUpUserData from "@Services/Auth/Mutations/SignUp/SignUpUserData";
-import CreateUserDto from "@Services/User/Mutations/CreateUser/CreateUserDto.dto";
 import { CommentDetail } from "@Shared/Response/CommentDetail";
 import { InterestDetail } from "@Shared/Response/InterestDetail";
 import { PostDetail } from "@Shared/Response/PostDetail";
@@ -18,7 +17,6 @@ export default class EntityMapper extends AutomapperProfile {
 	// eslint-disable-next-line class-methods-use-this
 	override get profile() {
 		return (mapper: Mapper) => {
-			CreateUserDto.createMap(mapper);
 			CommentDetail.createMap(mapper);
 			CreateAdminDto.createMap(mapper);
 			PostDetail.createMap(mapper);

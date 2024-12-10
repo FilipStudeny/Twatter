@@ -52,3 +52,16 @@ query GetUsersWithAdministartionList($page: Int = 1, $limit: Int = 10) {
 		limit
 	}
 }
+
+query GetUsersDropDownListData($page: Int = 1, $limit: Int = 10, $userId: String, $groupId: String, $getAll: Boolean) {
+	getUsers(page: $page, limit: $limit, userId: $userId, groupId: $groupId, getAll: $getAll) {
+		items {
+			id
+			email
+			firstName
+			lastName
+			username
+		}
+		total
+	}
+}

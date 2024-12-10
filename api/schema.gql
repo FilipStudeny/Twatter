@@ -16,7 +16,7 @@ type UserDetail {
   email: String!
   firstName: String!
   lastName: String!
-  username: String!
+  username: String
   postsCount: Float!
   commentsCount: Float!
   likesCount: Float!
@@ -133,7 +133,7 @@ type Query {
   getCommentsList(page: Int!, limit: Int!, creatorId: String, postId: String, id: String): PaginatedCommentsListResponse!
   getPostsStatistics(filter: GraphFilter!, year: Int, weekNumber: Int): [PostGraphDataDto!]!
   getPosts(page: Int!, limit: Int!, creatorId: String, postId: String, interestId: String, groupId: String): PaginatedPostsListResponse!
-  getUsers(page: Int! = 1, limit: Int! = 10, userId: String, groupId: String): PaginatedUsersResponse!
+  getUsers(page: Int! = 1, limit: Int! = 10, userId: String, groupId: String, getAll: Boolean): PaginatedUsersResponse!
 }
 
 """Filter options for the graph data"""
@@ -154,10 +154,9 @@ type Mutation {
   SignInUser(signInUser: SignInCredentials!): SignInResponse!
   SignUpUser(signUp: SignUpUserData!): GenericResponse!
   refreshToken(refreshToken: String!): SignInResponse!
-  logout(userId: String!): GenericResponse!
+  SignOutUser(userId: String!): GenericResponse!
   forgotPassword(email: String!): GenericResponse!
   resetPassword(resetPassword: ResetPasswordInput!): GenericResponse!
-  CreateUser(createUser: CreateUserDto!): GenericResponse!
 }
 
 input SignInCredentials {
@@ -232,12 +231,4 @@ input ResetPasswordInput {
   token: String!
   newPassword: String!
   repeatPassword: String!
-}
-
-input CreateUserDto {
-  firstName: String!
-  lastName: String!
-  password: String!
-  repeatPassword: String!
-  email: String!
 }

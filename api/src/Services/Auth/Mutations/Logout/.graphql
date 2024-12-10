@@ -1,0 +1,5 @@
+mutation SignOutUser($userId: String!) {
+	SignOutUser(userId: $userId){
+        message
+    }
+}

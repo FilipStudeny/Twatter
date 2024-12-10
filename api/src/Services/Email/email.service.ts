@@ -13,8 +13,9 @@ export class EmailService {
 	 * @param email - The user's email address.
 	 * @param username - The user's username or first name.
 	 * @param password - The user's plain text password (or a generated one).
+	 * @returns A promise that resolves once the email has been sent.
 	 */
-	async sendRegistrationEmail(email: string, username: string, password: string) {
+	async sendRegistrationEmail(email: string, username: string, password: string): Promise<void> {
 		this.logger.log(`Attempting to send registration email to ${email}`);
 
 		try {
@@ -35,6 +36,14 @@ export class EmailService {
 		}
 	}
 
+	/**
+	 * Sends a password reset email to a user who has requested a password reset.
+	 *
+	 * @param email - The user's email address where the reset link will be sent.
+	 * @param username - The user's username or display name.
+	 * @param resetLink - The URL link that allows the user to reset their password.
+	 * @returns A promise that resolves once the email has been sent.
+	 */
 	async sendPasswordResetEmail(email: string, username: string, resetLink: string): Promise<void> {
 		await this.mailerService.sendMail({
 			to: email,
@@ -47,6 +56,14 @@ export class EmailService {
 		});
 	}
 
+	/**
+	 * Sends a notification email to a user confirming that their password has been successfully changed.
+	 *
+	 * @param email - The user's email address where the notification will be sent.
+	 * @param username - The user's username or display name.
+	 * @param password - The user's new password (plain text).
+	 * @returns A promise that resolves once the email has been sent.
+	 */
 	async sendPasswordChangeNotification(email: string, username: string, password: string): Promise<void> {
 		await this.mailerService.sendMail({
 			to: email,

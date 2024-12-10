@@ -45,7 +45,7 @@ export default class AuthResolver {
 	}
 
 	@Mutation(() => GenericResponse)
-	async logout(@Args("userId") userId: string): Promise<GenericResponse> {
+	async SignOutUser(@Args("userId") userId: string): Promise<GenericResponse> {
 		await this.commandBus.execute(new LogoutCommand(userId));
 		return new GenericResponse("Logout successful");
 	}

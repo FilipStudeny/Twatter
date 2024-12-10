@@ -1,0 +1,6 @@
+mutation SignUp($createUser: CreateUserDto!) {
+	SignUpUser(createUser: $createUser) {
+		message
+		action
+	}
+}

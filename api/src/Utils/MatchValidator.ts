@@ -7,17 +7,6 @@ import {
 	registerDecorator,
 } from "class-validator";
 
-export const Match =
-	<T>(property: keyof T, options?: ValidationOptions) =>
-	(object: any, propertyName: string) =>
-		registerDecorator({
-			target: object.constructor,
-			propertyName,
-			options,
-			constraints: [property],
-			validator: MatchConstraint,
-		});
-
 @ValidatorConstraint({ name: "Match" })
 export class MatchConstraint implements ValidatorConstraintInterface {
 	validate(value: any, args?: ValidationArguments): boolean {
@@ -32,3 +21,14 @@ export class MatchConstraint implements ValidatorConstraintInterface {
 		return `${args?.property} does not match the ${propertyNameToCompare}`;
 	}
 }
+
+export const Match =
+	<T>(property: keyof T, options?: ValidationOptions) =>
+	(object: any, propertyName: string) =>
+		registerDecorator({
+			target: object.constructor,
+			propertyName,
+			options,
+			constraints: [property],
+			validator: MatchConstraint,
+		});

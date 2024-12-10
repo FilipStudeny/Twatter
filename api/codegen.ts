@@ -12,6 +12,7 @@ const config: CodegenConfig = {
 				legacyMode: false,
 				exposeFetcher: true,
 				exposeQueryKeys: true,
+				reactQueryVersion: 5,
 			},
 		},
 	},
