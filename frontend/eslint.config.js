@@ -63,6 +63,7 @@ export default tseslint.config(
 			"@stylistic/comma-spacing": ["error", { before: false, after: true }],
 			"@stylistic/quotes": ["error", "double"],
 			//"@stylistic/ts/indent": ["warn", 4],
+			"@stylistic/indent": ["warn", "tab"],
 			"@stylistic/ts/type-annotation-spacing": ["error", { before: false, after: true }],
 			"@stylistic/ts/member-delimiter-style": [
 				"error",

@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import React, { useState } from "react";
 
 import { useAuth } from "hooks/auth";
+import { useAuthenticationStore } from "stores/authentication";
 
 export const Route = createFileRoute("/sign_in")({ component: RouteComponent });
 
@@ -10,6 +11,8 @@ function RouteComponent() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const { signIn } = useAuth();
+
+	const signInAuth = useAuthenticationStore((state) => state.signIn);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -67,6 +70,7 @@ function RouteComponent() {
 
 					<Button variant='contained' type='submit' fullWidth onClick={() => {
                         signIn();
+						signInAuth();
                     }}>
 						Sign In
 					</Button>
