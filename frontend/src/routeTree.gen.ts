@@ -12,8 +12,12 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as SigninImport } from './routes/sign_in'
+import { Route as SearchImport } from './routes/search'
+import { Route as ProfileImport } from './routes/profile'
 import { Route as HomeImport } from './routes/home'
+import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as ProfileIdImport } from './routes/profile/$id'
+import { Route as ProfileIdFriendsImport } from './routes/profile/$id.friends'
 
 // Create/Update Routes
 
@@ -23,27 +27,71 @@ const SigninRoute = SigninImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const SearchRoute = SearchImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileRoute = ProfileImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const HomeRoute = HomeImport.update({
   id: '/home',
   path: '/home',
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProfileIdRoute = ProfileIdImport.update({
-  id: '/profile/$id',
-  path: '/profile/$id',
+const AuthenticatedRoute = AuthenticatedImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileIdRoute = ProfileIdImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ProfileRoute,
+} as any)
+
+const ProfileIdFriendsRoute = ProfileIdFriendsImport.update({
+  id: '/friends',
+  path: '/friends',
+  getParentRoute: () => ProfileIdRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedImport
+      parentRoute: typeof rootRoute
+    }
     '/home': {
       id: '/home'
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof HomeImport
+      parentRoute: typeof rootRoute
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileImport
+      parentRoute: typeof rootRoute
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchImport
       parentRoute: typeof rootRoute
     }
     '/sign_in': {
@@ -55,54 +103,122 @@ declare module '@tanstack/react-router' {
     }
     '/profile/$id': {
       id: '/profile/$id'
-      path: '/profile/$id'
+      path: '/$id'
       fullPath: '/profile/$id'
       preLoaderRoute: typeof ProfileIdImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof ProfileImport
+    }
+    '/profile/$id/friends': {
+      id: '/profile/$id/friends'
+      path: '/friends'
+      fullPath: '/profile/$id/friends'
+      preLoaderRoute: typeof ProfileIdFriendsImport
+      parentRoute: typeof ProfileIdImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface ProfileIdRouteChildren {
+  ProfileIdFriendsRoute: typeof ProfileIdFriendsRoute
+}
+
+const ProfileIdRouteChildren: ProfileIdRouteChildren = {
+  ProfileIdFriendsRoute: ProfileIdFriendsRoute,
+}
+
+const ProfileIdRouteWithChildren = ProfileIdRoute._addFileChildren(
+  ProfileIdRouteChildren,
+)
+
+interface ProfileRouteChildren {
+  ProfileIdRoute: typeof ProfileIdRouteWithChildren
+}
+
+const ProfileRouteChildren: ProfileRouteChildren = {
+  ProfileIdRoute: ProfileIdRouteWithChildren,
+}
+
+const ProfileRouteWithChildren =
+  ProfileRoute._addFileChildren(ProfileRouteChildren)
+
 export interface FileRoutesByFullPath {
+  '': typeof AuthenticatedRoute
   '/home': typeof HomeRoute
+  '/profile': typeof ProfileRouteWithChildren
+  '/search': typeof SearchRoute
   '/sign_in': typeof SigninRoute
-  '/profile/$id': typeof ProfileIdRoute
+  '/profile/$id': typeof ProfileIdRouteWithChildren
+  '/profile/$id/friends': typeof ProfileIdFriendsRoute
 }
 
 export interface FileRoutesByTo {
+  '': typeof AuthenticatedRoute
   '/home': typeof HomeRoute
+  '/profile': typeof ProfileRouteWithChildren
+  '/search': typeof SearchRoute
   '/sign_in': typeof SigninRoute
-  '/profile/$id': typeof ProfileIdRoute
+  '/profile/$id': typeof ProfileIdRouteWithChildren
+  '/profile/$id/friends': typeof ProfileIdFriendsRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/_authenticated': typeof AuthenticatedRoute
   '/home': typeof HomeRoute
+  '/profile': typeof ProfileRouteWithChildren
+  '/search': typeof SearchRoute
   '/sign_in': typeof SigninRoute
-  '/profile/$id': typeof ProfileIdRoute
+  '/profile/$id': typeof ProfileIdRouteWithChildren
+  '/profile/$id/friends': typeof ProfileIdFriendsRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/home' | '/sign_in' | '/profile/$id'
+  fullPaths:
+    | ''
+    | '/home'
+    | '/profile'
+    | '/search'
+    | '/sign_in'
+    | '/profile/$id'
+    | '/profile/$id/friends'
   fileRoutesByTo: FileRoutesByTo
-  to: '/home' | '/sign_in' | '/profile/$id'
-  id: '__root__' | '/home' | '/sign_in' | '/profile/$id'
+  to:
+    | ''
+    | '/home'
+    | '/profile'
+    | '/search'
+    | '/sign_in'
+    | '/profile/$id'
+    | '/profile/$id/friends'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/home'
+    | '/profile'
+    | '/search'
+    | '/sign_in'
+    | '/profile/$id'
+    | '/profile/$id/friends'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
+  AuthenticatedRoute: typeof AuthenticatedRoute
   HomeRoute: typeof HomeRoute
+  ProfileRoute: typeof ProfileRouteWithChildren
+  SearchRoute: typeof SearchRoute
   SigninRoute: typeof SigninRoute
-  ProfileIdRoute: typeof ProfileIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRoute: AuthenticatedRoute,
   HomeRoute: HomeRoute,
+  ProfileRoute: ProfileRouteWithChildren,
+  SearchRoute: SearchRoute,
   SigninRoute: SigninRoute,
-  ProfileIdRoute: ProfileIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -115,19 +231,41 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/_authenticated",
         "/home",
-        "/sign_in",
-        "/profile/$id"
+        "/profile",
+        "/search",
+        "/sign_in"
       ]
+    },
+    "/_authenticated": {
+      "filePath": "_authenticated.tsx"
     },
     "/home": {
       "filePath": "home.tsx"
+    },
+    "/profile": {
+      "filePath": "profile.tsx",
+      "children": [
+        "/profile/$id"
+      ]
+    },
+    "/search": {
+      "filePath": "search.tsx"
     },
     "/sign_in": {
       "filePath": "sign_in.tsx"
     },
     "/profile/$id": {
-      "filePath": "profile/$id.tsx"
+      "filePath": "profile/$id.tsx",
+      "parent": "/profile",
+      "children": [
+        "/profile/$id/friends"
+      ]
+    },
+    "/profile/$id/friends": {
+      "filePath": "profile/$id.friends.tsx",
+      "parent": "/profile/$id"
     }
   }
 }
