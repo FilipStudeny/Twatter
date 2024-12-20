@@ -4,70 +4,165 @@ import { RouterLink } from "@Components/navigation/routerLink";
 import CloseIcon from "@mui/icons-material/Close";
 import HomeIcon from "@mui/icons-material/Home";
 import MenuIcon from "@mui/icons-material/Menu";
-import { AppBar, Toolbar, IconButton, Avatar, Button, Typography, Box } from "@mui/material";
+import PeopleIcon from "@mui/icons-material/People"; // Icon for Friends
+import {
+	AppBar,
+	Toolbar,
+	IconButton,
+	Avatar,
+	Button,
+	Typography,
+	Box,
+	Tooltip,
+	Menu,
+	MenuItem,
+	useMediaQuery,
+	useTheme,
+} from "@mui/material";
+import React from "react";
 
-import { useAuth } from "hooks/auth";
-import { useAuthenticationStore } from "stores/authentication";
+import { useAuthenticationStore } from "stores/authenticationStore";
 
 interface HeaderProps {
 	leftOpen: boolean,
+	rightOpen: boolean,
 	lgUp: boolean,
 	onLeftToggle: ()=> void,
+	onRightToggle: ()=> void, // New prop for toggling RightSidebar
 }
 
-export const Header: React.FC<HeaderProps> = ({ leftOpen, lgUp, onLeftToggle }) => {
-	const { isLogged } = useAuth();
-    const isLoggedInAuth = useAuthenticationStore((state) => state.isLoggedIn);
+export const Header: React.FC<HeaderProps> = ({ leftOpen, rightOpen, lgUp, onLeftToggle, onRightToggle }) => {
+	const isLoggedIn = useAuthenticationStore((state) => state.isLoggedIn);
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-	// Remove useMemo as it's unnecessary for a boolean
-	const isLoggedIn = isLogged();
+	// State for user menu
+	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const open = Boolean(anchorEl);
+
+	const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+
+	const handleMenuClose = () => {
+		setAnchorEl(null);
+	};
 
 	return (
-		<AppBar position='fixed' sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-			<Toolbar sx={{ justifyContent: "flex-start" }}>
-				{/* Toggle Drawer Button */}
-				<IconButton
-					color='inherit'
-					aria-label={leftOpen ? "Close drawer" : "Open drawer"}
-					edge='start'
-					onClick={onLeftToggle}
-					sx={{ mr: 2 }}
-				>
-					{leftOpen && lgUp ? <CloseIcon /> : <MenuIcon />}
-				</IconButton>
+		<AppBar
+			position='fixed'
+			sx={{
+				zIndex: (theme) => theme.zIndex.drawer + 1,
+				backgroundColor: theme.palette.primary.main,
+			}}
+		>
+			<Toolbar sx={{ justifyContent: "space-between" }}>
+				{/* Left side: Logo and Drawer Toggle */}
+				<Box sx={{ display: "flex", alignItems: "center" }}>
+					{isLoggedIn && (
+						<Tooltip title={leftOpen ? "Close drawer" : "Open drawer"}>
+							<IconButton
+								color='inherit'
+								aria-label={leftOpen ? "Close drawer" : "Open drawer"}
+								edge='start'
+								onClick={onLeftToggle}
+								sx={{ mr: 2 }}
+							>
+								{leftOpen && lgUp ? <CloseIcon /> : <MenuIcon />}
+							</IconButton>
+						</Tooltip>
+					)}
+					{/* Logo */}
+					<RouterLink to='/home' style={{ color: "white" }}>
+						<Box sx={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+							<Typography
+								variant='h6'
+								noWrap
+								component='div'
+								sx={{ display: { xs: "none", sm: "block" }, fontWeight: "bold" }}
+							>
+								Twatter
+							</Typography>
+						</Box>
+					</RouterLink>
+				</Box>
 
-				{/* Conditional Rendering Based on Authentication Status */}
-				{isLoggedIn ? (
-					<Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
-						<Avatar alt='User Profile' src='/static/images/avatar/1.jpg' sx={{ mr: 1 }}>
-							U
-						</Avatar>
-						<Button color='inherit'>John Doe</Button>
-					</Box>
-				) : (
-					<Typography variant='h6' noWrap sx={{ ml: 2, mr: 2 }}>
-						My Responsive Layout
-					</Typography>
-				)}
-
-				{isLoggedInAuth && (
-					<Typography variant='h6' noWrap sx={{ ml: 2, mr: 2 }}>
-						LOGGED IN
-					</Typography>
-				)}
-
-				{/* Spacer to push the following buttons to the right side */}
+				{/* Spacer */}
 				<Box sx={{ flexGrow: 1 }} />
 
-				{/* Right side: Login and Profile buttons */}
-				{!isLoggedIn && (
-					<RouterLink to='/sign_in' style={{ textDecoration: "none", color: "inherit", marginRight: "8px" }}>
-						<Button color='inherit' startIcon={<HomeIcon />}>
-							Login
-						</Button>
-					</RouterLink>
-				)}
-				{isLoggedIn && <Button color='inherit'>Profile</Button>}
+				{/* Right side: Navigation Buttons */}
+				<Box sx={{ display: "flex", alignItems: "center" }}>
+					{isLoggedIn && (
+						<>
+							<Tooltip title={rightOpen ? "Close friends list" : "Open friends list"}>
+								<IconButton
+									color='inherit'
+									aria-label={rightOpen ? "Close drawer" : "Open drawer"}
+									edge='start'
+									onClick={onRightToggle}
+									sx={{ mr: 2 }}
+								>
+									<PeopleIcon />
+								</IconButton>
+							</Tooltip>
+
+							{/* Profile Menu */}
+							<Tooltip title='Profile'>
+								<IconButton onClick={handleMenuOpen} sx={{ p: 0, ml: 1 }}>
+									<Avatar alt={"User"} src={"https://randomuser.me/api/portraits/thumb/men/75.jpg"} />
+								</IconButton>
+							</Tooltip>
+							<Menu
+								anchorEl={anchorEl}
+								open={open}
+								onClose={handleMenuClose}
+								anchorOrigin={{
+									vertical: "top",
+									horizontal: "right",
+								}}
+								transformOrigin={{
+									vertical: "top",
+									horizontal: "right",
+								}}
+							>
+								<MenuItem onClick={handleMenuClose} component={RouterLink} to='/profile'>
+									Profile
+								</MenuItem>
+								<MenuItem onClick={handleMenuClose} component={RouterLink} to='/settings'>
+									Settings
+								</MenuItem>
+								<MenuItem
+									onClick={() => {
+										useAuthenticationStore.getState().signOut();
+										handleMenuClose();
+									}}
+								>
+									Logout
+								</MenuItem>
+							</Menu>
+						</>
+					)}
+
+					{/* Login Button for Guests */}
+					{!isLoggedIn && (
+						<RouterLink
+							to='/sign-in'
+							style={{ textDecoration: "none", color: "inherit", marginRight: isMobile ? 0 : "8px" }}
+						>
+							<Button
+								color='inherit'
+								startIcon={<HomeIcon />}
+								sx={{
+									display: { xs: "none", sm: "inline-flex" },
+									textTransform: "none",
+									fontSize: "16px",
+								}}
+							>
+								Login
+							</Button>
+						</RouterLink>
+					)}
+				</Box>
 			</Toolbar>
 		</AppBar>
 	);

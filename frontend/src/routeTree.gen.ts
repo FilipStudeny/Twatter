@@ -11,21 +11,15 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as SigninImport } from './routes/sign_in'
 import { Route as SearchImport } from './routes/search'
 import { Route as ProfileImport } from './routes/profile'
 import { Route as HomeImport } from './routes/home'
-import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as ProfileIdImport } from './routes/profile/$id'
+import { Route as AuthenticationSignInImport } from './routes/_authentication/sign-in'
+import { Route as AuthenticationForgottenPasswordImport } from './routes/_authentication/forgotten-password'
 import { Route as ProfileIdFriendsImport } from './routes/profile/$id.friends'
 
 // Create/Update Routes
-
-const SigninRoute = SigninImport.update({
-  id: '/sign_in',
-  path: '/sign_in',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const SearchRoute = SearchImport.update({
   id: '/search',
@@ -45,16 +39,24 @@ const HomeRoute = HomeImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthenticatedRoute = AuthenticatedImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const ProfileIdRoute = ProfileIdImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ProfileRoute,
 } as any)
+
+const AuthenticationSignInRoute = AuthenticationSignInImport.update({
+  id: '/_authentication/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthenticationForgottenPasswordRoute =
+  AuthenticationForgottenPasswordImport.update({
+    id: '/_authentication/forgotten-password',
+    path: '/forgotten-password',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 const ProfileIdFriendsRoute = ProfileIdFriendsImport.update({
   id: '/friends',
@@ -66,13 +68,6 @@ const ProfileIdFriendsRoute = ProfileIdFriendsImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthenticatedImport
-      parentRoute: typeof rootRoute
-    }
     '/home': {
       id: '/home'
       path: '/home'
@@ -94,11 +89,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchImport
       parentRoute: typeof rootRoute
     }
-    '/sign_in': {
-      id: '/sign_in'
-      path: '/sign_in'
-      fullPath: '/sign_in'
-      preLoaderRoute: typeof SigninImport
+    '/_authentication/forgotten-password': {
+      id: '/_authentication/forgotten-password'
+      path: '/forgotten-password'
+      fullPath: '/forgotten-password'
+      preLoaderRoute: typeof AuthenticationForgottenPasswordImport
+      parentRoute: typeof rootRoute
+    }
+    '/_authentication/sign-in': {
+      id: '/_authentication/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof AuthenticationSignInImport
       parentRoute: typeof rootRoute
     }
     '/profile/$id': {
@@ -144,32 +146,32 @@ const ProfileRouteWithChildren =
   ProfileRoute._addFileChildren(ProfileRouteChildren)
 
 export interface FileRoutesByFullPath {
-  '': typeof AuthenticatedRoute
   '/home': typeof HomeRoute
   '/profile': typeof ProfileRouteWithChildren
   '/search': typeof SearchRoute
-  '/sign_in': typeof SigninRoute
+  '/forgotten-password': typeof AuthenticationForgottenPasswordRoute
+  '/sign-in': typeof AuthenticationSignInRoute
   '/profile/$id': typeof ProfileIdRouteWithChildren
   '/profile/$id/friends': typeof ProfileIdFriendsRoute
 }
 
 export interface FileRoutesByTo {
-  '': typeof AuthenticatedRoute
   '/home': typeof HomeRoute
   '/profile': typeof ProfileRouteWithChildren
   '/search': typeof SearchRoute
-  '/sign_in': typeof SigninRoute
+  '/forgotten-password': typeof AuthenticationForgottenPasswordRoute
+  '/sign-in': typeof AuthenticationSignInRoute
   '/profile/$id': typeof ProfileIdRouteWithChildren
   '/profile/$id/friends': typeof ProfileIdFriendsRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/_authenticated': typeof AuthenticatedRoute
   '/home': typeof HomeRoute
   '/profile': typeof ProfileRouteWithChildren
   '/search': typeof SearchRoute
-  '/sign_in': typeof SigninRoute
+  '/_authentication/forgotten-password': typeof AuthenticationForgottenPasswordRoute
+  '/_authentication/sign-in': typeof AuthenticationSignInRoute
   '/profile/$id': typeof ProfileIdRouteWithChildren
   '/profile/$id/friends': typeof ProfileIdFriendsRoute
 }
@@ -177,48 +179,48 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | ''
     | '/home'
     | '/profile'
     | '/search'
-    | '/sign_in'
+    | '/forgotten-password'
+    | '/sign-in'
     | '/profile/$id'
     | '/profile/$id/friends'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | ''
     | '/home'
     | '/profile'
     | '/search'
-    | '/sign_in'
+    | '/forgotten-password'
+    | '/sign-in'
     | '/profile/$id'
     | '/profile/$id/friends'
   id:
     | '__root__'
-    | '/_authenticated'
     | '/home'
     | '/profile'
     | '/search'
-    | '/sign_in'
+    | '/_authentication/forgotten-password'
+    | '/_authentication/sign-in'
     | '/profile/$id'
     | '/profile/$id/friends'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  AuthenticatedRoute: typeof AuthenticatedRoute
   HomeRoute: typeof HomeRoute
   ProfileRoute: typeof ProfileRouteWithChildren
   SearchRoute: typeof SearchRoute
-  SigninRoute: typeof SigninRoute
+  AuthenticationForgottenPasswordRoute: typeof AuthenticationForgottenPasswordRoute
+  AuthenticationSignInRoute: typeof AuthenticationSignInRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  AuthenticatedRoute: AuthenticatedRoute,
   HomeRoute: HomeRoute,
   ProfileRoute: ProfileRouteWithChildren,
   SearchRoute: SearchRoute,
-  SigninRoute: SigninRoute,
+  AuthenticationForgottenPasswordRoute: AuthenticationForgottenPasswordRoute,
+  AuthenticationSignInRoute: AuthenticationSignInRoute,
 }
 
 export const routeTree = rootRoute
@@ -231,15 +233,12 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/_authenticated",
         "/home",
         "/profile",
         "/search",
-        "/sign_in"
+        "/_authentication/forgotten-password",
+        "/_authentication/sign-in"
       ]
-    },
-    "/_authenticated": {
-      "filePath": "_authenticated.tsx"
     },
     "/home": {
       "filePath": "home.tsx"
@@ -253,8 +252,11 @@ export const routeTree = rootRoute
     "/search": {
       "filePath": "search.tsx"
     },
-    "/sign_in": {
-      "filePath": "sign_in.tsx"
+    "/_authentication/forgotten-password": {
+      "filePath": "_authentication/forgotten-password.tsx"
+    },
+    "/_authentication/sign-in": {
+      "filePath": "_authentication/sign-in.tsx"
     },
     "/profile/$id": {
       "filePath": "profile/$id.tsx",

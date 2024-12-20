@@ -2,19 +2,18 @@ import Typography from "@mui/material/Typography/Typography";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { AppRoutes } from "../utils/routesConfig";
-import { useAuthenticationStore } from "stores/authentication";
+import { useAuthenticationStore } from "stores/authenticationStore";
 
 const Home = () => {
+	const isLoggedIn = useAuthenticationStore((state) => state.isLoggedIn);
 
-    const isLoggedIn = useAuthenticationStore((state) => state.isLoggedIn);
-
-    return (
+	return (
 		<>
-			{ isLoggedIn &&
+			{isLoggedIn && (
 				<Typography variant='h4' sx={{ mb: 2 }}>
 					Main Content
 				</Typography>
-			}
+			)}
 			<Typography variant='h4' sx={{ mb: 2 }}>
 				Main Content
 			</Typography>

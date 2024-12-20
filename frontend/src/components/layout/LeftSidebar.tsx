@@ -1,20 +1,22 @@
+// LeftSidebar.tsx
+
 import { RouterLink } from "@Components/navigation/routerLink";
-import { PersonPinCircleOutlined } from "@mui/icons-material";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import CloseIcon from "@mui/icons-material/Close";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import HomeIcon from "@mui/icons-material/Home";
-import InfoIcon from "@mui/icons-material/Info";
-import LogoutIcon from "@mui/icons-material/Logout";
-import PeopleIcon from "@mui/icons-material/People";
-import SettingsIcon from "@mui/icons-material/Settings";
+import {
+	PersonPinCircleOutlined,
+	Home as HomeIcon,
+	Search as SearchIcon,
+	Dashboard as DashboardIcon,
+	Settings as SettingsIcon,
+	ExpandLess,
+	ExpandMore,
+	ArrowRight,
+	People as PeopleIcon,
+	Logout as LogoutIcon,
+	HelpOutline as HelpOutlineIcon,
+	Info as InfoIcon,
+} from "@mui/icons-material";
 import {
 	Drawer,
-	IconButton,
-	Toolbar,
 	Box,
 	List,
 	ListItem,
@@ -25,10 +27,15 @@ import {
 	Divider,
 	Button,
 	Tooltip,
+	Avatar,
+	Typography,
+	useTheme,
+	Toolbar, // Added Toolbar import
 } from "@mui/material";
+import { useRouter } from "@tanstack/react-router";
+import React from "react";
 
-import { useAuth } from "hooks/auth";
-import { useAuthenticationStore } from "stores/authentication";
+import { useAuthenticationStore } from "stores/authenticationStore";
 
 interface LeftSidebarProps {
 	open: boolean,
@@ -37,7 +44,6 @@ interface LeftSidebarProps {
 	submenuOpen: boolean,
 	onSubmenuToggle: ()=> void,
 	onClose: ()=> void,
-	onLogout: ()=> void,
 	onHelp: ()=> void,
 	onAbout: ()=> void,
 }
@@ -52,17 +58,26 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 	onHelp,
 	onAbout,
 }) => {
+	const signOut = useAuthenticationStore((state) => state.signOut);
+	const router = useRouter();
+	const theme = useTheme();
 
-    const { signOut } = useAuth();
+	// Function to check if a route is active
+	const isActive = (path: string) => router.basepath === path;
 
-	const signOutAuth = useAuthenticationStore((state) => state.signOut);
+	// Function to handle navigation item click
+	const handleNavItemClick = () => {
+		if (!lgUp) {
+			onClose(); // Close the Drawer on mobile after navigation
+		}
+	};
 
 	return (
 		<Drawer
-			variant={lgUp ? "persistent" : "temporary"}
+			variant={lgUp ? "persistent" : "temporary"} // Changed to "persistent"
 			open={open}
 			onClose={onClose}
-			ModalProps={{ keepMounted: true }}
+			ModalProps={{ keepMounted: true }} // Better open performance on mobile.
 			sx={{
 				width: drawerWidth,
 				flexShrink: 0,
@@ -72,138 +87,234 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 					display: "flex",
 					flexDirection: "column",
 					justifyContent: "space-between",
+					backgroundColor: theme.palette.background.paper,
 				},
-				order: 0,
 			}}
 		>
-			{/* Main navigation area */}
+			{/* Top Section: User Info and Navigation */}
 			<Box>
-				<Toolbar>
-					{lgUp && (
-						<IconButton edge='start' color='inherit' onClick={onClose}>
-							<CloseIcon />
-						</IconButton>
-					)}
-				</Toolbar>
-				<Box sx={{ overflow: "auto" }}>
-					<List component='nav'>
-						<ListItem disablePadding>
-							<RouterLink
-								to='/profile/$id'
-								params={{ id: "10" }}
-								style={{ textDecoration: "none", width: "100%", color: "inherit" }}
-							>
-								<ListItemButton>
-									<ListItemIcon>
-										<PersonPinCircleOutlined />
-									</ListItemIcon>
-									<ListItemText primary='Profile' />
-								</ListItemButton>
-							</RouterLink>
-						</ListItem>
-						<ListItem disablePadding>
-							<RouterLink to='/home' style={{ textDecoration: "none", width: "100%", color: "inherit" }}>
-								<ListItemButton>
-									<ListItemIcon>
-										<HomeIcon />
-									</ListItemIcon>
-									<ListItemText primary='Home' />
-								</ListItemButton>
-							</RouterLink>
-						</ListItem>
-						<ListItem disablePadding>
-							<RouterLink
-								to='/search'
-								search={{ isBlocked: true, query: "asdasd" }}
-								params={{ id: "10" }}
-								style={{ textDecoration: "none", width: "100%", color: "inherit" }}
-							>
-								<ListItemButton>
-									<ListItemIcon>
-										<HomeIcon />
-									</ListItemIcon>
-									<ListItemText primary='Search' />
-								</ListItemButton>
-							</RouterLink>
-						</ListItem>
-						<ListItem disablePadding>
-							<ListItemButton>
+				{/* Spacer to offset the fixed header */}
+				<Toolbar /> {/* Added Toolbar spacer */}
+				{/* User Information Section */}
+				{useAuthenticationStore.getState().isLoggedIn && (
+					<Box sx={{ p: 2, display: "flex", alignItems: "center" }}>
+						<Avatar
+							alt={"User"}
+							src={"https://randomuser.me/api/portraits/thumb/men/75.jpg"}
+							sx={{ width: 48, height: 48, mr: 2 }}
+						>
+						</Avatar>
+						<Box>
+							<Typography variant='subtitle1' noWrap>
+								{"User"}
+							</Typography>
+							<Typography variant='body2' color='text.secondary' noWrap>
+								{"user@example.com"}
+							</Typography>
+						</Box>
+					</Box>
+				)}
+				{/* Navigation List */}
+				<List component='nav'>
+					{/* Profile */}
+					<ListItem disablePadding>
+						<RouterLink
+							to='/profile/$id'
+							params={{ id: "10" }}
+							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
+							onClick={handleNavItemClick}
+						>
+							<ListItemButton selected={isActive("/profile/$id")}>
+								<ListItemIcon>
+									<PersonPinCircleOutlined />
+								</ListItemIcon>
+								<ListItemText primary='Profile' />
+							</ListItemButton>
+						</RouterLink>
+					</ListItem>
+
+					{/* Home */}
+					<ListItem disablePadding>
+						<RouterLink
+							to='/home'
+							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
+							onClick={handleNavItemClick}
+						>
+							<ListItemButton selected={isActive("/home")}>
+								<ListItemIcon>
+									<HomeIcon />
+								</ListItemIcon>
+								<ListItemText primary='Home' />
+							</ListItemButton>
+						</RouterLink>
+					</ListItem>
+
+					{/* Search */}
+					<ListItem disablePadding>
+						<RouterLink
+							to='/search'
+							search={{ isBlocked: true, query: "asdasd" }}
+							params={{ id: "10" }}
+							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
+							onClick={handleNavItemClick}
+						>
+							<ListItemButton selected={isActive("/search")}>
+								<ListItemIcon>
+									<SearchIcon />
+								</ListItemIcon>
+								<ListItemText primary='Search' />
+							</ListItemButton>
+						</RouterLink>
+					</ListItem>
+
+					{/* Dashboard */}
+					<ListItem disablePadding>
+						<RouterLink
+							to='/home' // Corrected path
+							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
+							onClick={handleNavItemClick}
+						>
+							<ListItemButton selected={isActive("/dashboard")}>
 								<ListItemIcon>
 									<DashboardIcon />
 								</ListItemIcon>
 								<ListItemText primary='Dashboard' />
 							</ListItemButton>
-						</ListItem>
-						<ListItem disablePadding>
-							<ListItemButton onClick={onSubmenuToggle}>
-								<ListItemIcon>
-									<SettingsIcon />
-								</ListItemIcon>
-								<ListItemText primary='Settings' />
-								{submenuOpen ? <ExpandLess /> : <ExpandMore />}
-							</ListItemButton>
-						</ListItem>
-						<Collapse in={submenuOpen} timeout='auto' unmountOnExit>
-							<List component='div' disablePadding>
-								<ListItemButton sx={{ pl: 4 }}>
-									<ListItemIcon>
-										<ArrowRightIcon />
-									</ListItemIcon>
-									<ListItemText primary='Profile Settings' />
-								</ListItemButton>
-								<ListItemButton sx={{ pl: 4 }}>
-									<ListItemIcon>
-										<ArrowRightIcon />
-									</ListItemIcon>
-									<ListItemText primary='Account Settings' />
-								</ListItemButton>
-							</List>
-						</Collapse>
-						<ListItem disablePadding>
-							<ListItemButton>
+						</RouterLink>
+					</ListItem>
+
+					{/* Settings with Submenu */}
+					<ListItem disablePadding>
+						<ListItemButton onClick={onSubmenuToggle}>
+							<ListItemIcon>
+								<SettingsIcon />
+							</ListItemIcon>
+							<ListItemText primary='Settings' />
+							{submenuOpen ? <ExpandLess /> : <ExpandMore />}
+						</ListItemButton>
+					</ListItem>
+					<Collapse in={submenuOpen} timeout='auto' unmountOnExit>
+						<List component='div' disablePadding>
+							{/* Profile Settings */}
+							<ListItem disablePadding>
+								<RouterLink
+									to='/home'
+									style={{ textDecoration: "none", width: "100%", color: "inherit" }}
+									onClick={handleNavItemClick}
+								>
+									<ListItemButton sx={{ pl: 4 }} selected={isActive("/settings/profile")}>
+										<ListItemIcon>
+											<ArrowRight />
+										</ListItemIcon>
+										<ListItemText primary='Profile Settings' />
+									</ListItemButton>
+								</RouterLink>
+							</ListItem>
+							{/* Account Settings */}
+							<ListItem disablePadding>
+								<RouterLink
+									to='/home'
+									style={{ textDecoration: "none", width: "100%", color: "inherit" }}
+									onClick={handleNavItemClick}
+								>
+									<ListItemButton sx={{ pl: 4 }} selected={isActive("/settings/account")}>
+										<ListItemIcon>
+											<ArrowRight />
+										</ListItemIcon>
+										<ListItemText primary='Account Settings' />
+									</ListItemButton>
+								</RouterLink>
+							</ListItem>
+						</List>
+					</Collapse>
+
+					{/* Users */}
+					<ListItem disablePadding>
+						<RouterLink
+							to='/home'
+							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
+							onClick={handleNavItemClick}
+						>
+							<ListItemButton selected={isActive("/users")}>
 								<ListItemIcon>
 									<PeopleIcon />
 								</ListItemIcon>
 								<ListItemText primary='Users' />
 							</ListItemButton>
-						</ListItem>
-					</List>
-				</Box>
+						</RouterLink>
+					</ListItem>
+				</List>
 			</Box>
 
-			{/* Bottom action buttons */}
+			{/* Bottom Section: Action Buttons */}
 			<Box>
 				<Divider />
-				<Box sx={{ display: "flex" }}>
+				<Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1 }}>
+					{/* Logout Button */}
 					<Tooltip title='Logout'>
 						<Button
-							variant='contained'
-							color='primary'
-							fullWidth
-							sx={{ borderRadius: 0 }}
+							variant='outlined'
+							color='error'
 							startIcon={<LogoutIcon />}
-							onClick={() => { signOut(); signOutAuth(); } }
-						/>
+							fullWidth
+							onClick={() => {
+								signOut();
+								router.invalidate();
+								if (!lgUp) {
+									onClose(); // Close Drawer after logout on mobile
+								}
+							}}
+							sx={{
+								textTransform: "none",
+								justifyContent: "flex-start",
+							}}
+						>
+							Logout
+						</Button>
 					</Tooltip>
+
+					{/* Help Button */}
 					<Tooltip title='Help'>
 						<Button
-							variant='contained'
+							variant='outlined'
 							color='primary'
-							fullWidth
-							sx={{ borderRadius: 0 }}
 							startIcon={<HelpOutlineIcon />}
-							onClick={onHelp}
-						/>
+							fullWidth
+							onClick={() => {
+								onHelp();
+								if (!lgUp) {
+									onClose(); // Close Drawer after action on mobile
+								}
+							}}
+							sx={{
+								textTransform: "none",
+								justifyContent: "flex-start",
+							}}
+						>
+							Help
+						</Button>
 					</Tooltip>
+
+					{/* About Button */}
 					<Tooltip title='About'>
 						<Button
-							variant='contained'
+							variant='outlined'
 							color='primary'
-							fullWidth
-							sx={{ borderRadius: 0 }}
 							startIcon={<InfoIcon />}
-							onClick={onAbout}
-						/>
+							fullWidth
+							onClick={() => {
+								onAbout();
+								if (!lgUp) {
+									onClose(); // Close Drawer after action on mobile
+								}
+							}}
+							sx={{
+								textTransform: "none",
+								justifyContent: "flex-start",
+							}}
+						>
+							About
+						</Button>
 					</Tooltip>
 				</Box>
 			</Box>

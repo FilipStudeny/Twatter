@@ -2,10 +2,8 @@ import { NotFound } from "@Components/NotFound";
 import { createTheme, CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 /* eslint-disable @stylistic/object-curly-newline */
-/* eslint-disable @stylistic/brace-style */
 import { useAuth } from "hooks/auth";
 
 import { routeTree } from "./routeTree.gen";
@@ -26,7 +24,6 @@ const App = () => {
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
 			<RouterProvider router={router} context={{ auth }} />
-			<TanStackRouterDevtools router={router} />
 		</ThemeProvider>
 	);
 };

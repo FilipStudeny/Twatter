@@ -1,6 +1,8 @@
-import { Box, useMediaQuery, useTheme, Fab, Toolbar } from "@mui/material";
+import { Box, useMediaQuery, useTheme, Toolbar } from "@mui/material";
 import { Outlet } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+
+import { useAuthenticationStore } from "stores/authenticationStore";
 
 import { Header } from "./Header";
 import { LeftSidebar } from "./LeftSidebar";
@@ -20,6 +22,8 @@ export const Layout = () => {
 	const theme = useTheme();
 	const lgUp = useMediaQuery(theme.breakpoints.up("lg"));
 
+	const isLoggedIn = useAuthenticationStore((state) => state.isLoggedIn);
+
 	// Drawer states
 	const [leftOpen, setLeftOpen] = useState(lgUp);
 	const [rightOpen, setRightOpen] = useState(lgUp);
@@ -30,19 +34,24 @@ export const Layout = () => {
 	const handleLeftToggle = () => {
 		setLeftOpen((prev) => !prev);
 		if (!lgUp) {
-			// On small screens, closing the right sidebar when left is opened as overlay
 			setRightOpen(false);
 		}
 	};
 
 	const handleRightToggle = () => {
 		setRightOpen((prev) => !prev);
+		if (!lgUp) {
+			setLeftOpen(false);
+		}
 	};
 
-	// Automatically close the left sidebar when resizing below lg
 	useEffect(() => {
 		if (!lgUp) {
 			setLeftOpen(false);
+			setRightOpen(false);
+		} else {
+			setLeftOpen(true);
+			setRightOpen(true);
 		}
 	}, [lgUp]);
 
@@ -50,30 +59,43 @@ export const Layout = () => {
 		setSubmenuOpen((prev) => !prev);
 	};
 
-	const handleLogout = () => {
-		console.log("Logging out...");
-		// Implement actual logout logic here
-	};
-
 	const handleHelp = () => {
 		console.log("Navigating to Help...");
-		// Implement navigation to help page here
 	};
 
 	const handleAbout = () => {
 		console.log("Navigating to About...");
-		// Implement navigation to about page here
 	};
 
 	return (
-		<>
+		<div style={{ background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)" }}>
 			{/* Header */}
-			<Header leftOpen={leftOpen} lgUp={lgUp} onLeftToggle={handleLeftToggle} />
+			<Header leftOpen={leftOpen} rightOpen={rightOpen} lgUp={lgUp} onLeftToggle={handleLeftToggle} onRightToggle={handleRightToggle} />
 
 			{/* Page Layout */}
 			<Box
-				sx={{ display: "flex", flexDirection: "row", width: "100%", height: "100vh", boxSizing: "border-box" }}
+				sx={{
+					display: "flex",
+					flexDirection: "row",
+					width: "100%",
+					height: "100vh",
+					boxSizing: "border-box",
+				}}
 			>
+				{isLoggedIn && (
+					<>
+						<LeftSidebar
+							open={leftOpen}
+							lgUp={lgUp}
+							drawerWidth={drawerWidthLeft}
+							submenuOpen={submenuOpen}
+							onSubmenuToggle={handleSubmenuToggle}
+							onClose={() => setLeftOpen(false)}
+							onHelp={handleHelp}
+							onAbout={handleAbout}
+						/>
+					</>
+				)}
 				<Box
 					component='main'
 					sx={{
@@ -82,51 +104,27 @@ export const Layout = () => {
 						flexDirection: "column",
 						alignItems: "center",
 						justifyContent: "flex-start",
-						p: 3,
-						order: 1,
+						order: 0,
 						transition: "margin 0.3s",
+						px: 2,
 					}}
 				>
 					<Toolbar />
 					<Outlet />
 				</Box>
-
-				{/* Left Sidebar */}
-				<LeftSidebar
-					open={leftOpen}
-					lgUp={lgUp}
-					drawerWidth={drawerWidthLeft}
-					submenuOpen={submenuOpen}
-					onSubmenuToggle={handleSubmenuToggle}
-					onClose={() => setLeftOpen(false)}
-					onLogout={handleLogout}
-					onHelp={handleHelp}
-					onAbout={handleAbout}
-				/>
-
-				{/* Right Sidebar (Online Users) - Large screens only */}
-				{lgUp && (
-					<RightSidebar
-						open={rightOpen}
-						drawerWidth={drawerWidthRight}
-						onClose={handleRightToggle}
-						onlineUsers={onlineUsers}
-					/>
-				)}
-
-				{/* Floating Action Button for Right Sidebar (only on large screens) */}
-				{lgUp && (
-					<Fab
-						color='primary'
-						aria-label='toggle right sidebar'
-						onClick={handleRightToggle}
-						sx={{ position: "fixed", bottom: 16, right: 16 }}
-					>
-						+
-					</Fab>
+				{/* Right Sidebar and FAB */}
+				{isLoggedIn && (
+					<>
+						<RightSidebar
+							open={rightOpen}
+							drawerWidth={drawerWidthRight}
+							onClose={handleRightToggle}
+							onlineUsers={onlineUsers}
+							lgUp={lgUp}
+						/>
+					</>
 				)}
 			</Box>
-		</>
+		</div>
 	);
 };
-

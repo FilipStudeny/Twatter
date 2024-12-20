@@ -1,19 +1,13 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { useAuthenticationStore } from "stores/authentication";
+import { useAuthenticationStore } from "stores/authenticationStore";
 
 export const Route = createFileRoute("/profile")({
-	beforeLoad: async ({ context }) => {
+	beforeLoad: async () => {
 		const loggedIn = useAuthenticationStore.getState().isLoggedIn;
 
-		console.log(loggedIn);
-		if (loggedIn === true) {
-			console.log("asdsadasdasdasd");
-		}
-
-		const { isLogged } = context.auth;
-		if (!isLogged()) {
-			throw redirect({ to: "/sign_in" });
+		if (!loggedIn) {
+			throw redirect({ to: "/sign-in" });
 		}
 	},
 });
