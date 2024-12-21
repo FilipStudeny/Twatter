@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 import { RequestInit } from 'graphql-request/dist/types.dom';
-import { useMutation, useQuery, UseMutationOptions, UseQueryOptions } from '@tanstack/react-query';
+import { useMutation, useQuery, useInfiniteQuery, UseMutationOptions, UseQueryOptions, UseInfiniteQueryOptions, InfiniteData } from '@tanstack/react-query';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -23,11 +23,9 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: { input: any; output: any; }
 };
 
-/** Different types of roles available */
 export enum AdminRole {
   Admin = 'ADMIN',
   Administrator = 'ADMINISTRATOR',
@@ -84,7 +82,6 @@ export type GenericResponse = {
   message?: Maybe<Scalars['String']['output']>;
 };
 
-/** Filter options for the graph data */
 export enum GraphFilter {
   Day = 'Day',
   Month = 'Month',
@@ -302,13 +299,11 @@ export type QueryGetUsersArgs = {
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
-/** Target type for the reaction, either POST or COMMENT */
 export enum ReactionTargetType {
   Comment = 'COMMENT',
   Post = 'POST'
 }
 
-/** Different types of reactions available */
 export enum ReactionType {
   Angry = 'ANGRY',
   Dislike = 'DISLIKE',
@@ -451,7 +446,7 @@ export type GetAdministrationPostsListQuery = { __typename?: 'Query', getPosts: 
 
 
 
-export const CreateAdminDocument = `
+export const CreateAdminDocument = /*#__PURE__*/ `
     mutation CreateAdmin($createAdmin: CreateAdminDto!) {
   CreateAdmin(createAdminDto: $createAdmin) {
     message
@@ -460,7 +455,7 @@ export const CreateAdminDocument = `
     `;
 
 export const useCreateAdminMutation = <
-      TError = unknown,
+      TError = any,
       TContext = unknown
     >(
       client: GraphQLClient,
@@ -476,10 +471,12 @@ export const useCreateAdminMutation = <
   }
     )};
 
+useCreateAdminMutation.getKey = () => ['CreateAdmin'];
+
 
 useCreateAdminMutation.fetcher = (client: GraphQLClient, variables: CreateAdminMutationVariables, headers?: RequestInit['headers']) => fetcher<CreateAdminMutation, CreateAdminMutationVariables>(client, CreateAdminDocument, variables, headers);
 
-export const SignInAdminDocument = `
+export const SignInAdminDocument = /*#__PURE__*/ `
     mutation SignInAdmin($signIn: SignInCredentials!) {
   SignInAdmin(signIn: $signIn) {
     accessToken
@@ -489,7 +486,7 @@ export const SignInAdminDocument = `
     `;
 
 export const useSignInAdminMutation = <
-      TError = unknown,
+      TError = any,
       TContext = unknown
     >(
       client: GraphQLClient,
@@ -505,10 +502,12 @@ export const useSignInAdminMutation = <
   }
     )};
 
+useSignInAdminMutation.getKey = () => ['SignInAdmin'];
+
 
 useSignInAdminMutation.fetcher = (client: GraphQLClient, variables: SignInAdminMutationVariables, headers?: RequestInit['headers']) => fetcher<SignInAdminMutation, SignInAdminMutationVariables>(client, SignInAdminDocument, variables, headers);
 
-export const RefreshTokenDocument = `
+export const RefreshTokenDocument = /*#__PURE__*/ `
     mutation RefreshToken($refreshToken: String!) {
   refreshToken(refreshToken: $refreshToken) {
     accessToken
@@ -518,7 +517,7 @@ export const RefreshTokenDocument = `
     `;
 
 export const useRefreshTokenMutation = <
-      TError = unknown,
+      TError = any,
       TContext = unknown
     >(
       client: GraphQLClient,
@@ -534,10 +533,12 @@ export const useRefreshTokenMutation = <
   }
     )};
 
+useRefreshTokenMutation.getKey = () => ['RefreshToken'];
+
 
 useRefreshTokenMutation.fetcher = (client: GraphQLClient, variables: RefreshTokenMutationVariables, headers?: RequestInit['headers']) => fetcher<RefreshTokenMutation, RefreshTokenMutationVariables>(client, RefreshTokenDocument, variables, headers);
 
-export const CreateCommentDocument = `
+export const CreateCommentDocument = /*#__PURE__*/ `
     mutation CreateComment($createComment: CreateCommentDto!, $postId: String!) {
   CreateComment(createComment: $createComment, postId: $postId) {
     message
@@ -546,7 +547,7 @@ export const CreateCommentDocument = `
     `;
 
 export const useCreateCommentMutation = <
-      TError = unknown,
+      TError = any,
       TContext = unknown
     >(
       client: GraphQLClient,
@@ -562,10 +563,12 @@ export const useCreateCommentMutation = <
   }
     )};
 
+useCreateCommentMutation.getKey = () => ['CreateComment'];
+
 
 useCreateCommentMutation.fetcher = (client: GraphQLClient, variables: CreateCommentMutationVariables, headers?: RequestInit['headers']) => fetcher<CreateCommentMutation, CreateCommentMutationVariables>(client, CreateCommentDocument, variables, headers);
 
-export const PinCommentDocument = `
+export const PinCommentDocument = /*#__PURE__*/ `
     mutation PinComment($postId: String!, $commentId: String!) {
   PinComment(postId: $postId, commentId: $commentId) {
     message
@@ -574,7 +577,7 @@ export const PinCommentDocument = `
     `;
 
 export const usePinCommentMutation = <
-      TError = unknown,
+      TError = any,
       TContext = unknown
     >(
       client: GraphQLClient,
@@ -590,10 +593,12 @@ export const usePinCommentMutation = <
   }
     )};
 
+usePinCommentMutation.getKey = () => ['PinComment'];
+
 
 usePinCommentMutation.fetcher = (client: GraphQLClient, variables: PinCommentMutationVariables, headers?: RequestInit['headers']) => fetcher<PinCommentMutation, PinCommentMutationVariables>(client, PinCommentDocument, variables, headers);
 
-export const CreateGroupDocument = `
+export const CreateGroupDocument = /*#__PURE__*/ `
     mutation CreateGroup($createGroupDto: CreateGroupDto!) {
   createGroup(createGroupDto: $createGroupDto) {
     message
@@ -602,7 +607,7 @@ export const CreateGroupDocument = `
     `;
 
 export const useCreateGroupMutation = <
-      TError = unknown,
+      TError = any,
       TContext = unknown
     >(
       client: GraphQLClient,
@@ -618,10 +623,12 @@ export const useCreateGroupMutation = <
   }
     )};
 
+useCreateGroupMutation.getKey = () => ['CreateGroup'];
+
 
 useCreateGroupMutation.fetcher = (client: GraphQLClient, variables: CreateGroupMutationVariables, headers?: RequestInit['headers']) => fetcher<CreateGroupMutation, CreateGroupMutationVariables>(client, CreateGroupDocument, variables, headers);
 
-export const CreatePostDocument = `
+export const CreatePostDocument = /*#__PURE__*/ `
     mutation CreatePost($input: CreatePostDto!) {
   CreatePost(createPost: $input) {
     message
@@ -630,7 +637,7 @@ export const CreatePostDocument = `
     `;
 
 export const useCreatePostMutation = <
-      TError = unknown,
+      TError = any,
       TContext = unknown
     >(
       client: GraphQLClient,
@@ -646,10 +653,12 @@ export const useCreatePostMutation = <
   }
     )};
 
+useCreatePostMutation.getKey = () => ['CreatePost'];
+
 
 useCreatePostMutation.fetcher = (client: GraphQLClient, variables: CreatePostMutationVariables, headers?: RequestInit['headers']) => fetcher<CreatePostMutation, CreatePostMutationVariables>(client, CreatePostDocument, variables, headers);
 
-export const GetPostStatisticsDocument = `
+export const GetPostStatisticsDocument = /*#__PURE__*/ `
     query GetPostStatistics {
   getPostsStatistics(filter: Month, year: 2024) {
     period
@@ -660,7 +669,7 @@ export const GetPostStatisticsDocument = `
 
 export const useGetPostStatisticsQuery = <
       TData = GetPostStatisticsQuery,
-      TError = unknown
+      TError = any
     >(
       client: GraphQLClient,
       variables?: GetPostStatisticsQueryVariables,
@@ -676,12 +685,37 @@ export const useGetPostStatisticsQuery = <
   }
     )};
 
+useGetPostStatisticsQuery.document = GetPostStatisticsDocument;
+
 useGetPostStatisticsQuery.getKey = (variables?: GetPostStatisticsQueryVariables) => variables === undefined ? ['GetPostStatistics'] : ['GetPostStatistics', variables];
+
+export const useInfiniteGetPostStatisticsQuery = <
+      TData = InfiniteData<GetPostStatisticsQuery>,
+      TError = any
+    >(
+      client: GraphQLClient,
+      variables: GetPostStatisticsQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetPostStatisticsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetPostStatisticsQuery, TError, TData>['queryKey'] },
+      headers?: RequestInit['headers']
+    ) => {
+    
+    return useInfiniteQuery<GetPostStatisticsQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetPostStatistics.infinite'] : ['GetPostStatistics.infinite', variables],
+      queryFn: (metaData) => fetcher<GetPostStatisticsQuery, GetPostStatisticsQueryVariables>(client, GetPostStatisticsDocument, {...variables, ...(metaData.pageParam ?? {})}, headers)(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetPostStatisticsQuery.getKey = (variables?: GetPostStatisticsQueryVariables) => variables === undefined ? ['GetPostStatistics.infinite'] : ['GetPostStatistics.infinite', variables];
 
 
 useGetPostStatisticsQuery.fetcher = (client: GraphQLClient, variables?: GetPostStatisticsQueryVariables, headers?: RequestInit['headers']) => fetcher<GetPostStatisticsQuery, GetPostStatisticsQueryVariables>(client, GetPostStatisticsDocument, variables, headers);
 
-export const GetPostsListDocument = `
+export const GetPostsListDocument = /*#__PURE__*/ `
     query GetPostsList($page: Int = 1, $limit: Int = 10) {
   getPosts(page: $page, limit: $limit) {
     items {
@@ -719,7 +753,7 @@ export const GetPostsListDocument = `
 
 export const useGetPostsListQuery = <
       TData = GetPostsListQuery,
-      TError = unknown
+      TError = any
     >(
       client: GraphQLClient,
       variables?: GetPostsListQueryVariables,
@@ -727,6 +761,7 @@ export const useGetPostsListQuery = <
       headers?: RequestInit['headers']
     ) => {
     
+      console.log("adsasd")
     return useQuery<GetPostsListQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['GetPostsList'] : ['GetPostsList', variables],
@@ -735,12 +770,37 @@ export const useGetPostsListQuery = <
   }
     )};
 
+useGetPostsListQuery.document = GetPostsListDocument;
+
 useGetPostsListQuery.getKey = (variables?: GetPostsListQueryVariables) => variables === undefined ? ['GetPostsList'] : ['GetPostsList', variables];
+
+export const useInfiniteGetPostsListQuery = <
+      TData = InfiniteData<GetPostsListQuery>,
+      TError = any
+    >(
+      client: GraphQLClient,
+      variables: GetPostsListQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetPostsListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetPostsListQuery, TError, TData>['queryKey'] },
+      headers?: RequestInit['headers']
+    ) => {
+    
+    return useInfiniteQuery<GetPostsListQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetPostsList.infinite'] : ['GetPostsList.infinite', variables],
+      queryFn: (metaData) => fetcher<GetPostsListQuery, GetPostsListQueryVariables>(client, GetPostsListDocument, {...variables, ...(metaData.pageParam ?? {})}, headers)(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetPostsListQuery.getKey = (variables?: GetPostsListQueryVariables) => variables === undefined ? ['GetPostsList.infinite'] : ['GetPostsList.infinite', variables];
 
 
 useGetPostsListQuery.fetcher = (client: GraphQLClient, variables?: GetPostsListQueryVariables, headers?: RequestInit['headers']) => fetcher<GetPostsListQuery, GetPostsListQueryVariables>(client, GetPostsListDocument, variables, headers);
 
-export const GetAdministrationPostsListDocument = `
+export const GetAdministrationPostsListDocument = /*#__PURE__*/ `
     query GetAdministrationPostsList($page: Int = 1, $limit: Int = 10) {
   getPosts(page: $page, limit: $limit) {
     items {
@@ -793,7 +853,7 @@ export const GetAdministrationPostsListDocument = `
 
 export const useGetAdministrationPostsListQuery = <
       TData = GetAdministrationPostsListQuery,
-      TError = unknown
+      TError = any
     >(
       client: GraphQLClient,
       variables?: GetAdministrationPostsListQueryVariables,
@@ -809,7 +869,32 @@ export const useGetAdministrationPostsListQuery = <
   }
     )};
 
+useGetAdministrationPostsListQuery.document = GetAdministrationPostsListDocument;
+
 useGetAdministrationPostsListQuery.getKey = (variables?: GetAdministrationPostsListQueryVariables) => variables === undefined ? ['GetAdministrationPostsList'] : ['GetAdministrationPostsList', variables];
+
+export const useInfiniteGetAdministrationPostsListQuery = <
+      TData = InfiniteData<GetAdministrationPostsListQuery>,
+      TError = any
+    >(
+      client: GraphQLClient,
+      variables: GetAdministrationPostsListQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetAdministrationPostsListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetAdministrationPostsListQuery, TError, TData>['queryKey'] },
+      headers?: RequestInit['headers']
+    ) => {
+    
+    return useInfiniteQuery<GetAdministrationPostsListQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetAdministrationPostsList.infinite'] : ['GetAdministrationPostsList.infinite', variables],
+      queryFn: (metaData) => fetcher<GetAdministrationPostsListQuery, GetAdministrationPostsListQueryVariables>(client, GetAdministrationPostsListDocument, {...variables, ...(metaData.pageParam ?? {})}, headers)(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetAdministrationPostsListQuery.getKey = (variables?: GetAdministrationPostsListQueryVariables) => variables === undefined ? ['GetAdministrationPostsList.infinite'] : ['GetAdministrationPostsList.infinite', variables];
 
 
 useGetAdministrationPostsListQuery.fetcher = (client: GraphQLClient, variables?: GetAdministrationPostsListQueryVariables, headers?: RequestInit['headers']) => fetcher<GetAdministrationPostsListQuery, GetAdministrationPostsListQueryVariables>(client, GetAdministrationPostsListDocument, variables, headers);

@@ -1,6 +1,10 @@
 {
-  "dependencies": {
-    "@tanstack/react-query": "^5.62.3",
-    "graphql-request": "5.1.0"
-  }
+	"peerDependencies": {
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"dependencies": {
+		"@tanstack/react-query": "^5.62.3",
+		"graphql-request": "5.1.0"
+	}
 }

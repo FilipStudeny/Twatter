@@ -2,6 +2,7 @@ import { NotFound } from "@Components/NotFound";
 import { createTheme, CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 /* eslint-disable @stylistic/object-curly-newline */
 import { useAuth } from "hooks/auth";
@@ -17,14 +18,18 @@ declare module "@tanstack/react-router" {
 	}
 }
 
+const queryClient = new QueryClient();
+
 const App = () => {
 	const auth = useAuth();
 
 	return (
-		<ThemeProvider theme={theme}>
-			<CssBaseline />
-			<RouterProvider router={router} context={{ auth }} />
-		</ThemeProvider>
+		<QueryClientProvider client={queryClient}>
+			<ThemeProvider theme={theme}>
+				<CssBaseline />
+				<RouterProvider router={router} context={{ auth }} />
+			</ThemeProvider>
+		</QueryClientProvider>
 	);
 };
 

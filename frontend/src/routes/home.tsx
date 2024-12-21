@@ -1,11 +1,25 @@
 import Typography from "@mui/material/Typography/Typography";
 import { createFileRoute } from "@tanstack/react-router";
+import { GraphQLClient } from "graphql-request/dist";
+import { useEffect } from "react";
+
 
 import { AppRoutes } from "../utils/routesConfig";
-import { useAuthenticationStore } from "stores/authenticationStore";
+import { useAuthenticationStore } from "@Stores/authenticationStore";
+import { useGetPostsListQuery } from "../../../Shared";
+
+const client = new GraphQLClient("http://localhost:3000/graphql");
 
 const Home = () => {
 	const isLoggedIn = useAuthenticationStore((state) => state.isLoggedIn);
+
+	const variables = { page: 1, limit: 10 };
+	const { data, isLoading, error } = useGetPostsListQuery(client, variables);
+	useEffect(() => {
+		console.log(data?.getPosts);
+		console.log("ERROR", error);
+		console.log(isLoading);
+	}, [data, error, isLoading]);
 
 	return (
 		<>

@@ -26,8 +26,9 @@
 			"@Routes/*": ["./routes/*"],
 			"@Components/*": ["./components/*"],
 			"@Pages/*": ["./Pages/*"],
-			"@Utils/*": ["./utils/*"]
+			"@Utils/*": ["./utils/*"],
+			"@Stores/*": ["./stores/*"],
 		}
   },
-  "include": ["src"]
+  "include": ["src", "../Shared"]
 }
