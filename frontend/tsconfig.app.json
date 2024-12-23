@@ -30,5 +30,5 @@
 			"@Stores/*": ["./stores/*"],
 		}
   },
-  "include": ["src", "../Shared"]
+  "include": ["src", "../shared"]
 }

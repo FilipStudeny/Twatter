@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, useTheme, Toolbar } from "@mui/material";
+import { Box, useMediaQuery, useTheme, Toolbar, Container } from "@mui/material";
 import { Outlet } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 
@@ -70,7 +70,13 @@ export const Layout = () => {
 	return (
 		<div style={{ background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)" }}>
 			{/* Header */}
-			<Header leftOpen={leftOpen} rightOpen={rightOpen} lgUp={lgUp} onLeftToggle={handleLeftToggle} onRightToggle={handleRightToggle} />
+			<Header
+				leftOpen={leftOpen}
+				rightOpen={rightOpen}
+				lgUp={lgUp}
+				onLeftToggle={handleLeftToggle}
+				onRightToggle={handleRightToggle}
+			/>
 
 			{/* Page Layout */}
 			<Box
@@ -78,7 +84,7 @@ export const Layout = () => {
 					display: "flex",
 					flexDirection: "row",
 					width: "100%",
-					height: "100vh",
+					minHeight: "100vh",
 					boxSizing: "border-box",
 				}}
 			>
@@ -110,7 +116,9 @@ export const Layout = () => {
 					}}
 				>
 					<Toolbar />
-					<Outlet />
+					<Container maxWidth='md' sx={{ py: 2 }}>
+						<Outlet />
+					</Container>
 				</Box>
 				{/* Right Sidebar and FAB */}
 				{isLoggedIn && (

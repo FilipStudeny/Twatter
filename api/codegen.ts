@@ -5,14 +5,16 @@ const config: CodegenConfig = {
 	schema: "./schema.gql",
 	documents: "src/**/*.graphql",
 	generates: {
-		"../shared/gql.ts": {
+		"../shared/code/gql.ts": {
 			plugins: ["typescript", "typescript-operations", "typescript-react-query"],
 			config: {
 				addDocBlocks: false,
 				dedupeFragments: true,
 				pureMagicComment: true,
 				disableDescriptions: true,
-				fetcher: "graphql-request",
+				fetcher: {
+					func: "./fetcher.client.ts#fetcher", // Use the custom fetcher without a client parameter
+				},
 				legacyMode: false,
 				exposeFetcher: true,
 				exposeDocument: true,

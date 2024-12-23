@@ -14,12 +14,13 @@
 		"@emotion/styled": "^11.14.0",
 		"@mui/icons-material": "^6.2.0",
 		"@mui/material": "^6.2.0",
+		"@tanstack/react-query": "^5.62.3",
 		"@tanstack/react-router": "^1.91.1",
+		"dayjs": "^1.11.13",
+		"graphql-request": "5.1.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"zustand": "^5.0.2",
-		"@tanstack/react-query": "file:../Shared/node_modules/@tanstack/react-query",
-		"graphql-request": "file:../Shared/node_modules/graphql-request"
+		"zustand": "^5.0.2"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.15.0",
