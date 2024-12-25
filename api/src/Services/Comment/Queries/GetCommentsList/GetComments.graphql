@@ -1,0 +1,57 @@
+query GetCommentsByPostId($postId: String!, $page: Int!, $limit: Int!) {
+	getCommentsList(postId: $postId, page: $page, limit: $limit) {
+		items {
+			id
+			content
+			creator {
+				id
+				username
+				firstName
+				lastName
+			}
+			postId
+			reactions {
+				like
+				dislike
+				smile
+				angry
+				sad
+				love
+			}
+			reportsCount
+			strikesCount
+			createdAt
+			updatedAt
+		}
+	}
+}
+
+query GetCommentsByCreatorId($creatorId: String!, $page: Int!, $limit: Int!) {
+	getCommentsList(creatorId: $creatorId, page: $page, limit: $limit) {
+		items {
+			id
+			content
+			creator {
+				id
+				username
+				firstName
+				lastName
+			}
+			postId
+			reactions {
+				like
+				dislike
+				smile
+				angry
+				sad
+				love
+			}
+			reportsCount
+			strikesCount
+			createdAt
+			updatedAt
+		}
+	}
+}
+
+

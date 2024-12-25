@@ -6,7 +6,12 @@ const config: CodegenConfig = {
 	documents: "src/**/*.graphql",
 	generates: {
 		"../shared/code/gql.ts": {
-			plugins: ["typescript", "typescript-operations", "typescript-react-query"],
+			plugins: [
+				"typescript",
+				"typescript-operations",
+				"typescript-react-query",
+			],
+
 			config: {
 				addDocBlocks: false,
 				dedupeFragments: true,

@@ -43,8 +43,7 @@ type CommentDetail {
   creator: UserDetail!
   creatorId: String!
   postId: String!
-  reactionsCount: Float!
-  reactions: ReactionsCount!
+  reactions: ReactionsCount
   reportsCount: Float!
   strikesCount: Float!
   createdAt: DateTime!

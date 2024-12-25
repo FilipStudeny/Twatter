@@ -33,8 +33,7 @@ export type CommentDetail = {
   creatorId: Scalars['String']['output'];
   id: Scalars['String']['output'];
   postId: Scalars['String']['output'];
-  reactions: ReactionsCount;
-  reactionsCount: Scalars['Float']['output'];
+  reactions?: Maybe<ReactionsCount>;
   reportsCount: Scalars['Float']['output'];
   strikesCount: Scalars['Float']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -377,12 +376,50 @@ export type SignInAdminMutationVariables = Exact<{
 
 export type SignInAdminMutation = { __typename?: 'Mutation', SignInAdmin: { __typename?: 'SignInResponse', accessToken: string, refreshToken: string } };
 
+export type ForgotPasswordMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+}>;
+
+
+export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword: { __typename?: 'GenericResponse', message?: string | null } };
+
+export type SignOutUserMutationVariables = Exact<{
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type SignOutUserMutation = { __typename?: 'Mutation', SignOutUser: { __typename?: 'GenericResponse', message?: string | null } };
+
 export type RefreshTokenMutationVariables = Exact<{
   refreshToken: Scalars['String']['input'];
 }>;
 
 
 export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'SignInResponse', accessToken: string, refreshToken: string } };
+
+export type ResetPasswordMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  token: Scalars['String']['input'];
+  newPassword: Scalars['String']['input'];
+  repeatPassword: Scalars['String']['input'];
+}>;
+
+
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'GenericResponse', message?: string | null } };
+
+export type SignInUserMutationVariables = Exact<{
+  signInUser: SignInCredentials;
+}>;
+
+
+export type SignInUserMutation = { __typename?: 'Mutation', SignInUser: { __typename?: 'SignInResponse', accessToken: string, refreshToken: string } };
+
+export type SignUpMutationVariables = Exact<{
+  createUser: SignUpUserData;
+}>;
+
+
+export type SignUpMutation = { __typename?: 'Mutation', SignUpUser: { __typename?: 'GenericResponse', message?: string | null } };
 
 export type CreateCommentMutationVariables = Exact<{
   createComment: CreateCommentDto;
@@ -399,6 +436,24 @@ export type PinCommentMutationVariables = Exact<{
 
 
 export type PinCommentMutation = { __typename?: 'Mutation', PinComment: { __typename?: 'GenericResponse', message?: string | null } };
+
+export type GetCommentsByPostIdQueryVariables = Exact<{
+  postId: Scalars['String']['input'];
+  page: Scalars['Int']['input'];
+  limit: Scalars['Int']['input'];
+}>;
+
+
+export type GetCommentsByPostIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', items?: Array<{ __typename?: 'CommentDetail', id: string, content: string, postId: string, reportsCount: number, strikesCount: number, createdAt: any, updatedAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName: string, lastName: string }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+
+export type GetCommentsByCreatorIdQueryVariables = Exact<{
+  creatorId: Scalars['String']['input'];
+  page: Scalars['Int']['input'];
+  limit: Scalars['Int']['input'];
+}>;
+
+
+export type GetCommentsByCreatorIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', items?: Array<{ __typename?: 'CommentDetail', id: string, content: string, postId: string, reportsCount: number, strikesCount: number, createdAt: any, updatedAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName: string, lastName: string }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
 
 export type CreateGroupMutationVariables = Exact<{
   createGroupDto: CreateGroupDto;
@@ -434,6 +489,47 @@ export type GetAdministrationPostsListQueryVariables = Exact<{
 
 
 export type GetAdministrationPostsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'PostDetail', id: string, content: string, commentsCount?: number | null, createdAt: any, updatedAt: any, reportsCount?: number | null, strikesCount?: number | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName: string, lastName: string }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id: string, name: string } | null, pinnedComment?: { __typename?: 'CommentDetail', id: string, content: string, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName: string, lastName: string } } | null }> | null } };
+
+export type AddReactionMutationVariables = Exact<{
+  createOrUpdateReactionData: CreateOrUpdateReactionDto;
+}>;
+
+
+export type AddReactionMutation = { __typename?: 'Mutation', AddReaction: { __typename?: 'GenericResponse', message?: string | null } };
+
+export type GetUsersListQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetUsersListQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'UserDetail', id: string, email: string, firstName: string, lastName: string }> | null } };
+
+export type GetUserQueryVariables = Exact<{
+  userId?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename?: 'UserDetail', id: string, username?: string | null, firstName: string, lastName: string, email: string, friendsCount: number, createdAt: any, updatedAt: any, joinedGroupsCount: number, likesCount: number, commentsCount: number }> | null } };
+
+export type GetUsersWithAdministartionListQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetUsersWithAdministartionListQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'UserDetail', id: string, username?: string | null, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any, banStrikesCount: number, filedReportsCount: number, receivedReportsCount: number, createdGroupsCount: number, moderatedGroupsCount: number }> | null } };
+
+export type GetUsersDropDownListDataQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
+  groupId?: InputMaybe<Scalars['String']['input']>;
+  getAll?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type GetUsersDropDownListDataQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, items?: Array<{ __typename?: 'UserDetail', id: string, email: string, firstName: string, lastName: string, username?: string | null }> | null } };
 
 
 
@@ -490,6 +586,58 @@ useSignInAdminMutation.getKey = () => ['SignInAdmin'];
 
 useSignInAdminMutation.fetcher = (variables: SignInAdminMutationVariables, options?: RequestInit['headers']) => fetcher<SignInAdminMutation, SignInAdminMutationVariables>(SignInAdminDocument, variables, options);
 
+export const ForgotPasswordDocument = /*#__PURE__*/ `
+    mutation ForgotPassword($email: String!) {
+  forgotPassword(email: $email) {
+    message
+  }
+}
+    `;
+
+export const useForgotPasswordMutation = <
+      TError = any,
+      TContext = unknown
+    >(options?: UseMutationOptions<ForgotPasswordMutation, TError, ForgotPasswordMutationVariables, TContext>) => {
+    
+    return useMutation<ForgotPasswordMutation, TError, ForgotPasswordMutationVariables, TContext>(
+      {
+    mutationKey: ['ForgotPassword'],
+    mutationFn: (variables?: ForgotPasswordMutationVariables) => fetcher<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument, variables)(),
+    ...options
+  }
+    )};
+
+useForgotPasswordMutation.getKey = () => ['ForgotPassword'];
+
+
+useForgotPasswordMutation.fetcher = (variables: ForgotPasswordMutationVariables, options?: RequestInit['headers']) => fetcher<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument, variables, options);
+
+export const SignOutUserDocument = /*#__PURE__*/ `
+    mutation SignOutUser($userId: String!) {
+  SignOutUser(userId: $userId) {
+    message
+  }
+}
+    `;
+
+export const useSignOutUserMutation = <
+      TError = any,
+      TContext = unknown
+    >(options?: UseMutationOptions<SignOutUserMutation, TError, SignOutUserMutationVariables, TContext>) => {
+    
+    return useMutation<SignOutUserMutation, TError, SignOutUserMutationVariables, TContext>(
+      {
+    mutationKey: ['SignOutUser'],
+    mutationFn: (variables?: SignOutUserMutationVariables) => fetcher<SignOutUserMutation, SignOutUserMutationVariables>(SignOutUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+useSignOutUserMutation.getKey = () => ['SignOutUser'];
+
+
+useSignOutUserMutation.fetcher = (variables: SignOutUserMutationVariables, options?: RequestInit['headers']) => fetcher<SignOutUserMutation, SignOutUserMutationVariables>(SignOutUserDocument, variables, options);
+
 export const RefreshTokenDocument = /*#__PURE__*/ `
     mutation RefreshToken($refreshToken: String!) {
   refreshToken(refreshToken: $refreshToken) {
@@ -516,6 +664,87 @@ useRefreshTokenMutation.getKey = () => ['RefreshToken'];
 
 
 useRefreshTokenMutation.fetcher = (variables: RefreshTokenMutationVariables, options?: RequestInit['headers']) => fetcher<RefreshTokenMutation, RefreshTokenMutationVariables>(RefreshTokenDocument, variables, options);
+
+export const ResetPasswordDocument = /*#__PURE__*/ `
+    mutation ResetPassword($email: String!, $token: String!, $newPassword: String!, $repeatPassword: String!) {
+  resetPassword(
+    resetPassword: {email: $email, token: $token, newPassword: $newPassword, repeatPassword: $repeatPassword}
+  ) {
+    message
+  }
+}
+    `;
+
+export const useResetPasswordMutation = <
+      TError = any,
+      TContext = unknown
+    >(options?: UseMutationOptions<ResetPasswordMutation, TError, ResetPasswordMutationVariables, TContext>) => {
+    
+    return useMutation<ResetPasswordMutation, TError, ResetPasswordMutationVariables, TContext>(
+      {
+    mutationKey: ['ResetPassword'],
+    mutationFn: (variables?: ResetPasswordMutationVariables) => fetcher<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument, variables)(),
+    ...options
+  }
+    )};
+
+useResetPasswordMutation.getKey = () => ['ResetPassword'];
+
+
+useResetPasswordMutation.fetcher = (variables: ResetPasswordMutationVariables, options?: RequestInit['headers']) => fetcher<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument, variables, options);
+
+export const SignInUserDocument = /*#__PURE__*/ `
+    mutation SignInUser($signInUser: SignInCredentials!) {
+  SignInUser(signInUser: $signInUser) {
+    accessToken
+    refreshToken
+  }
+}
+    `;
+
+export const useSignInUserMutation = <
+      TError = any,
+      TContext = unknown
+    >(options?: UseMutationOptions<SignInUserMutation, TError, SignInUserMutationVariables, TContext>) => {
+    
+    return useMutation<SignInUserMutation, TError, SignInUserMutationVariables, TContext>(
+      {
+    mutationKey: ['SignInUser'],
+    mutationFn: (variables?: SignInUserMutationVariables) => fetcher<SignInUserMutation, SignInUserMutationVariables>(SignInUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+useSignInUserMutation.getKey = () => ['SignInUser'];
+
+
+useSignInUserMutation.fetcher = (variables: SignInUserMutationVariables, options?: RequestInit['headers']) => fetcher<SignInUserMutation, SignInUserMutationVariables>(SignInUserDocument, variables, options);
+
+export const SignUpDocument = /*#__PURE__*/ `
+    mutation SignUp($createUser: SignUpUserData!) {
+  SignUpUser(signUp: $createUser) {
+    message
+  }
+}
+    `;
+
+export const useSignUpMutation = <
+      TError = any,
+      TContext = unknown
+    >(options?: UseMutationOptions<SignUpMutation, TError, SignUpMutationVariables, TContext>) => {
+    
+    return useMutation<SignUpMutation, TError, SignUpMutationVariables, TContext>(
+      {
+    mutationKey: ['SignUp'],
+    mutationFn: (variables?: SignUpMutationVariables) => fetcher<SignUpMutation, SignUpMutationVariables>(SignUpDocument, variables)(),
+    ...options
+  }
+    )};
+
+useSignUpMutation.getKey = () => ['SignUp'];
+
+
+useSignUpMutation.fetcher = (variables: SignUpMutationVariables, options?: RequestInit['headers']) => fetcher<SignUpMutation, SignUpMutationVariables>(SignUpDocument, variables, options);
 
 export const CreateCommentDocument = /*#__PURE__*/ `
     mutation CreateComment($createComment: CreateCommentDto!, $postId: String!) {
@@ -568,6 +797,154 @@ usePinCommentMutation.getKey = () => ['PinComment'];
 
 
 usePinCommentMutation.fetcher = (variables: PinCommentMutationVariables, options?: RequestInit['headers']) => fetcher<PinCommentMutation, PinCommentMutationVariables>(PinCommentDocument, variables, options);
+
+export const GetCommentsByPostIdDocument = /*#__PURE__*/ `
+    query GetCommentsByPostId($postId: String!, $page: Int!, $limit: Int!) {
+  getCommentsList(postId: $postId, page: $page, limit: $limit) {
+    items {
+      id
+      content
+      creator {
+        id
+        username
+        firstName
+        lastName
+      }
+      postId
+      reactions {
+        like
+        dislike
+        smile
+        angry
+        sad
+        love
+      }
+      reportsCount
+      strikesCount
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `;
+
+export const useGetCommentsByPostIdQuery = <
+      TData = GetCommentsByPostIdQuery,
+      TError = any
+    >(
+      variables: GetCommentsByPostIdQueryVariables,
+      options?: Omit<UseQueryOptions<GetCommentsByPostIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetCommentsByPostIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetCommentsByPostIdQuery, TError, TData>(
+      {
+    queryKey: ['GetCommentsByPostId', variables],
+    queryFn: fetcher<GetCommentsByPostIdQuery, GetCommentsByPostIdQueryVariables>(GetCommentsByPostIdDocument, variables),
+    ...options
+  }
+    )};
+
+useGetCommentsByPostIdQuery.document = GetCommentsByPostIdDocument;
+
+useGetCommentsByPostIdQuery.getKey = (variables: GetCommentsByPostIdQueryVariables) => ['GetCommentsByPostId', variables];
+
+export const useInfiniteGetCommentsByPostIdQuery = <
+      TData = InfiniteData<GetCommentsByPostIdQuery>,
+      TError = any
+    >(
+      variables: GetCommentsByPostIdQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetCommentsByPostIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetCommentsByPostIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetCommentsByPostIdQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetCommentsByPostId.infinite', variables],
+      queryFn: (metaData) => fetcher<GetCommentsByPostIdQuery, GetCommentsByPostIdQueryVariables>(GetCommentsByPostIdDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetCommentsByPostIdQuery.getKey = (variables: GetCommentsByPostIdQueryVariables) => ['GetCommentsByPostId.infinite', variables];
+
+
+useGetCommentsByPostIdQuery.fetcher = (variables: GetCommentsByPostIdQueryVariables, options?: RequestInit['headers']) => fetcher<GetCommentsByPostIdQuery, GetCommentsByPostIdQueryVariables>(GetCommentsByPostIdDocument, variables, options);
+
+export const GetCommentsByCreatorIdDocument = /*#__PURE__*/ `
+    query GetCommentsByCreatorId($creatorId: String!, $page: Int!, $limit: Int!) {
+  getCommentsList(creatorId: $creatorId, page: $page, limit: $limit) {
+    items {
+      id
+      content
+      creator {
+        id
+        username
+        firstName
+        lastName
+      }
+      postId
+      reactions {
+        like
+        dislike
+        smile
+        angry
+        sad
+        love
+      }
+      reportsCount
+      strikesCount
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `;
+
+export const useGetCommentsByCreatorIdQuery = <
+      TData = GetCommentsByCreatorIdQuery,
+      TError = any
+    >(
+      variables: GetCommentsByCreatorIdQueryVariables,
+      options?: Omit<UseQueryOptions<GetCommentsByCreatorIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetCommentsByCreatorIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetCommentsByCreatorIdQuery, TError, TData>(
+      {
+    queryKey: ['GetCommentsByCreatorId', variables],
+    queryFn: fetcher<GetCommentsByCreatorIdQuery, GetCommentsByCreatorIdQueryVariables>(GetCommentsByCreatorIdDocument, variables),
+    ...options
+  }
+    )};
+
+useGetCommentsByCreatorIdQuery.document = GetCommentsByCreatorIdDocument;
+
+useGetCommentsByCreatorIdQuery.getKey = (variables: GetCommentsByCreatorIdQueryVariables) => ['GetCommentsByCreatorId', variables];
+
+export const useInfiniteGetCommentsByCreatorIdQuery = <
+      TData = InfiniteData<GetCommentsByCreatorIdQuery>,
+      TError = any
+    >(
+      variables: GetCommentsByCreatorIdQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetCommentsByCreatorIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetCommentsByCreatorIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetCommentsByCreatorIdQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetCommentsByCreatorId.infinite', variables],
+      queryFn: (metaData) => fetcher<GetCommentsByCreatorIdQuery, GetCommentsByCreatorIdQueryVariables>(GetCommentsByCreatorIdDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetCommentsByCreatorIdQuery.getKey = (variables: GetCommentsByCreatorIdQueryVariables) => ['GetCommentsByCreatorId.infinite', variables];
+
+
+useGetCommentsByCreatorIdQuery.fetcher = (variables: GetCommentsByCreatorIdQueryVariables, options?: RequestInit['headers']) => fetcher<GetCommentsByCreatorIdQuery, GetCommentsByCreatorIdQueryVariables>(GetCommentsByCreatorIdDocument, variables, options);
 
 export const CreateGroupDocument = /*#__PURE__*/ `
     mutation CreateGroup($createGroupDto: CreateGroupDto!) {
@@ -848,3 +1225,287 @@ useInfiniteGetAdministrationPostsListQuery.getKey = (variables?: GetAdministrati
 
 
 useGetAdministrationPostsListQuery.fetcher = (variables?: GetAdministrationPostsListQueryVariables, options?: RequestInit['headers']) => fetcher<GetAdministrationPostsListQuery, GetAdministrationPostsListQueryVariables>(GetAdministrationPostsListDocument, variables, options);
+
+export const AddReactionDocument = /*#__PURE__*/ `
+    mutation AddReaction($createOrUpdateReactionData: CreateOrUpdateReactionDto!) {
+  AddReaction(createOrUpdateReactionData: $createOrUpdateReactionData) {
+    message
+  }
+}
+    `;
+
+export const useAddReactionMutation = <
+      TError = any,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddReactionMutation, TError, AddReactionMutationVariables, TContext>) => {
+    
+    return useMutation<AddReactionMutation, TError, AddReactionMutationVariables, TContext>(
+      {
+    mutationKey: ['AddReaction'],
+    mutationFn: (variables?: AddReactionMutationVariables) => fetcher<AddReactionMutation, AddReactionMutationVariables>(AddReactionDocument, variables)(),
+    ...options
+  }
+    )};
+
+useAddReactionMutation.getKey = () => ['AddReaction'];
+
+
+useAddReactionMutation.fetcher = (variables: AddReactionMutationVariables, options?: RequestInit['headers']) => fetcher<AddReactionMutation, AddReactionMutationVariables>(AddReactionDocument, variables, options);
+
+export const GetUsersListDocument = /*#__PURE__*/ `
+    query GetUsersList($page: Int = 1, $limit: Int = 10) {
+  getUsers(page: $page, limit: $limit) {
+    items {
+      id
+      email
+      firstName
+      lastName
+    }
+    total
+    page
+    limit
+  }
+}
+    `;
+
+export const useGetUsersListQuery = <
+      TData = GetUsersListQuery,
+      TError = any
+    >(
+      variables?: GetUsersListQueryVariables,
+      options?: Omit<UseQueryOptions<GetUsersListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUsersListQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetUsersListQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetUsersList'] : ['GetUsersList', variables],
+    queryFn: fetcher<GetUsersListQuery, GetUsersListQueryVariables>(GetUsersListDocument, variables),
+    ...options
+  }
+    )};
+
+useGetUsersListQuery.document = GetUsersListDocument;
+
+useGetUsersListQuery.getKey = (variables?: GetUsersListQueryVariables) => variables === undefined ? ['GetUsersList'] : ['GetUsersList', variables];
+
+export const useInfiniteGetUsersListQuery = <
+      TData = InfiniteData<GetUsersListQuery>,
+      TError = any
+    >(
+      variables: GetUsersListQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetUsersListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUsersListQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetUsersListQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetUsersList.infinite'] : ['GetUsersList.infinite', variables],
+      queryFn: (metaData) => fetcher<GetUsersListQuery, GetUsersListQueryVariables>(GetUsersListDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetUsersListQuery.getKey = (variables?: GetUsersListQueryVariables) => variables === undefined ? ['GetUsersList.infinite'] : ['GetUsersList.infinite', variables];
+
+
+useGetUsersListQuery.fetcher = (variables?: GetUsersListQueryVariables, options?: RequestInit['headers']) => fetcher<GetUsersListQuery, GetUsersListQueryVariables>(GetUsersListDocument, variables, options);
+
+export const GetUserDocument = /*#__PURE__*/ `
+    query GetUser($userId: String) {
+  getUsers(userId: $userId) {
+    items {
+      id
+      username
+      firstName
+      lastName
+      email
+      friendsCount
+      createdAt
+      updatedAt
+      joinedGroupsCount
+      likesCount
+      commentsCount
+    }
+  }
+}
+    `;
+
+export const useGetUserQuery = <
+      TData = GetUserQuery,
+      TError = any
+    >(
+      variables?: GetUserQueryVariables,
+      options?: Omit<UseQueryOptions<GetUserQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUserQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetUserQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetUser'] : ['GetUser', variables],
+    queryFn: fetcher<GetUserQuery, GetUserQueryVariables>(GetUserDocument, variables),
+    ...options
+  }
+    )};
+
+useGetUserQuery.document = GetUserDocument;
+
+useGetUserQuery.getKey = (variables?: GetUserQueryVariables) => variables === undefined ? ['GetUser'] : ['GetUser', variables];
+
+export const useInfiniteGetUserQuery = <
+      TData = InfiniteData<GetUserQuery>,
+      TError = any
+    >(
+      variables: GetUserQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetUserQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUserQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetUserQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetUser.infinite'] : ['GetUser.infinite', variables],
+      queryFn: (metaData) => fetcher<GetUserQuery, GetUserQueryVariables>(GetUserDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetUserQuery.getKey = (variables?: GetUserQueryVariables) => variables === undefined ? ['GetUser.infinite'] : ['GetUser.infinite', variables];
+
+
+useGetUserQuery.fetcher = (variables?: GetUserQueryVariables, options?: RequestInit['headers']) => fetcher<GetUserQuery, GetUserQueryVariables>(GetUserDocument, variables, options);
+
+export const GetUsersWithAdministartionListDocument = /*#__PURE__*/ `
+    query GetUsersWithAdministartionList($page: Int = 1, $limit: Int = 10) {
+  getUsers(page: $page, limit: $limit) {
+    items {
+      id
+      username
+      firstName
+      lastName
+      email
+      createdAt
+      updatedAt
+      banStrikesCount
+      filedReportsCount
+      banStrikesCount
+      receivedReportsCount
+      createdGroupsCount
+      moderatedGroupsCount
+    }
+    total
+    page
+    limit
+  }
+}
+    `;
+
+export const useGetUsersWithAdministartionListQuery = <
+      TData = GetUsersWithAdministartionListQuery,
+      TError = any
+    >(
+      variables?: GetUsersWithAdministartionListQueryVariables,
+      options?: Omit<UseQueryOptions<GetUsersWithAdministartionListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUsersWithAdministartionListQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetUsersWithAdministartionListQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetUsersWithAdministartionList'] : ['GetUsersWithAdministartionList', variables],
+    queryFn: fetcher<GetUsersWithAdministartionListQuery, GetUsersWithAdministartionListQueryVariables>(GetUsersWithAdministartionListDocument, variables),
+    ...options
+  }
+    )};
+
+useGetUsersWithAdministartionListQuery.document = GetUsersWithAdministartionListDocument;
+
+useGetUsersWithAdministartionListQuery.getKey = (variables?: GetUsersWithAdministartionListQueryVariables) => variables === undefined ? ['GetUsersWithAdministartionList'] : ['GetUsersWithAdministartionList', variables];
+
+export const useInfiniteGetUsersWithAdministartionListQuery = <
+      TData = InfiniteData<GetUsersWithAdministartionListQuery>,
+      TError = any
+    >(
+      variables: GetUsersWithAdministartionListQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetUsersWithAdministartionListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUsersWithAdministartionListQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetUsersWithAdministartionListQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetUsersWithAdministartionList.infinite'] : ['GetUsersWithAdministartionList.infinite', variables],
+      queryFn: (metaData) => fetcher<GetUsersWithAdministartionListQuery, GetUsersWithAdministartionListQueryVariables>(GetUsersWithAdministartionListDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetUsersWithAdministartionListQuery.getKey = (variables?: GetUsersWithAdministartionListQueryVariables) => variables === undefined ? ['GetUsersWithAdministartionList.infinite'] : ['GetUsersWithAdministartionList.infinite', variables];
+
+
+useGetUsersWithAdministartionListQuery.fetcher = (variables?: GetUsersWithAdministartionListQueryVariables, options?: RequestInit['headers']) => fetcher<GetUsersWithAdministartionListQuery, GetUsersWithAdministartionListQueryVariables>(GetUsersWithAdministartionListDocument, variables, options);
+
+export const GetUsersDropDownListDataDocument = /*#__PURE__*/ `
+    query GetUsersDropDownListData($page: Int = 1, $limit: Int = 10, $userId: String, $groupId: String, $getAll: Boolean) {
+  getUsers(
+    page: $page
+    limit: $limit
+    userId: $userId
+    groupId: $groupId
+    getAll: $getAll
+  ) {
+    items {
+      id
+      email
+      firstName
+      lastName
+      username
+    }
+    total
+  }
+}
+    `;
+
+export const useGetUsersDropDownListDataQuery = <
+      TData = GetUsersDropDownListDataQuery,
+      TError = any
+    >(
+      variables?: GetUsersDropDownListDataQueryVariables,
+      options?: Omit<UseQueryOptions<GetUsersDropDownListDataQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUsersDropDownListDataQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetUsersDropDownListDataQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetUsersDropDownListData'] : ['GetUsersDropDownListData', variables],
+    queryFn: fetcher<GetUsersDropDownListDataQuery, GetUsersDropDownListDataQueryVariables>(GetUsersDropDownListDataDocument, variables),
+    ...options
+  }
+    )};
+
+useGetUsersDropDownListDataQuery.document = GetUsersDropDownListDataDocument;
+
+useGetUsersDropDownListDataQuery.getKey = (variables?: GetUsersDropDownListDataQueryVariables) => variables === undefined ? ['GetUsersDropDownListData'] : ['GetUsersDropDownListData', variables];
+
+export const useInfiniteGetUsersDropDownListDataQuery = <
+      TData = InfiniteData<GetUsersDropDownListDataQuery>,
+      TError = any
+    >(
+      variables: GetUsersDropDownListDataQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetUsersDropDownListDataQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUsersDropDownListDataQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetUsersDropDownListDataQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetUsersDropDownListData.infinite'] : ['GetUsersDropDownListData.infinite', variables],
+      queryFn: (metaData) => fetcher<GetUsersDropDownListDataQuery, GetUsersDropDownListDataQueryVariables>(GetUsersDropDownListDataDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetUsersDropDownListDataQuery.getKey = (variables?: GetUsersDropDownListDataQueryVariables) => variables === undefined ? ['GetUsersDropDownListData.infinite'] : ['GetUsersDropDownListData.infinite', variables];
+
+
+useGetUsersDropDownListDataQuery.fetcher = (variables?: GetUsersDropDownListDataQueryVariables, options?: RequestInit['headers']) => fetcher<GetUsersDropDownListDataQuery, GetUsersDropDownListDataQueryVariables>(GetUsersDropDownListDataDocument, variables, options);

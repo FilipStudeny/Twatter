@@ -1,10 +1,27 @@
 import { RouterLink } from "@Components/navigation/routerLink";
 import { Visibility, VisibilityOff, Person, Lock } from "@mui/icons-material";
-import { Box, Button, TextField, Typography, Link, Paper, InputAdornment, IconButton } from "@mui/material";
+import {
+	Alert,
+	Box,
+	Button,
+	Checkbox,
+	CircularProgress,
+	FormControlLabel,
+	IconButton,
+	InputAdornment,
+	Link,
+	Paper,
+	TextField,
+	Typography,
+} from "@mui/material";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useAuthenticationStore } from "stores/authenticationStore";
+
+import { useSignInUserMutation } from "../../../../shared";
+
+const BRAND_LOGO_URL = "https://via.placeholder.com/150";
 
 export const Route = createFileRoute("/_authentication/sign-in")({ component: RouteComponent });
 
@@ -12,18 +29,42 @@ function RouteComponent() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+	const [rememberMe, setRememberMe] = useState(false);
+
 	const navigate = useNavigate();
+	const signInStore = useAuthenticationStore((state) => state.signIn);
 
-	const signIn = useAuthenticationStore((state) => state.signIn);
+	const { mutateAsync: signInUser, isPending, isError, error } = useSignInUserMutation();
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		signIn();
-		navigate({ to: "/home" });
+
+		const response = await signInUser({
+			signInUser: {
+				email: username,
+				password: password,
+				passwordRepeat: password,
+			},
+		});
+
+		const { accessToken, refreshToken } = response.SignInUser;
+
+		if (!isError){
+			signInStore({ accessToken, refreshToken });
+			navigate({ to: "/home" });
+		}
 	};
 
+	useEffect(() => {
+		if (isError){
+
+			console.log(error?.response?.errors);
+			console.log(error?.response?.errors[0].extensions?.originalError.message[0]);
+		}
+	}, [error]);
+
 	const handleClickShowPassword = () => {
-		setShowPassword(!showPassword);
+		setShowPassword((prev) => !prev);
 	};
 
 	return (
@@ -34,6 +75,7 @@ function RouteComponent() {
 				display: "flex",
 				alignItems: "center",
 				justifyContent: "center",
+				py: 4,
 			}}
 		>
 			<Paper
@@ -48,6 +90,11 @@ function RouteComponent() {
 					background: "white",
 				}}
 			>
+				{/* Logo / Brand Section */}
+				<Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+					<img src={BRAND_LOGO_URL} alt='Brand Logo' style={{ height: 60 }} />
+				</Box>
+
 				<Typography
 					variant='h4'
 					component='h1'
@@ -61,9 +108,16 @@ function RouteComponent() {
 					Please sign in to your account
 				</Typography>
 
+				{isError && (
+					<Alert severity='error' sx={{ mb: 2 }}>
+						{error?.response?.errors[0].extensions?.originalError.message[0]}
+					</Alert>
+				)}
+
+				{/* Sign-In Form */}
 				<form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 					<TextField
-						label='Username'
+						label='Email'
 						variant='outlined'
 						fullWidth
 						value={username}
@@ -77,6 +131,7 @@ function RouteComponent() {
 							),
 						}}
 					/>
+
 					<TextField
 						label='Password'
 						variant='outlined'
@@ -105,10 +160,24 @@ function RouteComponent() {
 						}}
 					/>
 
+					{/* Remember Me Checkbox */}
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={rememberMe}
+								onChange={(e) => setRememberMe(e.target.checked)}
+								color='primary'
+							/>
+						}
+						label='Remember me'
+						sx={{ fontSize: "0.875rem", color: "text.secondary" }}
+					/>
+
 					<Button
 						variant='contained'
 						type='submit'
 						fullWidth
+						disabled={isPending}
 						sx={{
 							mt: 1,
 							py: 1.5,
@@ -120,15 +189,20 @@ function RouteComponent() {
 							"&:hover": { background: "linear-gradient(45deg, #21CBF3 30%, #2196F3 90%)" },
 						}}
 					>
-						Sign In
+						{/* Show a spinner if we are currently signing in */}
+						{isPending ? <CircularProgress size={24} color='inherit' /> : "Sign In"}
 					</Button>
 				</form>
 
+				{/* Additional Links */}
 				<Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
 					<Link
 						href='#'
 						variant='body2'
-						sx={{ color: "#1976d2", "&:hover": { textDecoration: "underline" } }}
+						sx={{
+							color: "#1976d2",
+							"&:hover": { textDecoration: "underline" },
+						}}
 					>
 						<RouterLink to='/forgotten-password' style={{ width: "100%" }}>
 							Forgot Password?
@@ -137,12 +211,19 @@ function RouteComponent() {
 					<Link
 						href='#'
 						variant='body2'
-						sx={{ color: "#1976d2", "&:hover": { textDecoration: "underline" } }}
+						sx={{
+							color: "#1976d2",
+							"&:hover": { textDecoration: "underline" },
+						}}
 					>
-						<RouterLink style={{ width: "100%" }}>Sign Up</RouterLink>
+						<RouterLink to='/sign-in' style={{ width: "100%" }}>
+							Sign Up
+						</RouterLink>
 					</Link>
 				</Box>
 			</Paper>
 		</Box>
 	);
 }
+
+export default RouteComponent;

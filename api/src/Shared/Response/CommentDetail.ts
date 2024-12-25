@@ -22,10 +22,7 @@ export class CommentDetail {
 	@Field()
 	postId: string;
 
-	@Field()
-	reactionsCount: number;
-
-	@Field(() => ReactionsCount)
+	@Field(() => ReactionsCount, { nullable: true })
 	reactions: ReactionsCount;
 
 	@Field()

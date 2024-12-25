@@ -1,0 +1,5 @@
+mutation SignUp($createUser: SignUpUserData!) {
+	SignUpUser(signUp: $createUser) {
+		message
+	}
+}
