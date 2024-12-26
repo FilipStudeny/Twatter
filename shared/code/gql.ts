@@ -1,3 +1,4 @@
+import { GraphQLResponse } from "graphql-request/dist/types";
 import { useMutation, useQuery, useInfiniteQuery, UseMutationOptions, UseQueryOptions, UseInfiniteQueryOptions, InfiniteData } from '@tanstack/react-query';
 import { fetcher } from './fetcher.client.ts';
 export type Maybe<T> = T | null;
@@ -542,7 +543,7 @@ export const CreateAdminDocument = /*#__PURE__*/ `
     `;
 
 export const useCreateAdminMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAdminMutation, TError, CreateAdminMutationVariables, TContext>) => {
     
@@ -569,7 +570,7 @@ export const SignInAdminDocument = /*#__PURE__*/ `
     `;
 
 export const useSignInAdminMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<SignInAdminMutation, TError, SignInAdminMutationVariables, TContext>) => {
     
@@ -595,7 +596,7 @@ export const ForgotPasswordDocument = /*#__PURE__*/ `
     `;
 
 export const useForgotPasswordMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<ForgotPasswordMutation, TError, ForgotPasswordMutationVariables, TContext>) => {
     
@@ -621,7 +622,7 @@ export const SignOutUserDocument = /*#__PURE__*/ `
     `;
 
 export const useSignOutUserMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<SignOutUserMutation, TError, SignOutUserMutationVariables, TContext>) => {
     
@@ -648,7 +649,7 @@ export const RefreshTokenDocument = /*#__PURE__*/ `
     `;
 
 export const useRefreshTokenMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<RefreshTokenMutation, TError, RefreshTokenMutationVariables, TContext>) => {
     
@@ -676,7 +677,7 @@ export const ResetPasswordDocument = /*#__PURE__*/ `
     `;
 
 export const useResetPasswordMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<ResetPasswordMutation, TError, ResetPasswordMutationVariables, TContext>) => {
     
@@ -703,7 +704,7 @@ export const SignInUserDocument = /*#__PURE__*/ `
     `;
 
 export const useSignInUserMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<SignInUserMutation, TError, SignInUserMutationVariables, TContext>) => {
     
@@ -729,7 +730,7 @@ export const SignUpDocument = /*#__PURE__*/ `
     `;
 
 export const useSignUpMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<SignUpMutation, TError, SignUpMutationVariables, TContext>) => {
     
@@ -755,7 +756,7 @@ export const CreateCommentDocument = /*#__PURE__*/ `
     `;
 
 export const useCreateCommentMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<CreateCommentMutation, TError, CreateCommentMutationVariables, TContext>) => {
     
@@ -781,7 +782,7 @@ export const PinCommentDocument = /*#__PURE__*/ `
     `;
 
 export const usePinCommentMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<PinCommentMutation, TError, PinCommentMutationVariables, TContext>) => {
     
@@ -830,7 +831,7 @@ export const GetCommentsByPostIdDocument = /*#__PURE__*/ `
 
 export const useGetCommentsByPostIdQuery = <
       TData = GetCommentsByPostIdQuery,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetCommentsByPostIdQueryVariables,
       options?: Omit<UseQueryOptions<GetCommentsByPostIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetCommentsByPostIdQuery, TError, TData>['queryKey'] }
@@ -850,7 +851,7 @@ useGetCommentsByPostIdQuery.getKey = (variables: GetCommentsByPostIdQueryVariabl
 
 export const useInfiniteGetCommentsByPostIdQuery = <
       TData = InfiniteData<GetCommentsByPostIdQuery>,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetCommentsByPostIdQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetCommentsByPostIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetCommentsByPostIdQuery, TError, TData>['queryKey'] }
@@ -904,7 +905,7 @@ export const GetCommentsByCreatorIdDocument = /*#__PURE__*/ `
 
 export const useGetCommentsByCreatorIdQuery = <
       TData = GetCommentsByCreatorIdQuery,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetCommentsByCreatorIdQueryVariables,
       options?: Omit<UseQueryOptions<GetCommentsByCreatorIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetCommentsByCreatorIdQuery, TError, TData>['queryKey'] }
@@ -924,7 +925,7 @@ useGetCommentsByCreatorIdQuery.getKey = (variables: GetCommentsByCreatorIdQueryV
 
 export const useInfiniteGetCommentsByCreatorIdQuery = <
       TData = InfiniteData<GetCommentsByCreatorIdQuery>,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetCommentsByCreatorIdQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetCommentsByCreatorIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetCommentsByCreatorIdQuery, TError, TData>['queryKey'] }
@@ -955,7 +956,7 @@ export const CreateGroupDocument = /*#__PURE__*/ `
     `;
 
 export const useCreateGroupMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<CreateGroupMutation, TError, CreateGroupMutationVariables, TContext>) => {
     
@@ -981,7 +982,7 @@ export const CreatePostDocument = /*#__PURE__*/ `
     `;
 
 export const useCreatePostMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<CreatePostMutation, TError, CreatePostMutationVariables, TContext>) => {
     
@@ -1009,7 +1010,7 @@ export const GetPostStatisticsDocument = /*#__PURE__*/ `
 
 export const useGetPostStatisticsQuery = <
       TData = GetPostStatisticsQuery,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables?: GetPostStatisticsQueryVariables,
       options?: Omit<UseQueryOptions<GetPostStatisticsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetPostStatisticsQuery, TError, TData>['queryKey'] }
@@ -1029,7 +1030,7 @@ useGetPostStatisticsQuery.getKey = (variables?: GetPostStatisticsQueryVariables)
 
 export const useInfiniteGetPostStatisticsQuery = <
       TData = InfiniteData<GetPostStatisticsQuery>,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetPostStatisticsQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetPostStatisticsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetPostStatisticsQuery, TError, TData>['queryKey'] }
@@ -1089,7 +1090,7 @@ export const GetPostsListDocument = /*#__PURE__*/ `
 
 export const useGetPostsListQuery = <
       TData = GetPostsListQuery,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables?: GetPostsListQueryVariables,
       options?: Omit<UseQueryOptions<GetPostsListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetPostsListQuery, TError, TData>['queryKey'] }
@@ -1109,7 +1110,7 @@ useGetPostsListQuery.getKey = (variables?: GetPostsListQueryVariables) => variab
 
 export const useInfiniteGetPostsListQuery = <
       TData = InfiniteData<GetPostsListQuery>,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetPostsListQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetPostsListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetPostsListQuery, TError, TData>['queryKey'] }
@@ -1184,7 +1185,7 @@ export const GetAdministrationPostsListDocument = /*#__PURE__*/ `
 
 export const useGetAdministrationPostsListQuery = <
       TData = GetAdministrationPostsListQuery,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables?: GetAdministrationPostsListQueryVariables,
       options?: Omit<UseQueryOptions<GetAdministrationPostsListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAdministrationPostsListQuery, TError, TData>['queryKey'] }
@@ -1204,7 +1205,7 @@ useGetAdministrationPostsListQuery.getKey = (variables?: GetAdministrationPostsL
 
 export const useInfiniteGetAdministrationPostsListQuery = <
       TData = InfiniteData<GetAdministrationPostsListQuery>,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetAdministrationPostsListQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetAdministrationPostsListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetAdministrationPostsListQuery, TError, TData>['queryKey'] }
@@ -1235,7 +1236,7 @@ export const AddReactionDocument = /*#__PURE__*/ `
     `;
 
 export const useAddReactionMutation = <
-      TError = any,
+      TError = GraphQLResponse,
       TContext = unknown
     >(options?: UseMutationOptions<AddReactionMutation, TError, AddReactionMutationVariables, TContext>) => {
     
@@ -1270,7 +1271,7 @@ export const GetUsersListDocument = /*#__PURE__*/ `
 
 export const useGetUsersListQuery = <
       TData = GetUsersListQuery,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables?: GetUsersListQueryVariables,
       options?: Omit<UseQueryOptions<GetUsersListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUsersListQuery, TError, TData>['queryKey'] }
@@ -1290,7 +1291,7 @@ useGetUsersListQuery.getKey = (variables?: GetUsersListQueryVariables) => variab
 
 export const useInfiniteGetUsersListQuery = <
       TData = InfiniteData<GetUsersListQuery>,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetUsersListQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetUsersListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUsersListQuery, TError, TData>['queryKey'] }
@@ -1334,7 +1335,7 @@ export const GetUserDocument = /*#__PURE__*/ `
 
 export const useGetUserQuery = <
       TData = GetUserQuery,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables?: GetUserQueryVariables,
       options?: Omit<UseQueryOptions<GetUserQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUserQuery, TError, TData>['queryKey'] }
@@ -1354,7 +1355,7 @@ useGetUserQuery.getKey = (variables?: GetUserQueryVariables) => variables === un
 
 export const useInfiniteGetUserQuery = <
       TData = InfiniteData<GetUserQuery>,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetUserQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetUserQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUserQuery, TError, TData>['queryKey'] }
@@ -1403,7 +1404,7 @@ export const GetUsersWithAdministartionListDocument = /*#__PURE__*/ `
 
 export const useGetUsersWithAdministartionListQuery = <
       TData = GetUsersWithAdministartionListQuery,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables?: GetUsersWithAdministartionListQueryVariables,
       options?: Omit<UseQueryOptions<GetUsersWithAdministartionListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUsersWithAdministartionListQuery, TError, TData>['queryKey'] }
@@ -1423,7 +1424,7 @@ useGetUsersWithAdministartionListQuery.getKey = (variables?: GetUsersWithAdminis
 
 export const useInfiniteGetUsersWithAdministartionListQuery = <
       TData = InfiniteData<GetUsersWithAdministartionListQuery>,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetUsersWithAdministartionListQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetUsersWithAdministartionListQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUsersWithAdministartionListQuery, TError, TData>['queryKey'] }
@@ -1468,7 +1469,7 @@ export const GetUsersDropDownListDataDocument = /*#__PURE__*/ `
 
 export const useGetUsersDropDownListDataQuery = <
       TData = GetUsersDropDownListDataQuery,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables?: GetUsersDropDownListDataQueryVariables,
       options?: Omit<UseQueryOptions<GetUsersDropDownListDataQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUsersDropDownListDataQuery, TError, TData>['queryKey'] }
@@ -1488,7 +1489,7 @@ useGetUsersDropDownListDataQuery.getKey = (variables?: GetUsersDropDownListDataQ
 
 export const useInfiniteGetUsersDropDownListDataQuery = <
       TData = InfiniteData<GetUsersDropDownListDataQuery>,
-      TError = any
+      TError = GraphQLResponse
     >(
       variables: GetUsersDropDownListDataQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetUsersDropDownListDataQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUsersDropDownListDataQuery, TError, TData>['queryKey'] }

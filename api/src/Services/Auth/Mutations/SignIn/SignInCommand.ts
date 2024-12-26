@@ -2,13 +2,12 @@ import { User } from "@Models/User";
 import SignInCredentials from "@Shared/Input/SignInCredentials";
 import { SignInResponse } from "@Shared/Response/SignInResponse";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
-import { ConflictException, UnauthorizedException } from "@nestjs/common";
+import { NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { CommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "@nestjs/jwt";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import * as bcrypt from "bcrypt";
-import { validate } from "class-validator";
 import { EntityManager } from "typeorm";
 
 export class SignInCommand {
@@ -26,20 +25,13 @@ export class SignInCommandHandler {
 	async execute(command: SignInCommand): Promise<SignInResponse> {
 		const { credentialsDto } = command;
 
-		const errors = await validate(credentialsDto);
-		if (errors.length > 0) {
-			throw new ConflictException(
-				`Validation failed: ${errors.map((error) => error.toString()).join(", ")}`,
-			);
-		}
-
 		const user = await this.entityManager.findOne(User, {
 			where: { email: credentialsDto.email },
 			relations: ["password"],
 		});
 
 		if (!user) {
-			throw new UnauthorizedException("Account doesn't exist. Create account.");
+			throw new NotFoundException("Account doesn't exist. Create account.");
 		}
 
 		if (!user.password || !(await bcrypt.compare(credentialsDto.password, user.password.hash))) {

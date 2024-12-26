@@ -1,4 +1,3 @@
-import { RedisModule } from "./Services/redis.module";
 import { AdminNotification } from "@Models/Administration/AdministrationNotification";
 import { Administrator } from "@Models/Administration/Administrator";
 import { BanStrike } from "@Models/Administration/BanStrike";
@@ -32,6 +31,7 @@ import { InterestModule } from "./Services/Interest/interest.module";
 import { PostModule } from "./Services/Post/post.module";
 import { ReactionModule } from "./Services/Reaction/reaction.module";
 import { UserModule } from "./Services/User/user.module";
+import { RedisModule } from "./Services/redis.module";
 
 @Module({
 	imports: [
@@ -88,6 +88,7 @@ import { UserModule } from "./Services/User/user.module";
 			driver: ApolloDriver,
 			autoSchemaFile: "schema.gql",
 			context: ({ request, response }) => ({ request, response }),
+			
 		}),
 	],
 	providers: [EntityMapper, JwtStrategy, AdminJwtStrategy],

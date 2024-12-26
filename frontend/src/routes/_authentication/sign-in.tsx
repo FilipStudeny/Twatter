@@ -1,4 +1,5 @@
 import { RouterLink } from "@Components/navigation/routerLink";
+import { GET_ERROR } from "@Utils/getResponseError";
 import { Visibility, VisibilityOff, Person, Lock } from "@mui/icons-material";
 import {
 	Alert,
@@ -9,13 +10,12 @@ import {
 	FormControlLabel,
 	IconButton,
 	InputAdornment,
-	Link,
 	Paper,
 	TextField,
 	Typography,
 } from "@mui/material";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useAuthenticationStore } from "stores/authenticationStore";
 
@@ -39,14 +39,15 @@ function RouteComponent() {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		const response = await signInUser({
-			signInUser: {
-				email: username,
-				password: password,
-				passwordRepeat: password,
+		const response = await signInUser(
+			{
+				signInUser: {
+					email: username,
+					password: password,
+					passwordRepeat: password,
+				},
 			},
-		});
-
+		);
 		const { accessToken, refreshToken } = response.SignInUser;
 
 		if (!isError){
@@ -54,14 +55,6 @@ function RouteComponent() {
 			navigate({ to: "/home" });
 		}
 	};
-
-	useEffect(() => {
-		if (isError){
-
-			console.log(error?.response?.errors);
-			console.log(error?.response?.errors[0].extensions?.originalError.message[0]);
-		}
-	}, [error]);
 
 	const handleClickShowPassword = () => {
 		setShowPassword((prev) => !prev);
@@ -110,7 +103,7 @@ function RouteComponent() {
 
 				{isError && (
 					<Alert severity='error' sx={{ mb: 2 }}>
-						{error?.response?.errors[0].extensions?.originalError.message[0]}
+						{GET_ERROR(error)}
 					</Alert>
 				)}
 
@@ -194,32 +187,14 @@ function RouteComponent() {
 					</Button>
 				</form>
 
-				{/* Additional Links */}
 				<Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-					<Link
-						href='#'
-						variant='body2'
-						sx={{
-							color: "#1976d2",
-							"&:hover": { textDecoration: "underline" },
-						}}
-					>
-						<RouterLink to='/forgotten-password' style={{ width: "100%" }}>
-							Forgot Password?
-						</RouterLink>
-					</Link>
-					<Link
-						href='#'
-						variant='body2'
-						sx={{
-							color: "#1976d2",
-							"&:hover": { textDecoration: "underline" },
-						}}
-					>
-						<RouterLink to='/sign-in' style={{ width: "100%" }}>
-							Sign Up
-						</RouterLink>
-					</Link>
+					<RouterLink to='/forgotten-password' style={{ width: "50%", color: "#1976d2" }}>
+						Forgot Password?
+					</RouterLink>
+
+					<RouterLink to='/forgotten-password' style={{ width: "50%", color: "#1976d2" }}>
+						Sign up
+					</RouterLink>
 				</Box>
 			</Paper>
 		</Box>

@@ -16,7 +16,7 @@ export default class SignInCredentials {
 	passwordRepeat: string;
 
 	@Field()
-	@IsEmail()
-	@IsNotEmpty()
+	@IsEmail({}, { message: "Please provide a valid email address." })
+	@IsNotEmpty({ message: "Email cannot be empty." })
 	email: string;
 }

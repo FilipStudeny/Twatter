@@ -10,6 +10,11 @@ const config: CodegenConfig = {
 				"typescript",
 				"typescript-operations",
 				"typescript-react-query",
+				{
+					add: {
+						content: `import { GraphQLResponse } from "graphql-request/dist/types";`,
+					},
+				},
 			],
 
 			config: {
@@ -27,7 +32,7 @@ const config: CodegenConfig = {
 				exposeMutationKeys: true,
 				reactQueryVersion: 5,
 				addInfiniteQuery: true,
-				errorType: "any",
+				errorType: "GraphQLResponse",
 			},
 		},
 	},
