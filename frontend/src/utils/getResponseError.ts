@@ -12,3 +12,13 @@ export const GET_ERROR = (err: GraphQLResponse) => {
 	// Otherwise, just return error as a string, or a fallback if it’s undefined
 	return error ?? "Unknown error";
 };
+
+export const GET_ERROR_LIST = (err: GraphQLResponse): string[] => {
+	const error = err?.response?.errors?.[0]?.extensions?.originalError?.message;
+
+	if (Array.isArray(error)) {
+		return error;
+	}
+
+	return [error];
+};

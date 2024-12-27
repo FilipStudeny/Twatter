@@ -1,13 +1,11 @@
 import { RouterLink } from "@Components/navigation/routerLink";
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
-import { Visibility, VisibilityOff, Person, Lock } from "@mui/icons-material";
+import { Visibility, VisibilityOff, Person, Lock, Email } from "@mui/icons-material";
 import {
 	Alert,
 	Box,
 	Button,
-	Checkbox,
 	CircularProgress,
-	FormControlLabel,
 	IconButton,
 	InputAdornment,
 	Paper,
@@ -17,42 +15,39 @@ import {
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { useAuthenticationStore } from "stores/authenticationStore";
-
-import { useSignInUserMutation } from "../../../../shared";
+import { useSignUpMutation } from "../../../../shared";
 
 const BRAND_LOGO_URL = "https://via.placeholder.com/150";
 
-export const Route = createFileRoute("/_authentication/sign-in")({ component: RouteComponent });
+export const Route = createFileRoute("/_authentication/sign-up")({ component: RouteComponent });
 
 function RouteComponent() {
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const [showPassword, setShowPassword] = useState(false);
-	const [rememberMe, setRememberMe] = useState(false);
-
 	const navigate = useNavigate();
-	const signInStore = useAuthenticationStore((state) => state.signIn);
 
-	const { mutateAsync: signInUser, isPending, isError, error } = useSignInUserMutation();
+	const [firstName, setFirstName] = useState("");
+	const [lastName, setLastName] = useState("");
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [repeatPassword, setRepeatPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
+
+	const { mutateAsync: signUpUser, isPending, isError, error } = useSignUpMutation();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		const response = await signInUser(
-			{
-				signInUser: {
-					email: username,
-					password: password,
-					passwordRepeat: password,
-				},
+		await signUpUser({
+			createUser: {
+				firstName,
+				lastName,
+				email,
+				password,
+				repeatPassword,
 			},
-		);
-		const { accessToken, refreshToken } = response.SignInUser;
+		});
 
-		if (!isError){
-			signInStore({ accessToken, refreshToken });
-			navigate({ to: "/home" });
+		if (!isError) {
+			navigate({ to: "/sign-in" });
 		}
 	};
 
@@ -94,10 +89,10 @@ function RouteComponent() {
 					gutterBottom
 					sx={{ fontWeight: "bold", color: "#1976d2" }}
 				>
-					Welcome Back
+					Create Your Account
 				</Typography>
 				<Typography variant='subtitle1' textAlign='center' gutterBottom sx={{ color: "text.secondary", mb: 3 }}>
-					Please sign in to your account
+					We are excited to have you!
 				</Typography>
 
 				{isError &&
@@ -107,13 +102,16 @@ function RouteComponent() {
 						</Alert>
 					))}
 
-				<form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+				<form
+					onSubmit={handleSubmit}
+					style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "20px" }}
+				>
 					<TextField
-						label='Email'
+						label='First Name'
 						variant='outlined'
 						fullWidth
-						value={username}
-						onChange={(e) => setUsername(e.target.value)}
+						value={firstName}
+						onChange={(e) => setFirstName(e.target.value)}
 						required
 						InputProps={{
 							startAdornment: (
@@ -124,6 +122,39 @@ function RouteComponent() {
 						}}
 					/>
 
+					<TextField
+						label='Last Name'
+						variant='outlined'
+						fullWidth
+						value={lastName}
+						onChange={(e) => setLastName(e.target.value)}
+						required
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position='start'>
+									<Person color='action' />
+								</InputAdornment>
+							),
+						}}
+					/>
+
+					<TextField
+						label='Email'
+						variant='outlined'
+						fullWidth
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						required
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position='start'>
+									<Email color='action' />
+								</InputAdornment>
+							),
+						}}
+					/>
+
+					{/* Password field */}
 					<TextField
 						label='Password'
 						variant='outlined'
@@ -152,16 +183,33 @@ function RouteComponent() {
 						}}
 					/>
 
-					<FormControlLabel
-						control={
-							<Checkbox
-								checked={rememberMe}
-								onChange={(e) => setRememberMe(e.target.checked)}
-								color='primary'
-							/>
-						}
-						label='Remember me'
-						sx={{ fontSize: "0.875rem", color: "text.secondary" }}
+					{/* Repeat Password field */}
+					<TextField
+						label='Repeat Password'
+						variant='outlined'
+						type={showPassword ? "text" : "password"}
+						fullWidth
+						value={repeatPassword}
+						onChange={(e) => setRepeatPassword(e.target.value)}
+						required
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position='start'>
+									<Lock color='action' />
+								</InputAdornment>
+							),
+							endAdornment: (
+								<InputAdornment position='end'>
+									<IconButton
+										onClick={handleClickShowPassword}
+										edge='end'
+										aria-label='toggle password visibility'
+									>
+										{showPassword ? <VisibilityOff /> : <Visibility />}
+									</IconButton>
+								</InputAdornment>
+							),
+						}}
 					/>
 
 					<Button
@@ -180,36 +228,23 @@ function RouteComponent() {
 							"&:hover": { background: "linear-gradient(45deg, #21CBF3 30%, #2196F3 90%)" },
 						}}
 					>
-						{isPending ? <CircularProgress size={24} color='inherit' /> : "Sign In"}
+						{isPending ? <CircularProgress size={24} color='inherit' /> : "Sign Up"}
 					</Button>
 				</form>
 
-				<Box
-					sx={{
-						display: "flex",
-						justifyContent: "space-between",
-						mt: 2,
-					}}
-				>
+				<Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+					<Typography variant='body2' sx={{ color: "text.secondary", mr: 1 }}>
+						Already have an account?
+					</Typography>
 					<RouterLink
-						to='/forgotten-password'
+						to='/sign-in'
 						style={{
 							textDecoration: "none",
 							color: "#1976d2",
 							fontSize: "0.875rem",
 						}}
 					>
-						Forgot Password?
-					</RouterLink>
-					<RouterLink
-						to='/sign-up'
-						style={{
-							textDecoration: "none",
-							color: "#1976d2",
-							fontSize: "0.875rem",
-						}}
-					>
-						Sign Up
+						Sign In
 					</RouterLink>
 				</Box>
 			</Paper>

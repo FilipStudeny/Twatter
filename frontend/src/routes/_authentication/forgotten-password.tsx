@@ -14,30 +14,36 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { useForgotPasswordMutation } from "../../../../shared";
+
 export const Route = createFileRoute("/_authentication/forgotten-password")({ component: RouteComponent });
 
 function RouteComponent() {
 	const [email, setEmail] = useState("");
-	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState("");
-	const [error, setError] = useState("");
+
+	const {
+		mutateAsync: retrieveForgottenPassword,
+		isPending,
+		isError,
+		error: mutationError,
+		reset,
+	} = useForgotPasswordMutation();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setLoading(true);
 		setSuccess("");
-		setError("");
 
-		// Simulate API call for password recovery
 		try {
-			// Replace this with actual API call, e.g., await requestPasswordRecovery(email)
-			await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
-			setSuccess("If an account with this email exists, a password reset link has been sent.");
+			const response = await retrieveForgottenPassword({ email });
+			setSuccess(
+				response.forgotPassword.message ??
+					"If an account with this email exists, a password reset link has been sent.",
+			);
 		} catch {
-			setError("Something went wrong. Please try again later.");
-		} finally {
-			setLoading(false);
+			reset();
 		}
+
 	};
 
 	return (
@@ -75,14 +81,20 @@ function RouteComponent() {
 					Enter your email address to reset your password
 				</Typography>
 
+				{/* Success message */}
 				{success && (
 					<Alert severity='success' sx={{ mb: 2 }}>
 						{success}
 					</Alert>
 				)}
-				{error && (
+
+				{/* Error from the mutation */}
+				{isError && (
 					<Alert severity='error' sx={{ mb: 2 }}>
-						{error}
+						{
+							// You can customize the error message as needed
+							mutationError?.response?.errors?.[0]?.message ?? "Something went wrong. Please try again."
+						}
 					</Alert>
 				)}
 
@@ -108,7 +120,7 @@ function RouteComponent() {
 						variant='contained'
 						type='submit'
 						fullWidth
-						disabled={loading}
+						disabled={isPending}
 						sx={{
 							mt: 1,
 							py: 1.5,
@@ -120,7 +132,7 @@ function RouteComponent() {
 							"&:hover": { background: "linear-gradient(45deg, #21CBF3 30%, #2196F3 90%)" },
 						}}
 					>
-						{loading ? <CircularProgress size={24} color='inherit' /> : "Send Reset Link"}
+						{isPending ? <CircularProgress size={24} color='inherit' /> : "Send Reset Link"}
 					</Button>
 				</form>
 
@@ -130,7 +142,7 @@ function RouteComponent() {
 						variant='body2'
 						sx={{ color: "#1976d2", "&:hover": { textDecoration: "underline" } }}
 					>
-						<RouterLink to="/sign-in" style={{ width: "100%" }}>
+						<RouterLink to='/sign-in' style={{ width: "100%" }}>
 							Back to Sign In
 						</RouterLink>
 					</Link>
