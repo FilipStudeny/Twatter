@@ -1,5 +1,5 @@
 // Home.tsx
-import SinglePost from "@Components/PostCard";
+import SinglePost from "@Components/post/PostCard";
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
 import { Container, Typography, CircularProgress, Alert, Box, Stack } from "@mui/material";
 import { createFileRoute } from "@tanstack/react-router";
@@ -47,9 +47,7 @@ const Home = () => {
 				<Typography variant='h6'>No posts available.</Typography>
 			) : (
 				<Stack spacing={4}>
-					{data?.getPosts?.items?.map((post: PostDetail) => (
-						<SinglePost post={post} />
-					))}
+					{data?.getPosts?.items?.map((post: PostDetail) => <SinglePost post={post} />)}
 				</Stack>
 			)}
 		</Container>

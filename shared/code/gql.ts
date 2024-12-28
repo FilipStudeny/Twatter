@@ -445,7 +445,7 @@ export type GetCommentsByPostIdQueryVariables = Exact<{
 }>;
 
 
-export type GetCommentsByPostIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', items?: Array<{ __typename?: 'CommentDetail', id: string, content: string, postId: string, reportsCount: number, strikesCount: number, createdAt: any, updatedAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+export type GetCommentsByPostIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename?: 'CommentDetail', id: string, content: string, postId: string, reportsCount: number, strikesCount: number, createdAt: any, updatedAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
 
 export type GetCommentsByCreatorIdQueryVariables = Exact<{
   creatorId: Scalars['String']['input'];
@@ -454,7 +454,7 @@ export type GetCommentsByCreatorIdQueryVariables = Exact<{
 }>;
 
 
-export type GetCommentsByCreatorIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', items?: Array<{ __typename?: 'CommentDetail', id: string, content: string, postId: string, reportsCount: number, strikesCount: number, createdAt: any, updatedAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+export type GetCommentsByCreatorIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename?: 'CommentDetail', id: string, content: string, postId: string, reportsCount: number, strikesCount: number, createdAt: any, updatedAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
 
 export type CreateGroupMutationVariables = Exact<{
   createGroupDto: CreateGroupDto;
@@ -833,6 +833,9 @@ export const GetCommentsByPostIdDocument = /*#__PURE__*/ `
       createdAt
       updatedAt
     }
+    page
+    total
+    limit
   }
 }
     `;
@@ -907,6 +910,9 @@ export const GetCommentsByCreatorIdDocument = /*#__PURE__*/ `
       createdAt
       updatedAt
     }
+    page
+    total
+    limit
   }
 }
     `;

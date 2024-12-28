@@ -58,7 +58,7 @@ export default tseslint.config(
 			"@stylistic/brace-style": ["warn", "1tbs", { allowSingleLine: true }],
 			"@stylistic/array-bracket-spacing": ["error", "never"],
 			"@stylistic/object-curly-spacing": ["error", "always"],
-			"@stylistic/object-curly-newline": ["error", { multiline: true }],
+			//"@stylistic/object-curly-newline": ["error", { multiline: true }],
 			"@stylistic/func-call-spacing": ["error", "never"],
 			"@stylistic/comma-spacing": ["error", { before: false, after: true }],
 			"@stylistic/quotes": ["error", "double"],
