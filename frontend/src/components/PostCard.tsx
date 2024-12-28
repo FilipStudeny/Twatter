@@ -1,5 +1,4 @@
 // SinglePost.tsx
-
 import CategoryIcon from "@mui/icons-material/Category";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import GroupIcon from "@mui/icons-material/Group";
@@ -27,42 +26,10 @@ import {
 import dayjs from "dayjs";
 import React, { useState, MouseEvent } from "react";
 
-// Types
-interface Creator {
-	id: string,
-	username: string,
-}
-interface Reactions {
-	like: number,
-	dislike: number,
-	sad: number,
-	smile: number,
-	angry: number,
-	love: number,
-}
-interface Interest {
-	id: string,
-	name: string,
-}
-interface Group {
-	id?: string,
-	name?: string,
-}
-export interface Post {
-	id: string,
-	content: string,
-	creator: Creator,
-	reactions: Reactions,
-	interest: Interest | null,
-	group: Group | null,
-	commentsCount: number,
-	createdAt: string,
-}
-interface SinglePostProps {
-post: Post,}
+import { RouterLink } from "./navigation/routerLink";
+import { PostDetail } from "../../../shared";
 
-// Reaction icons
-const reactionIcons: Record<string, React.ReactNode> = {
+const reactionIcons: Record<string, JSX.Element> = {
 	like: <ThumbUpIcon fontSize='small' />,
 	dislike: <ThumbDownIcon fontSize='small' />,
 	sad: <SentimentDissatisfiedIcon fontSize='small' />,
@@ -71,7 +38,6 @@ const reactionIcons: Record<string, React.ReactNode> = {
 	love: <FavoriteIcon fontSize='small' />,
 };
 
-// Assign each reaction a MUI Chip color (you can adjust as you like)
 const reactionChipColors: Record<
 	string,
 	"default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"
@@ -84,12 +50,13 @@ const reactionChipColors: Record<
 	love: "primary",
 };
 
-const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
-	// Create a fallback initial for the user avatar
-	const avatarLetter = post.creator.username.charAt(0).toUpperCase();
+interface SinglePostProps { post: PostDetail }
 
-	// State for the "add reaction" menu
+const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+	// Fallback for user’s avatar letter
+	const avatarLetter = post.creator.username ? post.creator.username.charAt(0).toUpperCase() : "?";
 
 	const handleMenuOpen = (event: MouseEvent<HTMLButtonElement>) => {
 		setAnchorEl(event.currentTarget);
@@ -99,22 +66,13 @@ const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
 		setAnchorEl(null);
 	};
 
-	// Example: when user selects a reaction from the menu
 	const handleReactionSelect = (reactionType: string) => {
 		handleMenuClose();
-		// In a real app, you'd likely call an API or update local state to reflect the new reaction
 		console.log("User selected reaction:", reactionType);
 	};
 
 	return (
-		<Card
-			sx={{
-				mb: 2,
-				width: "100%",
-				maxWidth: "100%",
-			}}
-			elevation={3}
-		>
+		<Card sx={{ mb: 2, maxWidth: "100%" }} elevation={3}>
 			<CardHeader
 				avatar={<Avatar>{avatarLetter}</Avatar>}
 				title={
@@ -128,7 +86,6 @@ const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
 					</Typography>
 				}
 				action={
-					// "More" / "Add reaction" icon
 					<>
 						<IconButton aria-label='add reaction' onClick={handleMenuOpen}>
 							<MoreVertIcon />
@@ -146,27 +103,29 @@ const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
 			/>
 
 			<CardContent>
-				{/* Post content */}
-				<Typography variant='body2' sx={{ mb: 2, whiteSpace: "pre-line" }}>
-					{post.content}
-				</Typography>
+				<RouterLink to="/post/$id" params={{ id: post.id }} style={{ textDecoration: "none", color: "inherit" }}>
+					<Typography variant='body2' sx={{ mb: 2, whiteSpace: "pre-line" }}>
+						{post.content}
+					</Typography>
+				</RouterLink>
 
-				{/* Reaction chips */}
-				<Stack direction='row' spacing={1} sx={{ mb: 2, flexWrap: "wrap" }}>
-					{Object.entries(post.reactions).map(([reactionType, count]) => (
-						<Chip
-							key={reactionType}
-							icon={reactionIcons[reactionType]}
-							label={count}
-							size='small'
-							variant='outlined'
-							color={reactionChipColors[reactionType] ?? "default"}
-							sx={{ textTransform: "capitalize" }}
-						/>
-					))}
-				</Stack>
+				{/* Only render the Stack if reactions is not null */}
+				{post.reactions && (
+					<Stack direction='row' spacing={1} sx={{ mb: 2, flexWrap: "wrap" }}>
+						{Object.entries(post.reactions).map(([reactionType, count]) => (
+							<Chip
+								key={reactionType}
+								icon={reactionIcons[reactionType]}
+								label={count}
+								size='small'
+								variant='outlined'
+								color={reactionChipColors[reactionType] ?? "default"}
+								sx={{ textTransform: "capitalize" }}
+							/>
+						))}
+					</Stack>
+				)}
 
-				{/* Interest and Group info (optional icons) */}
 				<Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
 					<Typography
 						variant='caption'
@@ -189,7 +148,7 @@ const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
 					)}
 
 					<Typography variant='caption' color='text.secondary'>
-						Comments: {post.commentsCount}
+						Comments: {post.commentsCount ?? 0}
 					</Typography>
 				</Box>
 			</CardContent>

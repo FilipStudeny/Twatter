@@ -7,56 +7,56 @@ export default class UserDetail {
 	@Field()
 	id: string;
 
-	@Field()
-	email: string;
-
-	@Field()
-	firstName: string;
-
-	@Field()
-	lastName: string;
+	@Field({ nullable: true })
+	email?: string;
 
 	@Field({ nullable: true })
-	username: string;
+	firstName?: string;
 
-	@Field()
-	postsCount: number;
+	@Field({ nullable: true })
+	lastName?: string;
 
-	@Field()
-	commentsCount: number;
+	@Field({ nullable: true })
+	username?: string;
 
-	@Field()
-	likesCount: number;
+	@Field({ nullable: true })
+	postsCount?: number;
 
-	@Field()
-	joinedGroupsCount: number;
+	@Field({ nullable: true })
+	commentsCount?: number;
 
-	@Field()
-	banStrikesCount: number;
+	@Field({ nullable: true })
+	likesCount?: number;
 
-	@Field()
-	sentNotificationsCount: number;
+	@Field({ nullable: true })
+	joinedGroupsCount?: number;
 
-	@Field()
-	filedReportsCount: number;
+	@Field({ nullable: true })
+	banStrikesCount?: number;
 
-	@Field()
-	receivedReportsCount: number;
+	@Field({ nullable: true })
+	sentNotificationsCount?: number;
 
-	@Field()
-	friendsCount: number;
+	@Field({ nullable: true })
+	filedReportsCount?: number;
 
-	@Field()
-	moderatedGroupsCount: number;
+	@Field({ nullable: true })
+	receivedReportsCount?: number;
 
-	@Field()
-	createdGroupsCount: number;
+	@Field({ nullable: true })
+	friendsCount?: number;
 
-	@Field()
-	createdAt: Date;
+	@Field({ nullable: true })
+	moderatedGroupsCount?: number;
 
-	@Field()
-	updatedAt: Date;
+	@Field({ nullable: true })
+	createdGroupsCount?: number;
+
+	@Field({ nullable: true })
+	createdAt?: Date;
+
+	@Field({ nullable: true })
+	updatedAt?: Date;
 
 	static createMap(mapper: Mapper): void {
 		createMap(

@@ -1,34 +1,58 @@
 // Home.tsx
-import SinglePost, { Post } from "@Components/PostCard";
-import { Typography } from "@mui/material";
+import SinglePost from "@Components/PostCard";
+import { GET_ERROR_LIST } from "@Utils/getResponseError";
+import { Container, Typography, CircularProgress, Alert, Box, Stack } from "@mui/material";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-import { useGetPostsListQuery } from "../../../shared";
+import { PostDetail, useGetPostsListQuery } from "../../../shared";
 import { AppRoutes } from "../utils/routesConfig";
 
 const Home = () => {
 	const variables = { page: 1, limit: 10 };
-	const { data, isLoading, error } = useGetPostsListQuery(variables);
+	const { data, isLoading, isError, error } = useGetPostsListQuery(variables);
 
 	useEffect(() => {
-		console.log(data?.getPosts);
-		console.log("ERROR", error);
-		console.log(isLoading);
+		console.log("Data:", data?.getPosts);
+		console.log("Error:", error);
+		console.log("Loading:", isLoading);
 	}, [data, error, isLoading]);
 
 	if (isLoading) {
-		return <Typography>Loading...</Typography>;
+		return (
+			<Box display='flex' justifyContent='center' alignItems='center' height='80vh'>
+				<CircularProgress />
+			</Box>
+		);
 	}
 
-	if (error) {
-		return <Typography>Error: {JSON.stringify(error)}</Typography>;
+	if (isError && error) {
+		return (
+			<Container sx={{ mt: 4 }}>
+				{GET_ERROR_LIST(error).map((errMsg: string, index: number) => (
+					<Alert key={index} severity='error' sx={{ marginTop: "5px" }}>
+						{errMsg}
+					</Alert>
+				))}
+			</Container>
+		);
 	}
 
 	return (
-		<>
-			{data?.getPosts?.items?.map((post) => <SinglePost key={post.id} post={post as Post} />)}
-		</>
+		<Container sx={{ mt: 4 }}>
+			<Typography variant='h4' gutterBottom>
+				Latest Posts
+			</Typography>
+			{data?.getPosts?.items?.length === 0 ? (
+				<Typography variant='h6'>No posts available.</Typography>
+			) : (
+				<Stack spacing={4}>
+					{data?.getPosts?.items?.map((post: PostDetail) => (
+						<SinglePost post={post} />
+					))}
+				</Stack>
+			)}
+		</Container>
 	);
 };
 

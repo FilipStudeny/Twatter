@@ -13,23 +13,23 @@ type ReactionsCount {
 
 type UserDetail {
   id: String!
-  email: String!
-  firstName: String!
-  lastName: String!
+  email: String
+  firstName: String
+  lastName: String
   username: String
-  postsCount: Float!
-  commentsCount: Float!
-  likesCount: Float!
-  joinedGroupsCount: Float!
-  banStrikesCount: Float!
-  sentNotificationsCount: Float!
-  filedReportsCount: Float!
-  receivedReportsCount: Float!
-  friendsCount: Float!
-  moderatedGroupsCount: Float!
-  createdGroupsCount: Float!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  postsCount: Float
+  commentsCount: Float
+  likesCount: Float
+  joinedGroupsCount: Float
+  banStrikesCount: Float
+  sentNotificationsCount: Float
+  filedReportsCount: Float
+  receivedReportsCount: Float
+  friendsCount: Float
+  moderatedGroupsCount: Float
+  createdGroupsCount: Float
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 """
@@ -58,14 +58,14 @@ type InterestDetail {
 }
 
 type GroupDetail {
-  id: String!
-  name: String!
-  interest: InterestDetail!
-  owner: UserDetail!
-  moderators: [UserDetail!]!
-  users: [UserDetail!]!
-  membersCount: Int!
-  postsCount: Int!
+  id: String
+  name: String
+  interest: InterestDetail
+  owner: UserDetail
+  moderators: [UserDetail!]
+  users: [UserDetail!]
+  membersCount: Int
+  postsCount: Int
 }
 
 type PostDetail {

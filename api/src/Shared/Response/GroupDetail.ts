@@ -5,27 +5,27 @@ import UserDetail from "./UserDetail";
 
 @ObjectType()
 export class GroupDetail {
-	@Field()
+	@Field(() => String, { nullable: true })
 	id: string;
 
-	@Field()
+	@Field(() => String, { nullable: true })
 	name: string;
 
-	@Field(() => InterestDetail)
+	@Field(() => InterestDetail, { nullable: true })
 	interest: InterestDetail;
 
-	@Field(() => UserDetail)
+	@Field(() => UserDetail, { nullable: true })
 	owner: UserDetail;
 
-	@Field(() => [UserDetail])
+	@Field(() => [UserDetail], { nullable: true })
 	moderators: UserDetail[];
 
-	@Field(() => [UserDetail])
+	@Field(() => [UserDetail], { nullable: true })
 	users: UserDetail[];
 
-	@Field(() => Int)
+	@Field(() => Int, { nullable: true })
 	membersCount: number;
 
-	@Field(() => Int)
+	@Field(() => Int, { nullable: true })
 	postsCount: number;
 }
