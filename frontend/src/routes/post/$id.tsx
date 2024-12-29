@@ -1,15 +1,12 @@
 // PostDetailPage.tsx
+
+import CommentsSection from "@Components/post/comments/CommenSection";
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
+import { reactionChipColors, reactionIcons } from "@Utils/reactions";
 import {
 	Category as CategoryIcon,
-	Favorite as FavoriteIcon,
 	Group as GroupIcon,
-	Mood as MoodIcon,
-	SentimentDissatisfied as SentimentDissatisfiedIcon,
-	SentimentVeryDissatisfied as SentimentVeryDissatisfiedIcon,
-	ThumbDown as ThumbDownIcon,
-	ThumbUp as ThumbUpIcon,
-	Report as ReportIcon, // Import ReportIcon
+	Report as ReportIcon,
 } from "@mui/icons-material";
 import {
 	Card,
@@ -29,66 +26,33 @@ import {
 	DialogContentText,
 	DialogActions,
 	Button,
-	CardActions, // Import CardActions for the footer
-	Tooltip, // Import Tooltip for hover effects
+	CardActions,
+	Tooltip,
 } from "@mui/material";
 import { createFileRoute } from "@tanstack/react-router";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { useGetPostsListQuery } from "../../../../shared";
 
-// Reaction icons and colors
-const reactionIcons: Record<string, JSX.Element> = {
-	like: <ThumbUpIcon fontSize='small' />,
-	dislike: <ThumbDownIcon fontSize='small' />,
-	sad: <SentimentDissatisfiedIcon fontSize='small' />,
-	smile: <MoodIcon fontSize='small' />,
-	angry: <SentimentVeryDissatisfiedIcon fontSize='small' />,
-	love: <FavoriteIcon fontSize='small' />,
-};
-
-const reactionChipColors: Record<
-	string,
-	"default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"
-> = {
-	like: "success",
-	dislike: "error",
-	sad: "info",
-	smile: "warning",
-	angry: "error",
-	love: "primary",
-};
-
-// Define the route using @tanstack/react-router
 export const Route = createFileRoute("/post/$id")({ component: RouteComponent });
 
 function RouteComponent() {
-	// Extract the 'id' parameter from the route
 	const { id } = Route.useParams();
-
-	// Fetch post data using the query hook
 	const { data, isLoading, isError, error } = useGetPostsListQuery({ postId: id });
-
-	// State for report dialog
 	const [openReportDialog, setOpenReportDialog] = useState(false);
 
-	// Handler to open the report dialog
 	const handleReportClick = () => {
 		setOpenReportDialog(true);
 	};
 
-	// Handler to close the report dialog
 	const handleReportClose = () => {
 		setOpenReportDialog(false);
 	};
 
-	// Handler to confirm the report
 	const handleReportConfirm = () => {
-		// Implement your report logic here (e.g., API call)
 		console.log("Post reported:", id);
 		setOpenReportDialog(false);
-		// Optionally, show a success message or notification
 	};
 
 	if (isLoading) {
@@ -111,8 +75,7 @@ function RouteComponent() {
 		);
 	}
 
-	const post = data?.getPosts?.items?.[0] ?? undefined;
-
+	const post = data?.getPosts?.items?.[0];
 	if (!post) {
 		return (
 			<Box display='flex' justifyContent='center' mt={4}>
@@ -147,13 +110,11 @@ function RouteComponent() {
 					}
 				/>
 				<CardContent>
-					{/* Post Content */}
 					<Typography variant='body2' sx={{ mb: 2, whiteSpace: "pre-line", lineHeight: 1.6 }}>
 						{post.content}
 					</Typography>
 				</CardContent>
 
-				{/* Footer with Metadata and Reactions */}
 				<CardActions
 					sx={{
 						justifyContent: "space-between",
@@ -162,7 +123,6 @@ function RouteComponent() {
 						borderTop: "1px solid #e0e0e0",
 					}}
 				>
-					{/* Post Metadata */}
 					<Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
 						<Typography
 							variant='caption'
@@ -189,37 +149,33 @@ function RouteComponent() {
 						</Typography>
 					</Box>
 
-					{/* Reactions Chips */}
 					{post.reactions && (
 						<Stack direction='row' spacing={0.5}>
 							{Object.entries(post.reactions).map(([reactionType, count]) => (
-								<Tooltip
+								<Chip
 									key={reactionType}
-									title={`${reactionType.charAt(0).toUpperCase() + reactionType.slice(1)}: ${count}`}
-								>
-									<Chip
-										icon={reactionIcons[reactionType]}
-										label={count}
-										size='small'
-										variant='outlined'
-										color={reactionChipColors[reactionType] ?? "default"}
-										sx={{
-											textTransform: "capitalize",
-											cursor: "pointer",
-											transition: "background-color 0.3s",
-											"&:hover": { backgroundColor: (theme) => theme.palette.action.hover },
-										}}
-										// Uncomment below to make reactions interactive
-										// onClick={() => handleReactionClick(reactionType)}
-									/>
-								</Tooltip>
+									icon={reactionIcons[reactionType]}
+									label={count}
+									size='small'
+									variant='outlined'
+									color={reactionChipColors[reactionType] ?? "default"}
+									sx={{
+										textTransform: "capitalize",
+										cursor: "pointer",
+										transition: "background-color 0.3s",
+										"&:hover": {
+											backgroundColor: (theme) => theme.palette.action.hover,
+										},
+									}}
+								/>
 							))}
 						</Stack>
 					)}
 				</CardActions>
 			</Card>
 
-			{/* Report Post Confirmation Dialog */}
+			<CommentsSection postId={id} />
+
 			<Dialog
 				open={openReportDialog}
 				onClose={handleReportClose}

@@ -1,10 +1,8 @@
 // CommentsModal.tsx
-import { reactionChipColors, reactionIcons } from "@Utils/reactions";
+
 import CloseIcon from "@mui/icons-material/Close";
-import ReportIcon from "@mui/icons-material/Report"; // Import ReportIcon
 import {
 	Dialog,
-	DialogTitle,
 	DialogContent,
 	DialogActions,
 	Button,
@@ -15,18 +13,17 @@ import {
 	Typography,
 	Box,
 	Stack,
-	Avatar,
-	Divider,
 	IconButton,
-	Chip,
 	DialogContentText,
+	useTheme,
 } from "@mui/material";
-import dayjs from "dayjs";
 import React, { useState, useEffect } from "react";
 
+import Comment from "./Comment";
 import { useGetCommentsByPostIdQuery } from "../../../../../shared";
-// Import your report API function
 // import { reportComment } from "../../../../../shared"; // Uncomment and adjust the path
+
+// 1) Import your new child component
 
 interface CommentsModalProps {
 	open: boolean,
@@ -35,6 +32,7 @@ interface CommentsModalProps {
 }
 
 const CommentsModal: React.FC<CommentsModalProps> = ({ open, onClose, postId }) => {
+	const theme = useTheme();
 	const [currentPage, setCurrentPage] = useState(1);
 	const commentsLimit = 5; // Number of comments per page
 
@@ -93,7 +91,6 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ open, onClose, postId }) 
 		if (reportingComment) {
 			try {
 				// TODO: Replace with your API call to report the comment
-				// Example:
 				// await reportComment(reportingComment.id);
 				console.log(`Reporting comment ID: ${reportingComment.id}`);
 
@@ -107,14 +104,12 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ open, onClose, postId }) 
 					severity: "success",
 				});
 			} catch {
-				// Handle error during reporting
 				setFeedback({
 					open: true,
 					message: "Failed to report the comment. Please try again.",
 					severity: "error",
 				});
 			} finally {
-				// Close the confirmation dialog
 				setReportingComment(null);
 			}
 		}
@@ -133,41 +128,51 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ open, onClose, postId }) 
 				fullWidth
 				maxWidth='sm'
 				aria-labelledby='comments-dialog-title'
+				// Backdrop blur (kept from your previous design)
+				BackdropProps={{
+					sx: {
+						backdropFilter: "blur(3px)",
+					},
+				}}
 				PaperProps={{
 					sx: {
-						borderRadius: 2,
+						borderRadius: 3,
 						boxShadow: 24,
-						padding: 1,
-						backgroundColor: (theme) => theme.palette.background.paper,
+						backgroundColor: theme.palette.background.paper,
+						overflow: "hidden",
 					},
 				}}
 			>
-				<DialogTitle
-					id='comments-dialog-title'
+				{/* Title / Header with subtle gradient */}
+				<Box
 					sx={{
-						m: 0,
+						background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+						color: "#fff",
 						p: 2,
 						display: "flex",
 						justifyContent: "space-between",
 						alignItems: "center",
-						borderBottom: "1px solid",
-						borderColor: "divider",
 					}}
 				>
-					<Typography variant='h6' component='div'>
+					<Typography variant='h6' component='div' id='comments-dialog-title' sx={{ fontWeight: 700 }}>
 						Comments
 					</Typography>
 					<IconButton
 						aria-label='close'
 						onClick={onClose}
 						sx={{
-							color: (theme) => theme.palette.grey[500],
+							color: "#fff",
+							"&:hover": {
+								backgroundColor: "rgba(255,255,255,0.2)",
+							},
 						}}
 					>
 						<CloseIcon />
 					</IconButton>
-				</DialogTitle>
-				<DialogContent dividers sx={{ padding: 2 }}>
+				</Box>
+
+				{/* Body Content */}
+				<DialogContent dividers sx={{ p: 2 }}>
 					{isLoading ? (
 						<Box display='flex' justifyContent='center' alignItems='center' height='200px'>
 							<CircularProgress />
@@ -182,117 +187,23 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ open, onClose, postId }) 
 						<Typography variant='body1'>No comments available.</Typography>
 					) : (
 						<Stack spacing={2}>
-							{data?.getCommentsList?.items?.map((comment, index: number) => (
-								<React.Fragment key={comment.id}>
-									<Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
-										<Avatar
-											src={comment.creator.firstName || undefined}
-											sx={{
-												width: 40,
-												height: 40,
-												border: "2px solid",
-												borderColor: "primary.main",
-												boxShadow: 1,
-											}}
-										>
-											{(!comment.creator.firstName &&
-												comment?.creator?.username?.charAt(0).toUpperCase()) ||
-												"?"}
-										</Avatar>
-										<Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-											{/* Top Row: Username and Report Button */}
-											<Box
-												sx={{
-													display: "flex",
-													justifyContent: "space-between",
-													alignItems: "center",
-												}}
-											>
-												<Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
-													{comment.creator.username}
-												</Typography>
-												{/* Report Button */}
-												<IconButton
-													aria-label='report comment'
-													size='small'
-													onClick={() =>
-														handleReportClick(
-															comment.id,
-															comment.creator.username || comment.creator.firstName || "",
-														)
-													}
-													sx={{
-														color: (theme) => theme.palette.error.main,
-														"&:hover": {
-															backgroundColor: (theme) => theme.palette.error.light,
-														},
-													}}
-												>
-													<ReportIcon fontSize='small' />
-												</IconButton>
-											</Box>
-											{/* Comment Content */}
-											<Typography variant='body2' sx={{ whiteSpace: "pre-line", mt: 0.5 }}>
-												{comment.content}
-											</Typography>
-											{/* Bottom Row: Timestamp and Reactions */}
-											<Box
-												sx={{
-													display: "flex",
-													justifyContent: "space-between",
-													alignItems: "center",
-													mt: 0.5,
-												}}
-											>
-												<Typography variant='caption' color='text.secondary'>
-													{dayjs(comment.createdAt).format("MMM D, YYYY h:mm A")}
-												</Typography>
-												{/* Display Reactions on the Right */}
-												{comment.reactions && (
-													<Stack direction='row' spacing={1} sx={{ flexWrap: "wrap" }}>
-														{Object.entries(comment.reactions).map(
-															([reactionType, count]) =>
-																(count as number) > 0 ? (
-																	<Chip
-																		key={reactionType}
-																		icon={reactionIcons[reactionType]}
-																		label={count}
-																		size='small'
-																		variant='filled'
-																		color={
-																			reactionChipColors[reactionType] ??
-																			"default"
-																		}
-																		sx={{
-																			textTransform: "capitalize",
-																			fontWeight: 500,
-																		}}
-																	/>
-																) : null,
-														)}
-													</Stack>
-												)}
-											</Box>
-										</Box>
-									</Box>
-									{data?.getCommentsList?.items &&
-										index !== data?.getCommentsList?.items?.length - 1 && (
-										<Divider sx={{ my: 2, borderColor: "divider" }} />
-									)}
-								</React.Fragment>
+							{data?.getCommentsList?.items?.map((comment) => (
+								// 2) Use the new <CommentItem> here:
+								<Comment key={comment.id} comment={{ creatorId: comment.creator.id, ...comment }} onReportClick={handleReportClick} />
 							))}
 						</Stack>
 					)}
 				</DialogContent>
+
+				{/* Actions (Pagination + Close) */}
 				<DialogActions
 					sx={{
 						justifyContent: "space-between",
-						paddingX: 3,
-						paddingY: 2,
+						px: 3,
+						py: 2,
 						flexWrap: "wrap",
 						gap: 1,
-						borderTop: "1px solid",
-						borderColor: "divider",
+						borderTop: `1px solid ${theme.palette.divider}`,
 					}}
 				>
 					{totalPages > 1 && (
@@ -316,14 +227,27 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ open, onClose, postId }) 
 				onClose={handleReportClose}
 				aria-labelledby='report-confirmation-dialog-title'
 				aria-describedby='report-confirmation-dialog-description'
+				PaperProps={{
+					sx: {
+						borderRadius: 3,
+						boxShadow: 24,
+					},
+				}}
+				BackdropProps={{
+					sx: {
+						backdropFilter: "blur(3px)",
+					},
+				}}
 			>
-				<DialogTitle id='report-confirmation-dialog-title'>Report Comment</DialogTitle>
-				<DialogContent>
+				<DialogContent sx={{ pt: 3 }}>
+					<Typography variant='h6' id='report-confirmation-dialog-title' gutterBottom>
+						Report Comment
+					</Typography>
 					<DialogContentText id='report-confirmation-dialog-description'>
 						{`Are you sure you want to report the comment by "${reportingComment?.username}"?`}
 					</DialogContentText>
 				</DialogContent>
-				<DialogActions>
+				<DialogActions sx={{ gap: 1, px: 3, py: 2 }}>
 					<Button onClick={handleReportClose} color='primary' sx={{ textTransform: "none" }}>
 						Cancel
 					</Button>

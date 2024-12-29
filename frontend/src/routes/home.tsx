@@ -1,22 +1,46 @@
 // Home.tsx
+
 import SinglePost from "@Components/post/PostCard";
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
-import { Container, Typography, CircularProgress, Alert, Box, Stack } from "@mui/material";
+import { Container, Typography, CircularProgress, Alert, Box, Stack, Button } from "@mui/material";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import React from "react";
 
-import { PostDetail, useGetPostsListQuery } from "../../../shared";
+import { useInfiniteScroll } from "hooks/infiniteScroll";
+
+import { PostDetail, useInfiniteGetPostsListQuery } from "../../../shared";
 import { AppRoutes } from "../utils/routesConfig";
 
-const Home = () => {
-	const variables = { page: 1, limit: 10 };
-	const { data, isLoading, isError, error } = useGetPostsListQuery(variables);
+const Home: React.FC = () => {
+	const {
+		data,
+		isLoading,
+		isError,
+		error,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteGetPostsListQuery(
+		{ page: 0, limit: 0 },
+		{
+			initialPageParam: { page: 1, limit: 5 },
 
-	useEffect(() => {
-		console.log("Data:", data?.getPosts);
-		console.log("Error:", error);
-		console.log("Loading:", isLoading);
-	}, [data, error, isLoading]);
+			getNextPageParam: (lastPage) => {
+				const currentPage = lastPage?.getPosts?.page ?? 1;
+				const limit = lastPage?.getPosts?.limit ?? 5;
+				const total = lastPage?.getPosts?.total ?? 0;
+				if (currentPage * limit < total) {
+					return { page: currentPage + 1, limit };
+				}
+
+				return undefined;
+			},
+		},
+	);
+
+	const { sentinelRef } = useInfiniteScroll(Boolean(hasNextPage), isFetchingNextPage, fetchNextPage);
+
+	const allPosts: PostDetail[] = data?.pages?.flatMap((page) => page?.getPosts?.items ?? []) ?? [];
 
 	if (isLoading) {
 		return (
@@ -43,15 +67,31 @@ const Home = () => {
 			<Typography variant='h4' gutterBottom>
 				Latest Posts
 			</Typography>
-			{data?.getPosts?.items?.length === 0 ? (
+
+			{allPosts.length === 0 ? (
 				<Typography variant='h6'>No posts available.</Typography>
 			) : (
 				<Stack spacing={4}>
-					{data?.getPosts?.items?.map((post: PostDetail) => <SinglePost post={post} />)}
+					{allPosts.map((post: PostDetail) => (
+						<SinglePost key={post.id} post={post} />
+					))}
 				</Stack>
+			)}
+
+			{hasNextPage && (
+				<>
+					<Box textAlign='center' mt={4}>
+						<Button variant='contained' onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+							{isFetchingNextPage ? "Loading..." : "Load More"}
+						</Button>
+					</Box>
+
+					<Box ref={sentinelRef} height='1px' />
+				</>
 			)}
 		</Container>
 	);
 };
 
 export const Route = createFileRoute(AppRoutes.HOME._)({ component: Home });
+export default Home;
