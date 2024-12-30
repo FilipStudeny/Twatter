@@ -1,3 +1,4 @@
+import { User } from "@Models/User";
 import { DbResponse } from "@Shared/DbResponse";
 import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
 import { Field, ObjectType } from "@nestjs/graphql";
@@ -18,6 +19,9 @@ export default class UserDetail {
 
 	@Field({ nullable: true })
 	username?: string;
+
+	@Field({ nullable: true })
+	profilePictureUrl?: string;
 
 	@Field({ nullable: true })
 	postsCount?: number;
@@ -83,7 +87,10 @@ export default class UserDetail {
 				(destionation) => destionation.username,
 				mapFrom((source) => source.user_username),
 			),
-
+			forMember(
+				(destination) => destination.profilePictureUrl,
+				mapFrom((source) => source.user_profilePictureUrl),
+			),
 			forMember(
 				(destionation) => destionation.postsCount,
 				mapFrom((source) => parseInt(source.posts_count, 10)),
@@ -140,6 +147,36 @@ export default class UserDetail {
 			forMember(
 				(destination) => destination.createdAt,
 				mapFrom((source) => source.user_createdAt),
+			),
+		);
+
+		createMap(
+			mapper,
+			User,
+			UserDetail,
+			forMember(
+				(destination) => destination.id,
+				mapFrom((source) => source.id),
+			),
+			forMember(
+				(destination) => destination.firstName,
+				mapFrom((source) => source.firstName),
+			),
+			forMember(
+				(destination) => destination.lastName,
+				mapFrom((source) => source.lastName),
+			),
+			forMember(
+				(destination) => destination.username,
+				mapFrom((source) => source.username),
+			),
+			forMember(
+				(destination) => destination.email,
+				mapFrom((source) => source.email),
+			),
+			forMember(
+				(destination) => destination.profilePictureUrl,
+				mapFrom((source) => source.profilePictureUrl),
 			),
 		);
 	}

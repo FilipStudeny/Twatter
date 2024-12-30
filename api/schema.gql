@@ -17,6 +17,7 @@ type UserDetail {
   firstName: String
   lastName: String
   username: String
+  profilePictureUrl: String
   postsCount: Float
   commentsCount: Float
   likesCount: Float
@@ -91,6 +92,7 @@ type GenericResponse {
 type SignInResponse {
   accessToken: String!
   refreshToken: String!
+  userData: UserDetail!
 }
 
 type PaginatedCommentsListResponse {

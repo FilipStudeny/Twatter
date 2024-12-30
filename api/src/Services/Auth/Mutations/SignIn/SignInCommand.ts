@@ -1,7 +1,10 @@
 import { User } from "@Models/User";
 import SignInCredentials from "@Shared/Input/SignInCredentials";
 import { SignInResponse } from "@Shared/Response/SignInResponse";
+import UserDetail from "@Shared/Response/UserDetail";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
+import { Mapper } from "@automapper/core";
+import { InjectMapper } from "@automapper/nestjs";
 import { NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { CommandHandler } from "@nestjs/cqrs";
@@ -20,6 +23,7 @@ export class SignInCommandHandler {
 		@InjectEntityManager() private readonly entityManager: EntityManager,
 		private readonly jwtService: JwtService,
 		private readonly configService: ConfigService,
+		@InjectMapper() private readonly mapper: Mapper,
 	) {}
 
 	async execute(command: SignInCommand): Promise<SignInResponse> {
@@ -50,9 +54,11 @@ export class SignInCommandHandler {
 			expiresIn: "7d",
 		});
 
+		const userData = this.mapper.map(user, User, UserDetail);
+
 		user.refreshToken = refreshToken;
 		await this.entityManager.save(user);
 
-		return new SignInResponse(accessToken, refreshToken);
+		return new SignInResponse(accessToken, refreshToken, userData);
 	}
 }

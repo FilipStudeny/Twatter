@@ -28,15 +28,15 @@ interface HeaderProps {
 	rightOpen: boolean,
 	lgUp: boolean,
 	onLeftToggle: ()=> void,
-	onRightToggle: ()=> void, // New prop for toggling RightSidebar
+	onRightToggle: ()=> void,
 }
 
 export const Header: React.FC<HeaderProps> = ({ leftOpen, rightOpen, lgUp, onLeftToggle, onRightToggle }) => {
-	const isLoggedIn = useAuthenticationStore((state) => state.isLoggedIn);
+	const { isLoggedIn, getUserData, signOut } = useAuthenticationStore();
+	const user = getUserData();
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-	// State for user menu
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
 
@@ -44,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({ leftOpen, rightOpen, lgUp, onLef
 		setAnchorEl(event.currentTarget);
 	};
 
+	// JUST closes the menu now
 	const handleMenuClose = () => {
 		setAnchorEl(null);
 	};
@@ -109,7 +110,15 @@ export const Header: React.FC<HeaderProps> = ({ leftOpen, rightOpen, lgUp, onLef
 							{/* Profile Menu */}
 							<Tooltip title='Profile'>
 								<IconButton onClick={handleMenuOpen} sx={{ p: 0, ml: 1 }}>
-									<Avatar alt={"User"} src={"https://randomuser.me/api/portraits/thumb/men/75.jpg"} />
+									<Avatar
+										alt='User'
+										src={user?.profilePictureUrl ? user.profilePictureUrl : undefined}
+									>
+										{/* If no profile picture, display first letter of firstname + lastname */}
+										{!user?.profilePictureUrl &&
+											(user?.firstName?.charAt(0) ?? "").toUpperCase() +
+												(user?.lastName?.charAt(0) ?? "").toUpperCase()}
+									</Avatar>
 								</IconButton>
 							</Tooltip>
 							<Menu
@@ -133,7 +142,7 @@ export const Header: React.FC<HeaderProps> = ({ leftOpen, rightOpen, lgUp, onLef
 								</MenuItem>
 								<MenuItem
 									onClick={() => {
-										useAuthenticationStore.getState().signOut();
+										signOut();
 										handleMenuClose();
 									}}
 								>
@@ -147,7 +156,11 @@ export const Header: React.FC<HeaderProps> = ({ leftOpen, rightOpen, lgUp, onLef
 					{!isLoggedIn && (
 						<RouterLink
 							to='/sign-in'
-							style={{ textDecoration: "none", color: "inherit", marginRight: isMobile ? 0 : "8px" }}
+							style={{
+								textDecoration: "none",
+								color: "inherit",
+								marginRight: isMobile ? 0 : "8px",
+							}}
 						>
 							<Button
 								color='inherit'

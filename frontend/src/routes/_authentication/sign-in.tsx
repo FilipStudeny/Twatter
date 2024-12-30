@@ -48,10 +48,10 @@ function RouteComponent() {
 				},
 			},
 		);
-		const { accessToken, refreshToken } = response.SignInUser;
+		const { accessToken, refreshToken, userData } = response.SignInUser;
 
 		if (!isError){
-			signInStore({ accessToken, refreshToken });
+			signInStore({ accessToken, refreshToken, userData });
 			navigate({ to: "/home" });
 		}
 	};

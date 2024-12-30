@@ -142,6 +142,7 @@ async function seedUsers(connection: Connection, password: string): Promise<User
 			const lastName = faker.person.lastName();
 			const email = faker.internet.email();
 			const username = faker.internet.userName();
+			const profilePictureUrl = faker.image.avatarGitHub();
 
 			const { hashedPassword, salt } = await generateHashedPassword(password);
 			const passwordEntity = new Password();
@@ -154,6 +155,7 @@ async function seedUsers(connection: Connection, password: string): Promise<User
 			user.email = email;
 			user.username = username;
 			user.password = passwordEntity;
+			user.profilePictureUrl = profilePictureUrl;
 
 			return user;
 		}),

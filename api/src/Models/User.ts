@@ -24,6 +24,9 @@ export class User extends BaseEntity {
 	@Column({ unique: true })
 	email: string;
 
+	@Column({ nullable: true })
+	profilePictureUrl: string;
+
 	@OneToOne(() => Password, (password) => password.id, { cascade: true })
 	@JoinColumn()
 	password: Password;

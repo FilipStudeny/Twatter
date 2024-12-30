@@ -331,6 +331,7 @@ export type SignInResponse = {
   __typename?: 'SignInResponse';
   accessToken: Scalars['String']['output'];
   refreshToken: Scalars['String']['output'];
+  userData: UserDetail;
 };
 
 export type SignUpUserData = {
@@ -357,6 +358,7 @@ export type UserDetail = {
   likesCount?: Maybe<Scalars['Float']['output']>;
   moderatedGroupsCount?: Maybe<Scalars['Float']['output']>;
   postsCount?: Maybe<Scalars['Float']['output']>;
+  profilePictureUrl?: Maybe<Scalars['String']['output']>;
   receivedReportsCount?: Maybe<Scalars['Float']['output']>;
   sentNotificationsCount?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -413,7 +415,7 @@ export type SignInUserMutationVariables = Exact<{
 }>;
 
 
-export type SignInUserMutation = { __typename?: 'Mutation', SignInUser: { __typename?: 'SignInResponse', accessToken: string, refreshToken: string } };
+export type SignInUserMutation = { __typename?: 'Mutation', SignInUser: { __typename?: 'SignInResponse', accessToken: string, refreshToken: string, userData: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null } } };
 
 export type SignUpMutationVariables = Exact<{
   createUser: SignUpUserData;
@@ -519,7 +521,7 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, likesCount?: number | null, commentsCount?: number | null }> | null } };
+export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, likesCount?: number | null, commentsCount?: number | null }> | null } };
 
 export type GetUsersWithAdministartionListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -707,6 +709,14 @@ export const SignInUserDocument = /*#__PURE__*/ `
   SignInUser(signInUser: $signInUser) {
     accessToken
     refreshToken
+    userData {
+      id
+      username
+      firstName
+      lastName
+      email
+      profilePictureUrl
+    }
   }
 }
     `;
@@ -1353,6 +1363,7 @@ export const GetUserDocument = /*#__PURE__*/ `
       firstName
       lastName
       email
+      profilePictureUrl
       friendsCount
       createdAt
       updatedAt

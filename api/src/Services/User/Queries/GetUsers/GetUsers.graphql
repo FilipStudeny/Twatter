@@ -20,6 +20,7 @@ query GetUser($userId: String) {
 			firstName
 			lastName
 			email
+			profilePictureUrl
 			friendsCount
 			createdAt
 			updatedAt

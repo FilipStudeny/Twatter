@@ -61,6 +61,10 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 			qb.addSelect('user.username AS "user_username"');
 		}
 
+		if (requestedFields.profilePictureUrl) {
+			qb.addSelect('user.profilePictureUrl AS "user_profilePictureUrl"');
+		}
+
 		if (requestedFields.postsCount) {
 			qb.leftJoin("user.posts", "post");
 			qb.addSelect('COUNT(DISTINCT post.id) AS "posts_count"');

@@ -19,6 +19,8 @@ export class DbResponse {
 
 	creator_lastName: string;
 
+	creator_profilePictureUrl: string;
+
 	interest_id: string;
 
 	interest_name: string;
@@ -34,6 +36,8 @@ export class DbResponse {
 	pinnedComment_creator_id: string;
 
 	pinnedComment_creator_username: string;
+
+	pinnedComment_profilePictureUrl: string;
 
 	reports_count: string;
 
@@ -64,6 +68,8 @@ export class DbResponse {
 	user_lastName: string;
 
 	user_username: string;
+
+	user_profilePictureUrl: string;
 
 	posts_count: string;
 

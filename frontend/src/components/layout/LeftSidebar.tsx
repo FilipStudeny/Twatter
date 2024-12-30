@@ -58,7 +58,9 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 	onHelp,
 	onAbout,
 }) => {
-	const signOut = useAuthenticationStore((state) => state.signOut);
+	const { getUserData, signOut } = useAuthenticationStore();
+	const user = getUserData();
+
 	const router = useRouter();
 	const theme = useTheme();
 
@@ -93,23 +95,24 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 		>
 			{/* Top Section: User Info and Navigation */}
 			<Box>
-				{/* Spacer to offset the fixed header */}
-				<Toolbar /> {/* Added Toolbar spacer */}
-				{/* User Information Section */}
+				<Toolbar />
 				{useAuthenticationStore.getState().isLoggedIn && (
 					<Box sx={{ p: 2, display: "flex", alignItems: "center" }}>
 						<Avatar
-							alt={"User"}
-							src={"https://randomuser.me/api/portraits/thumb/men/75.jpg"}
+							alt='User'
+							src={user?.profilePictureUrl ? user.profilePictureUrl : undefined}
 							sx={{ width: 48, height: 48, mr: 2 }}
 						>
+							{!user?.profilePictureUrl &&
+								(user?.firstName?.charAt(0) ?? "").toUpperCase() +
+									(user?.lastName?.charAt(0) ?? "").toUpperCase()}
 						</Avatar>
 						<Box>
 							<Typography variant='subtitle1' noWrap>
-								{"User"}
+								{user?.username}
 							</Typography>
 							<Typography variant='body2' color='text.secondary' noWrap>
-								{"user@example.com"}
+								{user?.firstName + " " + user?.lastName}
 							</Typography>
 						</Box>
 					</Box>
@@ -120,7 +123,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 					<ListItem disablePadding>
 						<RouterLink
 							to='/profile/$id'
-							params={{ id: "10" }}
+							params={{ id: user?.id ?? "" }}
 							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
 							onClick={handleNavItemClick}
 						>

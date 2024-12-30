@@ -2,5 +2,13 @@ mutation SignInUser($signInUser: SignInCredentials!) {
 	SignInUser(signInUser: $signInUser) {
 		accessToken
 		refreshToken
+		userData {
+			id
+			username
+			firstName
+			lastName
+			email
+			profilePictureUrl
+		}
 	}
 }
