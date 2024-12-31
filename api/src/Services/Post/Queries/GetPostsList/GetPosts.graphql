@@ -3,6 +3,7 @@ query GetPostsList($page: Int = 1, $limit: Int = 10, $creatorId: String, $groupI
 		items {
 			id
 			content
+			postPicture
 			creator {
 				id
 				username
@@ -55,6 +56,7 @@ query GetAdministrationPostsList(
 		items {
 			id
 			content
+			postPicture
 			creator {
 				id
 				username

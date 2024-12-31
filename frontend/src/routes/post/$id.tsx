@@ -41,6 +41,7 @@ function RouteComponent() {
 	const { id } = Route.useParams();
 	const { data, isLoading, isError, error } = useGetPostsListQuery({ postId: id });
 	const [openReportDialog, setOpenReportDialog] = useState(false);
+	const [isImageOpen, setIsImageOpen] = useState(false);
 
 	const handleReportClick = () => {
 		setOpenReportDialog(true);
@@ -53,6 +54,14 @@ function RouteComponent() {
 	const handleReportConfirm = () => {
 		console.log("Post reported:", id);
 		setOpenReportDialog(false);
+	};
+
+	const handleImageClick = () => {
+		setIsImageOpen(true);
+	};
+
+	const handleImageClose = () => {
+		setIsImageOpen(false);
 	};
 
 	if (isLoading) {
@@ -113,6 +122,32 @@ function RouteComponent() {
 					<Typography variant='body2' sx={{ mb: 2, whiteSpace: "pre-line", lineHeight: 1.6 }}>
 						{post.content}
 					</Typography>
+
+					{/* Clickable post picture (if present) */}
+					{post.postPicture && (
+						<Box
+							sx={{
+								display: "flex",
+								justifyContent: "center",
+								mb: 2,
+								cursor: "pointer",
+							}}
+							onClick={handleImageClick}
+						>
+							<Box
+								component='img'
+								src={post.postPicture}
+								alt={`Post ${post.id} image`}
+								sx={{
+									height: 233,
+									width: "100%",
+									maxHeight: { xs: 233, md: 167 },
+									borderRadius: 2,
+									objectFit: "cover",
+								}}
+							/>
+						</Box>
+					)}
 				</CardContent>
 
 				<CardActions
@@ -196,6 +231,30 @@ function RouteComponent() {
 						Report
 					</Button>
 				</DialogActions>
+			</Dialog>
+
+			{/* Image Modal */}
+			<Dialog
+				open={isImageOpen}
+				onClose={handleImageClose}
+				maxWidth='lg'
+				PaperProps={{
+					sx: {
+						backgroundColor: "transparent",
+						boxShadow: "none",
+					},
+				}}
+			>
+				<Box
+					component='img'
+					src={post.postPicture ?? ""}
+					alt={`Fullscreen post ${post.id} image`}
+					sx={{
+						maxWidth: "90vw",
+						maxHeight: "90vh",
+						objectFit: "contain",
+					}}
+				/>
 			</Dialog>
 		</>
 	);

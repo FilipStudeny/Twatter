@@ -56,6 +56,10 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 			qb.addSelect('post.content AS "post_content"');
 		}
 
+		if (requestedFields.postPicture) {
+			qb.addSelect('post.postPicture AS "post_postPicture"');
+		}
+
 		if (requestedFields.createdAt) {
 			qb.addSelect('post."createdAt" AS "post_createdAt"');
 		}

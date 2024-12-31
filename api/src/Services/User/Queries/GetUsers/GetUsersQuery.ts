@@ -18,6 +18,7 @@ export class GetUsersQuery {
 		public readonly userId?: string,
 		public readonly groupId?: string,
 		public readonly getAll?: boolean,
+		public readonly friendOf?: string,
 	) {}
 }
 
@@ -29,7 +30,7 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 	) {}
 
 	async execute(query: GetUsersQuery): Promise<PaginatedUsersResponse> {
-		const { page, limit, requestedFields, userId, groupId, getAll } = query;
+		const { page, limit, requestedFields, userId, groupId, getAll, friendOf } = query;
 		const skip = (page - 1) * limit;
 
 		const qb = this.entityManager.createQueryBuilder(User, "user");
@@ -43,6 +44,11 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 		if (groupId) {
 			qb.leftJoin("user.groups", "group");
 			qb.andWhere("group.id = :groupId", { groupId });
+		}
+
+		if (friendOf) {
+			qb.leftJoin("user.friends", "friends");
+			qb.andWhere("friends.id = :friendOf", { friendOf });
 		}
 
 		if (requestedFields.email) {
@@ -75,9 +81,43 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 			qb.addSelect('COUNT(DISTINCT comment.id) AS "comments_count"');
 		}
 
-		if (requestedFields.likesCount) {
+		if (requestedFields.reactions) {
 			qb.leftJoin("user.reactions", "reaction");
-			qb.addSelect(`SUM(CASE WHEN reaction.type = 'like' THEN 1 ELSE 0 END) AS "likes_count"`);
+			const reactionsFields = [];
+
+			if (requestedFields.reactions.like) {
+				reactionsFields.push(
+					`SUM(CASE WHEN reaction.type = 'like' THEN 1 ELSE 0 END) AS "like_count"`,
+				);
+			}
+			if (requestedFields.reactions.dislike) {
+				reactionsFields.push(
+					`SUM(CASE WHEN reaction.type = 'dislike' THEN 1 ELSE 0 END) AS "dislike_count"`,
+				);
+			}
+			if (requestedFields.reactions.smile) {
+				reactionsFields.push(
+					`SUM(CASE WHEN reaction.type = 'smile' THEN 1 ELSE 0 END) AS "smile_count"`,
+				);
+			}
+			if (requestedFields.reactions.angry) {
+				reactionsFields.push(
+					`SUM(CASE WHEN reaction.type = 'angry' THEN 1 ELSE 0 END) AS "angry_count"`,
+				);
+			}
+			if (requestedFields.reactions.sad) {
+				reactionsFields.push(
+					`SUM(CASE WHEN reaction.type = 'sad' THEN 1 ELSE 0 END) AS "sad_count"`,
+				);
+			}
+			if (requestedFields.reactions.love) {
+				reactionsFields.push(
+					`SUM(CASE WHEN reaction.type = 'love' THEN 1 ELSE 0 END) AS "love_count"`,
+				);
+			}
+			if (reactionsFields.length > 0) {
+				qb.addSelect(reactionsFields);
+			}
 		}
 
 		if (requestedFields.joinedGroupsCount) {

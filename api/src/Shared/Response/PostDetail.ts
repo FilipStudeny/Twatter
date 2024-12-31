@@ -16,6 +16,9 @@ export class PostDetail {
 	@Field()
 	content: string;
 
+	@Field(() => String, { nullable: true })
+	postPicture: string;
+
 	@Field(() => UserDetail)
 	creator: UserDetail;
 
@@ -91,6 +94,10 @@ export class PostDetail {
 			forMember(
 				(destination) => destination.content,
 				mapFrom((source) => source.post_content),
+			),
+			forMember(
+				(destination) => destination.postPicture,
+				mapFrom((source) => source.post_postPicture),
 			),
 			forMember(
 				(destination) => destination.createdAt,

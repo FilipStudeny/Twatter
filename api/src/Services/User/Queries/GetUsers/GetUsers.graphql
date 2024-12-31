@@ -25,9 +25,33 @@ query GetUser($userId: String) {
 			createdAt
 			updatedAt
 			joinedGroupsCount
-			likesCount
+			reactions {
+				like
+				dislike
+				smile
+				angry
+				sad
+				love
+			}
 			commentsCount
+			createdAt
+			updatedAt
 		}
+	}
+}
+
+query GetFriends($page: Int = 1, $limit: Int = 10, $friendOf: String) {
+	getUsers(page: $page, limit: $limit, friendOf: $friendOf) {
+		items {
+			id
+			username
+			firstName
+			lastName
+			profilePictureUrl
+		}
+		total
+		page
+		limit
 	}
 }
 
@@ -47,6 +71,14 @@ query GetUsersWithAdministartionList($page: Int = 1, $limit: Int = 10) {
 			receivedReportsCount
 			createdGroupsCount
 			moderatedGroupsCount
+			reactions {
+				like
+				dislike
+				smile
+				angry
+				sad
+				love
+			}
 		}
 		total
 		page

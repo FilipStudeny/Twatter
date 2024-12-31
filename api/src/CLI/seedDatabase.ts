@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
@@ -132,10 +133,12 @@ async function seedInterests(connection: Connection): Promise<Interest[]> {
 }
 
 /**
- * Seeds users into the "user" table.
+ * Seeds users into the "user" table with random data and assigns mutual friends.
  * @param connection The database connection.
+ * @param password A plaintext password used to seed user.password.
  */
-async function seedUsers(connection: Connection, password: string): Promise<User[]> {
+export async function seedUsers(connection: Connection, password: string): Promise<User[]> {
+	// 1) Create 10 new users with random data
 	const users = await Promise.all(
 		Array.from({ length: 10 }).map(async () => {
 			const firstName = faker.person.firstName();
@@ -144,11 +147,13 @@ async function seedUsers(connection: Connection, password: string): Promise<User
 			const username = faker.internet.userName();
 			const profilePictureUrl = faker.image.avatarGitHub();
 
+			// Generate a hashed password
 			const { hashedPassword, salt } = await generateHashedPassword(password);
 			const passwordEntity = new Password();
 			passwordEntity.hash = hashedPassword;
 			passwordEntity.salt = salt;
 
+			// Create a new user
 			const user = new User();
 			user.firstName = firstName;
 			user.lastName = lastName;
@@ -156,13 +161,58 @@ async function seedUsers(connection: Connection, password: string): Promise<User
 			user.username = username;
 			user.password = passwordEntity;
 			user.profilePictureUrl = profilePictureUrl;
+			user.friends = []; // Initialize with no friends
 
 			return user;
 		}),
 	);
 
+	// 2) Save all users so they get assigned IDs
 	await connection.manager.save(users);
 	console.log("Users have been inserted into the database.");
+
+	// 3) Initialize friendship tracking
+	const friendLimit = 4; // Maximum number of friends per user
+	const userFriendCounts: Record<number, number> = {}; // Track number of friends per user ID
+
+	users.forEach((user) => {
+		userFriendCounts[user.id] = 0;
+	});
+
+	// 4) Generate all possible unique user pairs (A, B) where A.id < B.id
+	const userPairs: [User, User][] = [];
+	for (let i = 0; i < users.length; i++) {
+		for (let j = i + 1; j < users.length; j++) {
+			userPairs.push([users[i], users[j]]);
+		}
+	}
+
+	// 5) Shuffle the user pairs to randomize friendship assignments
+	faker.helpers.shuffle(userPairs);
+
+	// 6) Assign mutual friendships based on shuffled pairs
+	for (const [userA, userB] of userPairs) {
+		// Check if both users can accept more friends
+		if (userFriendCounts[userA.id] < friendLimit && userFriendCounts[userB.id] < friendLimit) {
+			// Assign each other as friends
+			userA.friends.push(userB);
+			userB.friends.push(userA);
+
+			// Update friend counts
+			userFriendCounts[userA.id]++;
+			userFriendCounts[userB.id]++;
+		}
+
+		// Optional: Break early if all users have reached their friend limits
+		// Uncomment the following lines if you want to stop once all users have max friends
+		// const allReachedLimit = users.every(user => userFriendCounts[user.id] >= friendLimit);
+		// if (allReachedLimit) break;
+	}
+
+	// 7) Save the updated friendships to the database
+	await connection.manager.save(users);
+	console.log("Users now have mutually assigned friends.");
+
 	return users;
 }
 
@@ -172,16 +222,36 @@ async function seedUsers(connection: Connection, password: string): Promise<User
  * @param users Array of users to associate posts with.
  * @param interests Array of interests to associate posts with.
  */
-async function seedPosts(connection: Connection, users: User[], interests: Interest[]): Promise<Post[]> {
+export async function seedPosts(connection: Connection, users: User[], interests: Interest[]): Promise<Post[]> {
 	const posts = await Promise.all(
 		Array.from({ length: 20 }).map(async () => {
 			const randomUser = users[Math.floor(Math.random() * users.length)];
 			const randomInterest = interests[Math.floor(Math.random() * interests.length)];
 
+			// Decide if this post has content only, picture only, or both
+			const randomType = Math.floor(Math.random() * 3);
+			// 0 -> content only
+			// 1 -> picture only
+			// 2 -> both
+
 			const post = new Post();
-			post.content = faker.lorem.sentences(3);
 			post.creator = randomUser;
 			post.interest = randomInterest;
+
+			switch (randomType) {
+				case 0:
+					post.content = faker.lorem.sentences(3);
+					post.postPicture = ""; // no picture
+					break;
+				case 1:
+					post.content = ""; // no content
+					post.postPicture = faker.image.urlPicsumPhotos();
+					break;
+				case 2:
+					post.content = faker.lorem.sentences(3);
+					post.postPicture = faker.image.urlPicsumPhotos();
+					break;
+			}
 
 			return post;
 		}),

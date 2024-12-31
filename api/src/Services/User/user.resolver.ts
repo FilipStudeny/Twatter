@@ -30,9 +30,12 @@ export default class UserResolver {
 		@Args("userId", { type: () => String, nullable: true }) userId: string,
 		@Args("groupId", { type: () => String, nullable: true }) groupId: string,
 		@Args("getAll", { type: () => Boolean, nullable: true }) getAll: boolean,
+		@Args("friendOf", { type: () => String, nullable: true }) friendOf: string,
 		@Info() info: GraphQLResolveInfo,
 	) {
 		const fields = graphqlFields(info);
-		return this.queryBus.execute(new GetUsersQuery(page, limit, fields.items, userId, groupId, getAll));
+		return this.queryBus.execute(
+			new GetUsersQuery(page, limit, fields.items, userId, groupId, getAll, friendOf),
+		);
 	}
 }

@@ -20,7 +20,7 @@ type UserDetail {
   profilePictureUrl: String
   postsCount: Float
   commentsCount: Float
-  likesCount: Float
+  reactions: ReactionsCount
   joinedGroupsCount: Float
   banStrikesCount: Float
   sentNotificationsCount: Float
@@ -72,6 +72,7 @@ type GroupDetail {
 type PostDetail {
   id: String!
   content: String!
+  postPicture: String
   creator: UserDetail!
   commentsCount: Int
   reactions: ReactionsCount
@@ -134,7 +135,7 @@ type Query {
   getCommentsList(page: Int!, limit: Int!, creatorId: String, postId: String, id: String): PaginatedCommentsListResponse!
   getPostsStatistics(filter: GraphFilter!, year: Int, weekNumber: Int): [PostGraphDataDto!]!
   getPosts(page: Int!, limit: Int!, creatorId: String, postId: String, interestId: String, groupId: String): PaginatedPostsListResponse!
-  getUsers(page: Int! = 1, limit: Int! = 10, userId: String, groupId: String, getAll: Boolean): PaginatedUsersResponse!
+  getUsers(page: Int! = 1, limit: Int! = 10, userId: String, groupId: String, getAll: Boolean, friendOf: String): PaginatedUsersResponse!
 }
 
 """Filter options for the graph data"""

@@ -14,6 +14,9 @@ export class Post extends BaseEntity {
 	@Column()
 	content: string;
 
+	@Column({ nullable: true })
+	postPicture?: string;
+
 	@ManyToOne(() => User, (user) => user.posts)
 	creator: User;
 

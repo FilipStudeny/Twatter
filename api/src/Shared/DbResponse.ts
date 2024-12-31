@@ -5,6 +5,8 @@ export class DbResponse {
 
 	post_content: string;
 
+	post_postPicture: string;
+
 	post_createdAt: Date;
 
 	post_updatedAt: Date;

@@ -2,6 +2,7 @@ import { User } from "@Models/User";
 import { DbResponse } from "@Shared/DbResponse";
 import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
 import { Field, ObjectType } from "@nestjs/graphql";
+import { ReactionsCount } from "./ReactionsCount";
 
 @ObjectType()
 export default class UserDetail {
@@ -29,8 +30,8 @@ export default class UserDetail {
 	@Field({ nullable: true })
 	commentsCount?: number;
 
-	@Field({ nullable: true })
-	likesCount?: number;
+	@Field(() => ReactionsCount, { nullable: true })
+	reactions: ReactionsCount;
 
 	@Field({ nullable: true })
 	joinedGroupsCount?: number;
@@ -147,6 +148,20 @@ export default class UserDetail {
 			forMember(
 				(destination) => destination.createdAt,
 				mapFrom((source) => source.user_createdAt),
+			),
+			forMember(
+				(destination) => destination.reactions,
+				mapFrom(
+					(source) =>
+						({
+							like: parseInt(source.like_count || "0", 10),
+							dislike: parseInt(source.dislike_count || "0", 10),
+							smile: parseInt(source.smile_count || "0", 10),
+							angry: parseInt(source.angry_count || "0", 10),
+							sad: parseInt(source.sad_count || "0", 10),
+							love: parseInt(source.love_count || "0", 10),
+						}) as ReactionsCount,
+				),
 			),
 		);
 
