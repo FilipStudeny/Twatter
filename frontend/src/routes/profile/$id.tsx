@@ -1,6 +1,8 @@
 // RouteComponent.tsx
 
 import FriendsList from "@Components/profile/FriendsList";
+import UserComments from "@Components/profile/UserComments";
+import UserPosts from "@Components/profile/UserPosts";
 import { PersonAdd as PersonAddIcon, Message as MessageIcon, Report as ReportIcon } from "@mui/icons-material";
 import {
 	Box,
@@ -29,7 +31,7 @@ export const Route = createFileRoute("/profile/$id")({
 function RouteComponent() {
 	const { id } = Route.useParams();
 
-	const [tabValue, setTabValue] = useState(0);
+	const [tabValue, setTabValue] = useState<number>(0);
 
 	const {
 		data: userData,
@@ -44,14 +46,17 @@ function RouteComponent() {
 
 	const handleAddFriend = () => {
 		console.log("Add Friend clicked");
+		// Implement add friend functionality here
 	};
 
 	const handleSendMessage = () => {
 		console.log("Send Message clicked");
+		// Implement send message functionality here
 	};
 
 	const handleReportUser = () => {
 		console.log("Report User clicked");
+		// Implement report user functionality here
 	};
 
 	if (userLoading) {
@@ -69,7 +74,7 @@ function RouteComponent() {
 					Error: User not found.
 				</Typography>
 				<Typography variant='body2' color='error'>
-					{userErrorMessage?.message ?? ""}
+					{userErrorMessage?.message ?? "An unexpected error occurred."}
 				</Typography>
 			</Box>
 		);
@@ -151,7 +156,7 @@ function RouteComponent() {
 							</Typography>
 							<Typography variant='body1'>{user.joinedGroupsCount ?? 0}</Typography>
 						</Grid>
-						{/* Removed other stats like Comments, Likes, etc. */}
+						{/* You can add more stats here if needed */}
 					</Grid>
 
 					<Divider sx={{ mb: 2 }} />
@@ -172,44 +177,28 @@ function RouteComponent() {
 						<Typography variant='subtitle2' color='text.secondary'>
 							Last Updated:
 						</Typography>
-						<Typography variant='body2'>
-							{new Date(user.updatedAt).toLocaleDateString()}
-						</Typography>
+						<Typography variant='body2'>{new Date(user.updatedAt).toLocaleDateString()}</Typography>
 					</Box>
 
 					{/* TAB SECTION */}
 					<Box sx={{ borderTop: 1, borderColor: "divider", mt: 2 }}>
-						<Tabs value={tabValue} onChange={handleTabChange} variant='fullWidth' sx={{ mb: 2 }}>
-							<Tab label='Posts' />
-							<Tab label='Comments' />
-							<Tab label='Reactions' />
+						<Tabs
+							value={tabValue}
+							onChange={handleTabChange}
+							variant='fullWidth'
+							sx={{ mb: 2 }}
+							aria-label='profile tabs'
+						>
+							<Tab label='Posts' id='tab-0' aria-controls='tabpanel-0' />
+							<Tab label='Comments' id='tab-1' aria-controls='tabpanel-1' />
+							<Tab label='Reactions' id='tab-2' aria-controls='tabpanel-2' />
 						</Tabs>
 
 						{/* Tab Panels */}
-						{tabValue === 0 && (
-							<Box sx={{ px: 2, py: 1 }}>
-								<Typography variant='subtitle2' gutterBottom>
-									User Posts
-								</Typography>
-								{/* TODO: Render user’s posts here. E.g. <UserPostsList userId={user.id} /> */}
-								<Typography variant='body2' color='text.secondary'>
-									[Placeholder for user’s posts...]
-								</Typography>
-							</Box>
-						)}
-						{tabValue === 1 && (
-							<Box sx={{ px: 2, py: 1 }}>
-								<Typography variant='subtitle2' gutterBottom>
-									User Comments
-								</Typography>
-								{/* TODO: Render user’s comments here. E.g. <UserCommentsList userId={user.id} /> */}
-								<Typography variant='body2' color='text.secondary'>
-									[Placeholder for user’s comments...]
-								</Typography>
-							</Box>
-						)}
+						{tabValue === 0 && <UserPosts userId={id} />}
+						{tabValue === 1 && <UserComments userId={id} />}
 						{tabValue === 2 && (
-							<Box sx={{ px: 2, py: 1 }}>
+							<Box sx={{ px: 2, py: 1 }} role='tabpanel' id='tabpanel-2' aria-labelledby='tab-2'>
 								<Typography variant='subtitle2' gutterBottom>
 									User Reactions
 								</Typography>

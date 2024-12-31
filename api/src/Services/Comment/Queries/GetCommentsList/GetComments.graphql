@@ -18,8 +18,6 @@ query GetCommentsByPostId($postId: String!, $page: Int!, $limit: Int!) {
 				sad
 				love
 			}
-			reportsCount
-			strikesCount
 			createdAt
 			updatedAt
 		}
@@ -49,8 +47,6 @@ query GetCommentsByCreatorId($creatorId: String!, $page: Int!, $limit: Int!) {
 				sad
 				love
 			}
-			reportsCount
-			strikesCount
 			createdAt
 			updatedAt
 		}

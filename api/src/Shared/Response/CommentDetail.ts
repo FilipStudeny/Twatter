@@ -17,18 +17,15 @@ export class CommentDetail {
 	creator: UserDetail;
 
 	@Field()
-	creatorId: string;
-
-	@Field()
 	postId: string;
 
 	@Field(() => ReactionsCount, { nullable: true })
 	reactions: ReactionsCount;
 
-	@Field()
+	@Field({ nullable: true })
 	reportsCount: number;
 
-	@Field()
+	@Field({ nullable: true })
 	strikesCount: number;
 
 	@Field()
@@ -46,7 +43,6 @@ export class CommentDetail {
 				(destination) => destination.id,
 				mapFrom((source) => source.comment_id),
 			),
-
 			forMember(
 				(destination) => destination.postId,
 				mapFrom((source) => source.post_id),

@@ -1,7 +1,7 @@
 // CommentsSection.tsx
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
 import { Box, Button, CircularProgress, Typography, Alert } from "@mui/material";
-import React, { useEffect } from "react";
+import React from "react";
 
 import { useInfiniteScroll } from "hooks/infiniteScroll";
 
@@ -48,10 +48,6 @@ function CommentsSection({ postId }: CommentsSectionProps) {
 		console.log(`Reporting comment [id=${commentId}] by user: ${username}`);
 	};
 
-	useEffect(() => {
-		console.log(commentPages?.pages);
-	}, [commentPages?.pages]);
-
 	return (
 		<Box sx={{ mt: 3 }}>
 			<Typography variant='h6' gutterBottom>
@@ -77,10 +73,7 @@ function CommentsSection({ postId }: CommentsSectionProps) {
 					{page?.getCommentsList?.items?.map((comment) => (
 						<Box key={comment.id} sx={{ mb: 2 }}>
 							<Comment
-								comment={{
-									creatorId: comment.creator.id,
-									...comment,
-								}}
+								comment={comment}
 								onReportClick={handleReportCommentClick}
 							/>
 						</Box>

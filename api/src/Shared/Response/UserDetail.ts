@@ -31,7 +31,7 @@ export default class UserDetail {
 	commentsCount?: number;
 
 	@Field(() => ReactionsCount, { nullable: true })
-	reactions: ReactionsCount;
+	reactions?: ReactionsCount;
 
 	@Field({ nullable: true })
 	joinedGroupsCount?: number;
