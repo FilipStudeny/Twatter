@@ -28,10 +28,10 @@ export class CommentDetail {
 	@Field({ nullable: true })
 	strikesCount: number;
 
-	@Field()
+	@Field({ nullable: true })
 	createdAt: Date;
 
-	@Field()
+	@Field({ nullable: true })
 	updatedAt: Date;
 
 	static createMap(mapper: Mapper): void {
@@ -46,6 +46,14 @@ export class CommentDetail {
 			forMember(
 				(destination) => destination.postId,
 				mapFrom((source) => source.post_id),
+			),
+			forMember(
+				(destination) => destination.createdAt,
+				mapFrom((source) => source.comment_createdat),
+			),
+			forMember(
+				(destination) => destination.postId,
+				mapFrom((source) => source.comment_post_id),
 			),
 			forMember(
 				(destination) => destination.content,

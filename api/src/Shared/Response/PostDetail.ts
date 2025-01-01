@@ -28,10 +28,10 @@ export class PostDetail {
 	@Field(() => ReactionsCount, { nullable: true })
 	reactions: ReactionsCount;
 
-	@Field()
+	@Field({ nullable: true })
 	createdAt: Date;
 
-	@Field()
+	@Field({ nullable: true })
 	updatedAt: Date;
 
 	@Field(() => InterestDetail, { nullable: true })

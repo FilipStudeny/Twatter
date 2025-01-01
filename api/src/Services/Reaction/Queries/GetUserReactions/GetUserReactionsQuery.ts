@@ -1,6 +1,4 @@
-// get-user-reactions.query.ts
-
-import ReactionType from "@Models/Enums/ReactionType";
+/* eslint-disable no-plusplus */
 import { DbResponse } from "@Shared/DbResponse";
 import { CommentDetail } from "@Shared/Response/CommentDetail";
 import { PostDetail } from "@Shared/Response/PostDetail";
@@ -17,7 +15,6 @@ export class GetUserReactionsQuery {
 		public readonly page: number,
 		public readonly limit: number,
 		public readonly userId: string,
-		public readonly reactionTypes?: ReactionType[],
 	) {}
 }
 
@@ -29,105 +26,100 @@ export class GetUserReactionsQueryHandler implements IQueryHandler<GetUserReacti
 	) {}
 
 	async execute(query: GetUserReactionsQuery): Promise<PaginatedUserReactionsResponse> {
-		const { page, limit, userId, reactionTypes } = query;
+		const { page, limit, userId } = query;
 
-		// Calculate offset for pagination
-		const offset = (page - 1) * limit;
+		const offset = Math.max((page - 1) * limit, 0);
 
-		// Initialize parameters array
 		const parameters: any[] = [userId];
-		let paramIndex = 2; // Start indexing from 2 since $1 is already used for userId
+		let paramIndex = 2;
 
-		// Build the base WHERE clause
-		let whereClause = 'reaction."userId" = $1';
-		if (reactionTypes && reactionTypes.length > 0) {
-			const reactionPlaceholders = reactionTypes.map(() => `$${paramIndex++}`);
-			whereClause += ` AND reaction.type IN (${reactionPlaceholders.join(", ")})`;
-			parameters.push(...reactionTypes);
-		}
+		const whereClause = 'r."userId" = $1';
 
-		// SQL for reactions on posts
-		const reactedPostsSql = `
-            SELECT 
-                reaction."createdAt" AS "reaction_createdAt",
-                'POST' AS "type",
-                CAST(post.id AS TEXT) AS "post_id",         -- Cast to TEXT
-                NULL::text AS "comment_id",                 -- Placeholder for comment_id
-                post.content AS "post_content",
-                post."postPicture" AS "post_postPicture",
-                NULL::uuid AS "comment_postId",              -- Placeholder for comment_postId
-                post."createdAt" AS "post_createdAt",
-                post."updatedAt" AS "post_updatedAt",
-                creator.id AS "creator_id",
-                creator.username AS "creator_username",
-                creator."firstName" AS "creator_firstName",
-                creator."lastName" AS "creator_lastName"
-            FROM reaction
-            LEFT JOIN post ON reaction."postId" = post.id
-            LEFT JOIN "user" AS creator ON post."creatorId" = creator.id
+		const mainSql = `
+            SELECT
+                p.id AS "post_id",
+                p.content AS "post_content",
+                p."postPicture" AS "post_postPicture",
+                p."createdAt" AS "post_createdAt",
+                p."updatedAt" AS "post_updatedAt",
+                c.id AS "comment_id",
+                c.content AS "comment_content",
+                c."createdAt" AS "comment_createdAt",
+                c."updatedAt" AS "comment_updatedAt",
+                c."postId" AS "comment_post_id",
+                u.id AS "creator_id",
+                u.username AS "creator_username",
+                u."firstName" AS "creator_firstName",
+                u."lastName" AS "creator_lastName",
+                u."profilePictureUrl" AS "creator_profilePictureUrl",
+                i.id AS "interest_id",
+                i.name AS "interest_name",
+                g.id AS "group_id",
+                g.name AS "group_name",
+                SUM(CASE WHEN reactions.type = 'like' THEN 1 ELSE 0 END) AS "like_count",
+                SUM(CASE WHEN reactions.type = 'dislike' THEN 1 ELSE 0 END) AS "dislike_count",
+                SUM(CASE WHEN reactions.type = 'smile' THEN 1 ELSE 0 END) AS "smile_count",
+                SUM(CASE WHEN reactions.type = 'angry' THEN 1 ELSE 0 END) AS "angry_count",
+                SUM(CASE WHEN reactions.type = 'sad' THEN 1 ELSE 0 END) AS "sad_count",
+                SUM(CASE WHEN reactions.type = 'love' THEN 1 ELSE 0 END) AS "love_count",
+                CASE
+                    WHEN r."postId" IS NOT NULL THEN 'POST'
+                    WHEN r."commentId" IS NOT NULL THEN 'COMMENT'
+                    ELSE NULL
+                END AS "reaction_target"
+            FROM
+                reaction AS r
+            LEFT JOIN post AS p ON r."postId" = p.id
+            LEFT JOIN comment AS c ON r."commentId" = c.id
+            LEFT JOIN "user" AS u ON r."userId" = u.id
+            LEFT JOIN interest AS i ON p."interestId" = i.id
+            LEFT JOIN "group" AS g ON p."groupId" = g.id
+            LEFT JOIN reaction AS reactions ON reactions."postId" = p.id OR reactions."commentId" = c.id
             WHERE ${whereClause}
-                AND reaction."commentId" IS NULL
-        `;
-
-		// SQL for reactions on comments
-		const reactedCommentsSql = `
-            SELECT 
-                reaction."createdAt" AS "reaction_createdAt",
-                'COMMENT' AS "type",
-                NULL::text AS "post_id",                     -- Placeholder for post_id
-                CAST(comment.id AS TEXT) AS "comment_id",    -- Cast to TEXT
-                comment.content AS "comment_content",
-                NULL::text AS "post_postPicture",             -- Placeholder for post_postPicture
-                comment."postId" AS "comment_postId",
-                comment."createdAt" AS "comment_createdAt",
-                comment."updatedAt" AS "comment_updatedAt",
-                creator.id AS "creator_id",
-                creator.username AS "creator_username",
-                creator."firstName" AS "creator_firstName",
-                creator."lastName" AS "creator_lastName"
-            FROM reaction
-            LEFT JOIN comment ON reaction."commentId" = comment.id
-            LEFT JOIN "user" AS creator ON comment."creatorId" = creator.id
-            WHERE ${whereClause}
-                AND reaction."commentId" IS NOT NULL
-        `;
-
-		// Combine both queries using UNION ALL and apply ordering and pagination
-		const unionSql = `
-            (${reactedPostsSql})
-            UNION ALL
-            (${reactedCommentsSql})
-            ORDER BY "reaction_createdAt" DESC
+            GROUP BY
+                p.id, p.content, p."postPicture", p."createdAt", p."updatedAt",
+                c.id, c.content, c."createdAt", c."updatedAt", c."postId",
+                u.id, u.username, u."firstName", u."lastName", u."profilePictureUrl",
+                i.id, i.name,
+                g.id, g.name, r."postId", r."commentId", r."createdAt"
+            ORDER BY r."createdAt" DESC
             LIMIT $${paramIndex++} OFFSET $${paramIndex++}
         `;
 
-		// Append limit and offset to parameters
 		parameters.push(limit, offset);
-
-		const items: any[] = await this.entityManager.query(unionSql, parameters);
-		console.log(items);
-
-		// Get total count for pagination
+		const items: any[] = await this.entityManager.query(mainSql, parameters);
 		const countSql = `
-                SELECT COUNT(*) FROM (
-                    ${reactedPostsSql}
-                    UNION ALL
-                    ${reactedCommentsSql}
-                ) AS combined
-            `;
-		const countParameters = parameters.slice(0, paramIndex - 3); // Exclude limit and offset
-		const countResult = await this.entityManager.query(countSql, countParameters);
+        SELECT COUNT(*) FROM (
+            SELECT p.id
+            FROM reaction AS r
+            LEFT JOIN post AS p ON r."postId" = p.id
+            LEFT JOIN comment AS c ON r."commentId" = c.id
+            LEFT JOIN "user" AS u ON r."userId" = u.id
+            LEFT JOIN interest AS i ON p."interestId" = i.id
+            LEFT JOIN "group" AS g ON p."groupId" = g.id
+            WHERE ${whereClause}
+            GROUP BY
+                p.id, p.content, p."postPicture", p."createdAt", p."updatedAt",
+                c.id, c.content, c."createdAt", c."updatedAt", c."postId",
+                u.id, u.username, u."firstName", u."lastName", u."profilePictureUrl",
+                i.id, i.name,
+                g.id, g.name, r."postId", r."commentId", r."createdAt"
+        ) AS total_count_query
+    `;
 
+		const countParameters = parameters.slice(0, paramIndex - 3);
+		const countResult = await this.entityManager.query(countSql, countParameters);
 		const total = parseInt(countResult[0].count, 10);
 
-		// Map the raw results to PostDetail or CommentDetail
 		const mappedItems: Array<PostDetail | CommentDetail> = items
 			.map((item) => {
-				if (item.type === "POST") {
-					return this.mapper.map(item, DbResponse, PostDetail);
+				if (item.reaction_target === "POST") {
+					const postDetail = this.mapper.map(item, DbResponse, PostDetail);
+					return postDetail;
 				}
-				if (item.type === "COMMENT") {
-					return this.mapper.map(item, DbResponse, CommentDetail);
+				if (item.reaction_target === "COMMENT") {
+					const commentDetail = this.mapper.map(item, DbResponse, CommentDetail);
+					return commentDetail;
 				}
 				return null;
 			})

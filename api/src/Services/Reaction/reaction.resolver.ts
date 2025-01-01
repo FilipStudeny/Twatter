@@ -1,4 +1,3 @@
-import ReactionType from "@Models/Enums/ReactionType";
 import GenericResponse from "@Shared/Response/GenericResponse";
 import { CurrentUser } from "@Utils/JWT/CurrentUser";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
@@ -34,10 +33,9 @@ export class ReactionsResolver {
 	@Public()
 	async getUserReactions(
 		@Args("userId") userId: string,
-		@Args("reactionTypes", { type: () => [ReactionType], nullable: true }) reactionTypes?: ReactionType[],
 		@Args("page", { type: () => Int, nullable: true, defaultValue: 1 }) page: number = 1,
 		@Args("limit", { type: () => Int, nullable: true, defaultValue: 10 }) limit: number = 10,
 	): Promise<PaginatedUserReactionsResponse> {
-		return this.queryBus.execute(new GetUserReactionsQuery(page, limit, userId, reactionTypes));
+		return this.queryBus.execute(new GetUserReactionsQuery(page, limit, userId));
 	}
 }

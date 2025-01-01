@@ -46,8 +46,8 @@ type CommentDetail {
   reactions: ReactionsCount
   reportsCount: Float
   strikesCount: Float
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type InterestDetail {
@@ -75,8 +75,8 @@ type PostDetail {
   creator: UserDetail!
   commentsCount: Int
   reactions: ReactionsCount
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime
+  updatedAt: DateTime
   interest: InterestDetail
   group: GroupDetail
   reportsCount: Int
@@ -140,21 +140,11 @@ type PaginatedUsersResponse {
 type Query {
   hello: String!
   getInterests(page: Int! = 1, limit: Int! = 10, interestId: String): PaginatedInterestsListResponse!
-  getUserReactions(userId: String!, reactionTypes: [ReactionType!], page: Int = 1, limit: Int = 10): PaginatedUserReactionsResponse!
+  getUserReactions(userId: String!, page: Int = 1, limit: Int = 10): PaginatedUserReactionsResponse!
   getCommentsList(page: Int!, limit: Int!, creatorId: String, postId: String, id: String): PaginatedCommentsListResponse!
   getPostsStatistics(filter: GraphFilter!, year: Int, weekNumber: Int): [PostGraphDataDto!]!
   getPosts(page: Int!, limit: Int!, creatorId: String, postId: String, interestId: String, groupId: String): PaginatedPostsListResponse!
   getUsers(page: Int! = 1, limit: Int! = 10, userId: String, groupId: String, getAll: Boolean, friendOf: String): PaginatedUsersResponse!
-}
-
-"""Different types of reactions available"""
-enum ReactionType {
-  LIKE
-  DISLIKE
-  SMILE
-  ANGRY
-  SAD
-  LOVE
 }
 
 """Filter options for the graph data"""
@@ -211,6 +201,16 @@ input CreateOrUpdateReactionDto {
   reactionType: ReactionType!
   targetId: String!
   targetType: ReactionTargetType!
+}
+
+"""Different types of reactions available"""
+enum ReactionType {
+  LIKE
+  DISLIKE
+  SMILE
+  ANGRY
+  SAD
+  LOVE
 }
 
 """Target type for the reaction, either POST or COMMENT"""

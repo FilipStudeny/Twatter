@@ -1,0 +1,61 @@
+query GetUserReactions($userId: String!, $page: Int, $limit: Int) {
+	getUserReactions(userId: $userId, page: $page, limit: $limit) {
+		items {
+			__typename
+			... on PostDetail {
+				id
+				content
+				postPicture
+				creator {
+					id
+					username
+					firstName
+					lastName
+				}
+				reactions {
+					like
+					dislike
+					sad
+					smile
+					angry
+					love
+				}
+				interest {
+					id
+					name
+				}
+				group {
+					id
+					name
+				}
+				commentsCount
+				createdAt
+				updatedAt
+			}
+			... on CommentDetail {
+				id
+				content
+				postId
+				creator {
+					id
+					username
+					firstName
+					lastName
+				}
+				reactions {
+					like
+					dislike
+					smile
+					angry
+					sad
+					love
+				}
+				createdAt
+				updatedAt
+			}
+		}
+		total
+		page
+		limit
+	}
+}

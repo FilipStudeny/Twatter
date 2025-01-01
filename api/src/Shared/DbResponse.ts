@@ -97,6 +97,8 @@ export class DbResponse {
 
 	user_createdAt: Date;
 
+	comment_post_id: string;
+
 	comment_content: string;
 
 	comment_updatedAt: Date;
@@ -104,4 +106,8 @@ export class DbResponse {
 	comment_createdAt: Date;
 
 	groups_count: string;
+
+	comment_createdat: Date;
+
+	comment_updatedat: Date;
 }
