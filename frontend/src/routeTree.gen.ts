@@ -19,7 +19,6 @@ import { Route as PostIdImport } from './routes/post/$id'
 import { Route as AuthenticationSignUpImport } from './routes/_authentication/sign-up'
 import { Route as AuthenticationSignInImport } from './routes/_authentication/sign-in'
 import { Route as AuthenticationForgottenPasswordImport } from './routes/_authentication/forgotten-password'
-import { Route as ProfileIdFriendsImport } from './routes/profile/$id.friends'
 
 // Create/Update Routes
 
@@ -71,12 +70,6 @@ const AuthenticationForgottenPasswordRoute =
     path: '/forgotten-password',
     getParentRoute: () => rootRoute,
   } as any)
-
-const ProfileIdFriendsRoute = ProfileIdFriendsImport.update({
-  id: '/friends',
-  path: '/friends',
-  getParentRoute: () => ProfileIdRoute,
-} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -138,36 +131,17 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileIdImport
       parentRoute: typeof ProfileImport
     }
-    '/profile/$id/friends': {
-      id: '/profile/$id/friends'
-      path: '/friends'
-      fullPath: '/profile/$id/friends'
-      preLoaderRoute: typeof ProfileIdFriendsImport
-      parentRoute: typeof ProfileIdImport
-    }
   }
 }
 
 // Create and export the route tree
 
-interface ProfileIdRouteChildren {
-  ProfileIdFriendsRoute: typeof ProfileIdFriendsRoute
-}
-
-const ProfileIdRouteChildren: ProfileIdRouteChildren = {
-  ProfileIdFriendsRoute: ProfileIdFriendsRoute,
-}
-
-const ProfileIdRouteWithChildren = ProfileIdRoute._addFileChildren(
-  ProfileIdRouteChildren,
-)
-
 interface ProfileRouteChildren {
-  ProfileIdRoute: typeof ProfileIdRouteWithChildren
+  ProfileIdRoute: typeof ProfileIdRoute
 }
 
 const ProfileRouteChildren: ProfileRouteChildren = {
-  ProfileIdRoute: ProfileIdRouteWithChildren,
+  ProfileIdRoute: ProfileIdRoute,
 }
 
 const ProfileRouteWithChildren =
@@ -181,8 +155,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof AuthenticationSignInRoute
   '/sign-up': typeof AuthenticationSignUpRoute
   '/post/$id': typeof PostIdRoute
-  '/profile/$id': typeof ProfileIdRouteWithChildren
-  '/profile/$id/friends': typeof ProfileIdFriendsRoute
+  '/profile/$id': typeof ProfileIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -193,8 +166,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof AuthenticationSignInRoute
   '/sign-up': typeof AuthenticationSignUpRoute
   '/post/$id': typeof PostIdRoute
-  '/profile/$id': typeof ProfileIdRouteWithChildren
-  '/profile/$id/friends': typeof ProfileIdFriendsRoute
+  '/profile/$id': typeof ProfileIdRoute
 }
 
 export interface FileRoutesById {
@@ -206,8 +178,7 @@ export interface FileRoutesById {
   '/_authentication/sign-in': typeof AuthenticationSignInRoute
   '/_authentication/sign-up': typeof AuthenticationSignUpRoute
   '/post/$id': typeof PostIdRoute
-  '/profile/$id': typeof ProfileIdRouteWithChildren
-  '/profile/$id/friends': typeof ProfileIdFriendsRoute
+  '/profile/$id': typeof ProfileIdRoute
 }
 
 export interface FileRouteTypes {
@@ -221,7 +192,6 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/post/$id'
     | '/profile/$id'
-    | '/profile/$id/friends'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/home'
@@ -232,7 +202,6 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/post/$id'
     | '/profile/$id'
-    | '/profile/$id/friends'
   id:
     | '__root__'
     | '/home'
@@ -243,7 +212,6 @@ export interface FileRouteTypes {
     | '/_authentication/sign-up'
     | '/post/$id'
     | '/profile/$id'
-    | '/profile/$id/friends'
   fileRoutesById: FileRoutesById
 }
 
@@ -312,14 +280,7 @@ export const routeTree = rootRoute
     },
     "/profile/$id": {
       "filePath": "profile/$id.tsx",
-      "parent": "/profile",
-      "children": [
-        "/profile/$id/friends"
-      ]
-    },
-    "/profile/$id/friends": {
-      "filePath": "profile/$id.friends.tsx",
-      "parent": "/profile/$id"
+      "parent": "/profile"
     }
   }
 }

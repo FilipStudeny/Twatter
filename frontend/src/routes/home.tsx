@@ -1,6 +1,6 @@
 // Home.tsx
 
-import SinglePost from "@Components/post/PostCard";
+import SinglePost from "@Components/post/SinglePost";
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
 import { Container, Typography, CircularProgress, Alert, Box, Stack, Button } from "@mui/material";
 import { createFileRoute } from "@tanstack/react-router";
@@ -12,31 +12,24 @@ import { PostDetail, useInfiniteGetPostsListQuery } from "../../../shared";
 import { AppRoutes } from "../utils/routesConfig";
 
 const Home: React.FC = () => {
-	const {
-		data,
-		isLoading,
-		isError,
-		error,
-		fetchNextPage,
-		hasNextPage,
-		isFetchingNextPage,
-	} = useInfiniteGetPostsListQuery(
-		{ page: 0, limit: 0 },
-		{
-			initialPageParam: { page: 1, limit: 5 },
+	const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useInfiniteGetPostsListQuery(
+			{ page: 0, limit: 0 },
+			{
+				initialPageParam: { page: 1, limit: 5 },
 
-			getNextPageParam: (lastPage) => {
-				const currentPage = lastPage?.getPosts?.page ?? 1;
-				const limit = lastPage?.getPosts?.limit ?? 5;
-				const total = lastPage?.getPosts?.total ?? 0;
-				if (currentPage * limit < total) {
-					return { page: currentPage + 1, limit };
-				}
+				getNextPageParam: (lastPage) => {
+					const currentPage = lastPage?.getPosts?.page ?? 1;
+					const limit = lastPage?.getPosts?.limit ?? 5;
+					const total = lastPage?.getPosts?.total ?? 0;
+					if (currentPage * limit < total) {
+						return { page: currentPage + 1, limit };
+					}
 
-				return undefined;
+					return undefined;
+				},
 			},
-		},
-	);
+		);
 
 	const { sentinelRef } = useInfiniteScroll(Boolean(hasNextPage), isFetchingNextPage, fetchNextPage);
 
@@ -73,7 +66,7 @@ const Home: React.FC = () => {
 			) : (
 				<Stack spacing={4}>
 					{allPosts.map((post: PostDetail) => (
-						<SinglePost key={post.id} post={post} />
+						<SinglePost key={post.id} post={post} canOpenComments />
 					))}
 				</Stack>
 			)}

@@ -1,6 +1,21 @@
-query GetPostsList($page: Int = 1, $limit: Int = 10, $creatorId: String, $groupId: String, $interestId: String, $postId: String) {
-	getPosts(page: $page, limit: $limit, creatorId: $creatorId, groupId: $groupId, interestId: $interestId, postId: $postId) {
+query GetPostsList(
+	$page: Int = 1
+	$limit: Int = 10
+	$creatorId: String
+	$groupId: String
+	$interestId: String
+	$postId: String
+) {
+	getPosts(
+		page: $page
+		limit: $limit
+		creatorId: $creatorId
+		groupId: $groupId
+		interestId: $interestId
+		postId: $postId
+	) {
 		items {
+			__typename
 			id
 			content
 			postPicture

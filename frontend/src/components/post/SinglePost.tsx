@@ -1,33 +1,18 @@
 // SinglePost.tsx
 import { RouterLink } from "@Components/navigation/routerLink";
+import { ReportButton } from "@Components/report/ReportButton";
 import CategoryIcon from "@mui/icons-material/Category";
 import CommentIcon from "@mui/icons-material/Comment";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import GroupIcon from "@mui/icons-material/Group";
 import MoodIcon from "@mui/icons-material/Mood";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import {
-	Card,
-	CardHeader,
-	CardContent,
-	Typography,
-	Stack,
-	Chip,
-	Avatar,
-	IconButton,
-	Box,
-	Menu,
-	MenuItem,
-	ListItemIcon,
-	ListItemText,
-	Dialog,
-} from "@mui/material";
+import { Card, CardHeader, CardContent, Typography, Stack, Chip, Avatar, Box, Dialog } from "@mui/material";
 import dayjs from "dayjs";
-import React, { useState, MouseEvent } from "react";
+import React, { useState } from "react";
 
 import CommentsModal from "./comments/CommentsModal";
 import { PostDetail } from "../../../../shared";
@@ -55,26 +40,12 @@ const reactionChipColors: Record<
 
 interface SinglePostProps {
 	post: PostDetail,
+	canOpenComments: boolean,
 }
 
-const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
-	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+const SinglePost: React.FC<SinglePostProps> = ({ post, canOpenComments }) => {
 	const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 	const [isImageOpen, setIsImageOpen] = useState(false);
-
-	const handleMenuOpen = (event: MouseEvent<HTMLButtonElement>) => {
-		setAnchorEl(event.currentTarget);
-	};
-
-	const handleMenuClose = () => {
-		setAnchorEl(null);
-	};
-
-	const handleReactionSelect = (reactionType: string) => {
-		handleMenuClose();
-		console.log("User selected reaction:", reactionType);
-		// TODO: Implement reaction logic (e.g., send to API)
-	};
 
 	const handleCommentsOpen = () => {
 		setIsCommentsOpen(true);
@@ -84,7 +55,6 @@ const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
 		setIsCommentsOpen(false);
 	};
 
-	// Image modal handlers
 	const handleImageClick = () => {
 		setIsImageOpen(true);
 	};
@@ -118,21 +88,7 @@ const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
 							{dayjs(post.createdAt).format("MMM D, YYYY h:mm A")}
 						</Typography>
 					}
-					action={
-						<>
-							<IconButton aria-label='add reaction' onClick={handleMenuOpen}>
-								<MoreVertIcon />
-							</IconButton>
-							<Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-								{Object.entries(reactionIcons).map(([reactionType, icon]) => (
-									<MenuItem key={reactionType} onClick={() => handleReactionSelect(reactionType)}>
-										<ListItemIcon>{icon}</ListItemIcon>
-										<ListItemText primary={reactionType} />
-									</MenuItem>
-								))}
-							</Menu>
-						</>
-					}
+					action={<ReportButton reportTarget={post} />}
 					sx={{ pb: 1, pt: 2 }}
 				/>
 
@@ -200,7 +156,7 @@ const SinglePost: React.FC<SinglePostProps> = ({ post }) => {
 								gap: 0.5,
 								cursor: "pointer",
 							}}
-							onClick={handleCommentsOpen}
+							onClick={canOpenComments ? handleCommentsOpen : undefined}
 						>
 							<CategoryIcon fontSize='inherit' />
 							{post.interest?.name ?? "—"}

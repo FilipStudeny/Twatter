@@ -15,6 +15,7 @@ query GetUsersList($page: Int = 1, $limit: Int = 10) {
 query GetUser($userId: String) {
 	getUsers(userId: $userId){
 		items{
+			__typename
 			id
 			username
 			firstName

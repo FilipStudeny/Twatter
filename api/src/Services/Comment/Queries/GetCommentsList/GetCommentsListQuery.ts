@@ -47,7 +47,7 @@ export class GetCommentsListQueryHandler implements IQueryHandler<GetCommentsLis
 
 		// Requested fields selection
 		if (requestedFields.postId) {
-			qb.addSelect('comment.postId AS "post_id"');
+			qb.addSelect('comment.postId AS "comment_post_id"');
 		}
 
 		if (requestedFields.content) {

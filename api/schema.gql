@@ -155,6 +155,7 @@ enum GraphFilter {
 }
 
 type Mutation {
+  CreateReport(createReportDto: ReportDto!): GenericResponse!
   SignInAdmin(signIn: SignInCredentials!): SignInResponse!
   CreateAdmin(createAdminDto: CreateAdminDto!): GenericResponse!
   createGroup(createGroupDto: CreateGroupDto!): GenericResponse!
@@ -168,6 +169,23 @@ type Mutation {
   SignOutUser(userId: String!): GenericResponse!
   forgotPassword(email: String!): GenericResponse!
   resetPassword(resetPassword: ResetPasswordInput!): GenericResponse!
+}
+
+input ReportDto {
+  reportType: ReportType!
+  message: String!
+  reportedPostId: String
+  reportedCommentId: String
+  reportedUserId: String
+}
+
+"""Different types of reports available"""
+enum ReportType {
+  SPAM
+  ABUSE
+  INAPPROPRIATE_CONTENT
+  HARASSMENT
+  OTHER
 }
 
 input SignInCredentials {

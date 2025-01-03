@@ -7,8 +7,10 @@ import { InjectMapper } from "@automapper/nestjs";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { EntityManager } from "typeorm";
+import { validate as isUUID } from "uuid";
 
 import PaginatedUsersResponse from "./PaginatedUsersResponse.type";
+import { BadRequestException } from "@nestjs/common";
 
 export class GetUsersQuery {
 	constructor(
@@ -32,6 +34,14 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 	async execute(query: GetUsersQuery): Promise<PaginatedUsersResponse> {
 		const { page, limit, requestedFields, userId, groupId, getAll, friendOf } = query;
 		const skip = (page - 1) * limit;
+
+		if (userId && !isUUID(userId)) {
+			throw new BadRequestException("Invalid user ID.");
+		}
+
+		if (friendOf && !isUUID(friendOf)) {
+			throw new BadRequestException("Invalid user ID.");
+		}
 
 		const qb = this.entityManager.createQueryBuilder(User, "user");
 

@@ -1,9 +1,13 @@
 // RouteComponent.tsx
 
+import { RouterLink } from "@Components/navigation/routerLink";
 import FriendsList from "@Components/profile/FriendsList";
 import UserComments from "@Components/profile/UserComments";
 import UserPosts from "@Components/profile/UserPosts";
-import { PersonAdd as PersonAddIcon, Message as MessageIcon, Report as ReportIcon } from "@mui/icons-material";
+import UserReactions from "@Components/profile/UserReactions";
+import { ReportButton } from "@Components/report/ReportButton";
+import { GET_ERROR_LIST } from "@Utils/getResponseError";
+import { PersonAdd as PersonAddIcon, Message as MessageIcon } from "@mui/icons-material";
 import {
 	Box,
 	Card,
@@ -54,28 +58,129 @@ function RouteComponent() {
 		// Implement send message functionality here
 	};
 
-	const handleReportUser = () => {
-		console.log("Report User clicked");
-		// Implement report user functionality here
-	};
-
 	if (userLoading) {
 		return (
-			<Box p={2} display='flex' justifyContent='center' alignItems='center'>
-				<CircularProgress />
+			<Box
+				sx={{
+					minHeight: "100vh",
+					display: "flex",
+					flexDirection: "column",
+					justifyContent: "center",
+					alignItems: "center",
+					backgroundColor: "background.default",
+				}}
+			>
+				<CircularProgress
+					sx={{
+						color: "primary.main",
+						mb: 2,
+						animationDuration: "1.5s",
+					}}
+					thickness={4.5}
+					size={60}
+				/>
+				<Typography
+					variant='h6'
+					color='text.secondary'
+					sx={{
+						fontWeight: "medium",
+						textAlign: "center",
+					}}
+				>
+					Loading user data, please wait...
+				</Typography>
 			</Box>
 		);
 	}
 
 	if (userError || !userData?.getUsers?.items?.length) {
 		return (
-			<Box p={2}>
-				<Typography variant='h6' color='error'>
-					Error: User not found.
+			<Box
+				p={4}
+				sx={{
+					borderRadius: 3,
+					textAlign: "center",
+					boxShadow: 3,
+					backgroundColor: "background.default",
+					color: "text.primary",
+				}}
+			>
+				<Typography variant='h4' fontWeight='bold' color='error' gutterBottom>
+					{userError ? "Something Went Wrong" : "User Not Found"}
 				</Typography>
-				<Typography variant='body2' color='error'>
-					{userErrorMessage?.message ?? "An unexpected error occurred."}
+				<Typography variant='body1' color='text.secondary' gutterBottom>
+					{userError
+						? "We ran into an issue while fetching the user data. Please refresh the page or try again later."
+						: "The user you're looking for doesn't exist or may have been removed."}
 				</Typography>
+				<Box
+					sx={{
+						mt: 3,
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "center",
+						justifyContent: "center",
+					}}
+				>
+					{GET_ERROR_LIST(userErrorMessage).length > 0 && (
+						<Box sx={{ textAlign: "left", maxWidth: "400px", mb: 2 }}>
+							<Typography variant='subtitle1' fontWeight='bold' color='error'>
+								Error Details:
+							</Typography>
+							{GET_ERROR_LIST(userErrorMessage).map((errMsg: string, index: number) => (
+								<Typography key={index} variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+									• {errMsg}
+								</Typography>
+							))}
+						</Box>
+					)}
+					<Box
+						sx={{
+							mt: 3,
+							display: "flex",
+							justifyContent: "center",
+							gap: 2,
+						}}
+					>
+						<RouterLink to='/home' style={{ textDecoration: "none" }}>
+							<Box
+								component='button'
+								sx={{
+									px: 4,
+									py: 1.5,
+									borderRadius: 2,
+									backgroundColor: "primary.main",
+									color: "white",
+									border: "none",
+									cursor: "pointer",
+									"&:hover": {
+										backgroundColor: "primary.dark",
+									},
+								}}
+							>
+								Go to Home
+							</Box>
+						</RouterLink>
+						<Box
+							component='button'
+							sx={{
+								px: 4,
+								py: 1.5,
+								borderRadius: 2,
+								backgroundColor: "grey.300",
+								color: "text.primary",
+								border: "none",
+								cursor: "pointer",
+								"&:hover": {
+									backgroundColor: "grey.400",
+								},
+							}}
+							onClick={() => window.location.reload()}
+						>
+							Reload Page
+						</Box>
+					</Box>
+				</Box>
 			</Box>
 		);
 	}
@@ -86,7 +191,6 @@ function RouteComponent() {
 		<Box
 			sx={{
 				minHeight: "100vh",
-				bgcolor: "background.default",
 				py: 4,
 				px: 2,
 				display: "flex",
@@ -124,11 +228,7 @@ function RouteComponent() {
 									<MessageIcon />
 								</IconButton>
 							</Tooltip>
-							<Tooltip title='Report User'>
-								<IconButton aria-label='report user' onClick={handleReportUser}>
-									<ReportIcon />
-								</IconButton>
-							</Tooltip>
+							<ReportButton reportTarget={user} />
 						</Box>
 					}
 					sx={{ pb: 1 }}
@@ -197,17 +297,7 @@ function RouteComponent() {
 						{/* Tab Panels */}
 						{tabValue === 0 && <UserPosts userId={id} />}
 						{tabValue === 1 && <UserComments userId={id} />}
-						{tabValue === 2 && (
-							<Box sx={{ px: 2, py: 1 }} role='tabpanel' id='tabpanel-2' aria-labelledby='tab-2'>
-								<Typography variant='subtitle2' gutterBottom>
-									User Reactions
-								</Typography>
-								{/* TODO: Render user’s reactions here. E.g. <UserReactionsList userId={user.id} /> */}
-								<Typography variant='body2' color='text.secondary'>
-									[Placeholder for user’s reactions on posts/comments...]
-								</Typography>
-							</Box>
-						)}
+						{tabValue === 2 && <UserReactions userId={id} />}
 					</Box>
 				</CardContent>
 			</Card>

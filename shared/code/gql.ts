@@ -29,14 +29,14 @@ export enum AdminRole {
 export type CommentDetail = {
   __typename?: 'CommentDetail';
   content: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
   creator: UserDetail;
   id: Scalars['String']['output'];
   postId: Scalars['String']['output'];
   reactions?: Maybe<ReactionsCount>;
   reportsCount?: Maybe<Scalars['Float']['output']>;
   strikesCount?: Maybe<Scalars['Float']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type CreateAdminDto = {
@@ -104,6 +104,7 @@ export type Mutation = {
   CreateAdmin: GenericResponse;
   CreateComment: GenericResponse;
   CreatePost: GenericResponse;
+  CreateReport: GenericResponse;
   PinComment: GenericResponse;
   SignInAdmin: SignInResponse;
   SignInUser: SignInResponse;
@@ -134,6 +135,11 @@ export type MutationCreateCommentArgs = {
 
 export type MutationCreatePostArgs = {
   createPost: CreatePostDto;
+};
+
+
+export type MutationCreateReportArgs = {
+  createReportDto: ReportDto;
 };
 
 
@@ -206,6 +212,14 @@ export type PaginatedPostsListResponse = {
   total?: Maybe<Scalars['Int']['output']>;
 };
 
+export type PaginatedUserReactionsResponse = {
+  __typename?: 'PaginatedUserReactionsResponse';
+  items?: Maybe<Array<ReactedItemUnion>>;
+  limit?: Maybe<Scalars['Int']['output']>;
+  page?: Maybe<Scalars['Int']['output']>;
+  total?: Maybe<Scalars['Int']['output']>;
+};
+
 export type PaginatedUsersResponse = {
   __typename?: 'PaginatedUsersResponse';
   items?: Maybe<Array<UserDetail>>;
@@ -218,7 +232,7 @@ export type PostDetail = {
   __typename?: 'PostDetail';
   commentsCount?: Maybe<Scalars['Int']['output']>;
   content: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
   creator: UserDetail;
   group?: Maybe<GroupDetail>;
   id: Scalars['String']['output'];
@@ -229,7 +243,7 @@ export type PostDetail = {
   reactions?: Maybe<ReactionsCount>;
   reportsCount?: Maybe<Scalars['Int']['output']>;
   strikesCount?: Maybe<Scalars['Int']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type PostGraphDataDto = {
@@ -244,6 +258,7 @@ export type Query = {
   getInterests: PaginatedInterestsListResponse;
   getPosts: PaginatedPostsListResponse;
   getPostsStatistics: Array<PostGraphDataDto>;
+  getUserReactions: PaginatedUserReactionsResponse;
   getUsers: PaginatedUsersResponse;
   hello: Scalars['String']['output'];
 };
@@ -282,6 +297,13 @@ export type QueryGetPostsStatisticsArgs = {
 };
 
 
+export type QueryGetUserReactionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  userId: Scalars['String']['input'];
+};
+
+
 export type QueryGetUsersArgs = {
   friendOf?: InputMaybe<Scalars['String']['input']>;
   getAll?: InputMaybe<Scalars['Boolean']['input']>;
@@ -290,6 +312,8 @@ export type QueryGetUsersArgs = {
   page?: Scalars['Int']['input'];
   userId?: InputMaybe<Scalars['String']['input']>;
 };
+
+export type ReactedItemUnion = CommentDetail | PostDetail;
 
 export enum ReactionTargetType {
   Comment = 'COMMENT',
@@ -314,6 +338,22 @@ export type ReactionsCount = {
   sad: Scalars['Int']['output'];
   smile: Scalars['Int']['output'];
 };
+
+export type ReportDto = {
+  message: Scalars['String']['input'];
+  reportType: ReportType;
+  reportedCommentId?: InputMaybe<Scalars['String']['input']>;
+  reportedPostId?: InputMaybe<Scalars['String']['input']>;
+  reportedUserId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum ReportType {
+  Abuse = 'ABUSE',
+  Harassment = 'HARASSMENT',
+  InappropriateContent = 'INAPPROPRIATE_CONTENT',
+  Other = 'OTHER',
+  Spam = 'SPAM'
+}
 
 export type ResetPasswordInput = {
   email: Scalars['String']['input'];
@@ -448,7 +488,7 @@ export type GetCommentsByPostIdQueryVariables = Exact<{
 }>;
 
 
-export type GetCommentsByPostIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename?: 'CommentDetail', id: string, content: string, postId: string, createdAt: any, updatedAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+export type GetCommentsByPostIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename: 'CommentDetail', id: string, content: string, postId: string, createdAt?: any | null, updatedAt?: any | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
 
 export type GetCommentsByCreatorIdQueryVariables = Exact<{
   creatorId: Scalars['String']['input'];
@@ -457,7 +497,7 @@ export type GetCommentsByCreatorIdQueryVariables = Exact<{
 }>;
 
 
-export type GetCommentsByCreatorIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename?: 'CommentDetail', id: string, content: string, postId: string, createdAt: any, updatedAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+export type GetCommentsByCreatorIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename: 'CommentDetail', id: string, content: string, postId: string, createdAt?: any | null, updatedAt?: any | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
 
 export type CreateGroupMutationVariables = Exact<{
   createGroupDto: CreateGroupDto;
@@ -488,7 +528,7 @@ export type GetPostsListQueryVariables = Exact<{
 }>;
 
 
-export type GetPostsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'PostDetail', id: string, content: string, postPicture?: string | null, commentsCount?: number | null, createdAt: any, updatedAt: any, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id?: string | null, name?: string | null } | null }> | null } };
+export type GetPostsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'PostDetail', id: string, content: string, postPicture?: string | null, commentsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id?: string | null, name?: string | null } | null }> | null } };
 
 export type GetAdministrationPostsListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -500,7 +540,7 @@ export type GetAdministrationPostsListQueryVariables = Exact<{
 }>;
 
 
-export type GetAdministrationPostsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'PostDetail', id: string, content: string, postPicture?: string | null, commentsCount?: number | null, createdAt: any, updatedAt: any, reportsCount?: number | null, strikesCount?: number | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id?: string | null, name?: string | null } | null, pinnedComment?: { __typename?: 'CommentDetail', id: string, content: string, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null } } | null }> | null } };
+export type GetAdministrationPostsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'PostDetail', id: string, content: string, postPicture?: string | null, commentsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, reportsCount?: number | null, strikesCount?: number | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id?: string | null, name?: string | null } | null, pinnedComment?: { __typename?: 'CommentDetail', id: string, content: string, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null } } | null }> | null } };
 
 export type AddReactionMutationVariables = Exact<{
   createOrUpdateReactionData: CreateOrUpdateReactionDto;
@@ -508,6 +548,22 @@ export type AddReactionMutationVariables = Exact<{
 
 
 export type AddReactionMutation = { __typename?: 'Mutation', AddReaction: { __typename?: 'GenericResponse', message?: string | null } };
+
+export type GetUserReactionsQueryVariables = Exact<{
+  userId: Scalars['String']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetUserReactionsQuery = { __typename?: 'Query', getUserReactions: { __typename?: 'PaginatedUserReactionsResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'CommentDetail', id: string, content: string, postId: string, createdAt?: any | null, updatedAt?: any | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null } | { __typename: 'PostDetail', id: string, content: string, postPicture?: string | null, commentsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id?: string | null, name?: string | null } | null }> | null } };
+
+export type CreateReportMutationVariables = Exact<{
+  input: ReportDto;
+}>;
+
+
+export type CreateReportMutation = { __typename?: 'Mutation', CreateReport: { __typename?: 'GenericResponse', message?: string | null } };
 
 export type GetUsersListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -522,7 +578,7 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
 
 export type GetFriendsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -831,6 +887,7 @@ export const GetCommentsByPostIdDocument = /*#__PURE__*/ `
     query GetCommentsByPostId($postId: String!, $page: Int!, $limit: Int!) {
   getCommentsList(postId: $postId, page: $page, limit: $limit) {
     items {
+      __typename
       id
       content
       creator {
@@ -906,6 +963,7 @@ export const GetCommentsByCreatorIdDocument = /*#__PURE__*/ `
     query GetCommentsByCreatorId($creatorId: String!, $page: Int!, $limit: Int!) {
   getCommentsList(creatorId: $creatorId, page: $page, limit: $limit) {
     items {
+      __typename
       id
       content
       creator {
@@ -1093,6 +1151,7 @@ export const GetPostsListDocument = /*#__PURE__*/ `
     postId: $postId
   ) {
     items {
+      __typename
       id
       content
       postPicture
@@ -1302,6 +1361,140 @@ useAddReactionMutation.getKey = () => ['AddReaction'];
 
 useAddReactionMutation.fetcher = (variables: AddReactionMutationVariables, options?: RequestInit['headers']) => fetcher<AddReactionMutation, AddReactionMutationVariables>(AddReactionDocument, variables, options);
 
+export const GetUserReactionsDocument = /*#__PURE__*/ `
+    query GetUserReactions($userId: String!, $page: Int, $limit: Int) {
+  getUserReactions(userId: $userId, page: $page, limit: $limit) {
+    items {
+      __typename
+      ... on PostDetail {
+        id
+        content
+        postPicture
+        creator {
+          id
+          username
+          firstName
+          lastName
+        }
+        reactions {
+          like
+          dislike
+          sad
+          smile
+          angry
+          love
+        }
+        interest {
+          id
+          name
+        }
+        group {
+          id
+          name
+        }
+        commentsCount
+        createdAt
+        updatedAt
+      }
+      ... on CommentDetail {
+        id
+        content
+        postId
+        creator {
+          id
+          username
+          firstName
+          lastName
+        }
+        reactions {
+          like
+          dislike
+          smile
+          angry
+          sad
+          love
+        }
+        createdAt
+        updatedAt
+      }
+    }
+    total
+    page
+    limit
+  }
+}
+    `;
+
+export const useGetUserReactionsQuery = <
+      TData = GetUserReactionsQuery,
+      TError = GraphQLResponse
+    >(
+      variables: GetUserReactionsQueryVariables,
+      options?: Omit<UseQueryOptions<GetUserReactionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUserReactionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetUserReactionsQuery, TError, TData>(
+      {
+    queryKey: ['GetUserReactions', variables],
+    queryFn: fetcher<GetUserReactionsQuery, GetUserReactionsQueryVariables>(GetUserReactionsDocument, variables),
+    ...options
+  }
+    )};
+
+useGetUserReactionsQuery.document = GetUserReactionsDocument;
+
+useGetUserReactionsQuery.getKey = (variables: GetUserReactionsQueryVariables) => ['GetUserReactions', variables];
+
+export const useInfiniteGetUserReactionsQuery = <
+      TData = InfiniteData<GetUserReactionsQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetUserReactionsQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetUserReactionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUserReactionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetUserReactionsQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetUserReactions.infinite', variables],
+      queryFn: (metaData) => fetcher<GetUserReactionsQuery, GetUserReactionsQueryVariables>(GetUserReactionsDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetUserReactionsQuery.getKey = (variables: GetUserReactionsQueryVariables) => ['GetUserReactions.infinite', variables];
+
+
+useGetUserReactionsQuery.fetcher = (variables: GetUserReactionsQueryVariables, options?: RequestInit['headers']) => fetcher<GetUserReactionsQuery, GetUserReactionsQueryVariables>(GetUserReactionsDocument, variables, options);
+
+export const CreateReportDocument = /*#__PURE__*/ `
+    mutation CreateReport($input: ReportDto!) {
+  CreateReport(createReportDto: $input) {
+    message
+  }
+}
+    `;
+
+export const useCreateReportMutation = <
+      TError = GraphQLResponse,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateReportMutation, TError, CreateReportMutationVariables, TContext>) => {
+    
+    return useMutation<CreateReportMutation, TError, CreateReportMutationVariables, TContext>(
+      {
+    mutationKey: ['CreateReport'],
+    mutationFn: (variables?: CreateReportMutationVariables) => fetcher<CreateReportMutation, CreateReportMutationVariables>(CreateReportDocument, variables)(),
+    ...options
+  }
+    )};
+
+useCreateReportMutation.getKey = () => ['CreateReport'];
+
+
+useCreateReportMutation.fetcher = (variables: CreateReportMutationVariables, options?: RequestInit['headers']) => fetcher<CreateReportMutation, CreateReportMutationVariables>(CreateReportDocument, variables, options);
+
 export const GetUsersListDocument = /*#__PURE__*/ `
     query GetUsersList($page: Int = 1, $limit: Int = 10) {
   getUsers(page: $page, limit: $limit) {
@@ -1366,6 +1559,7 @@ export const GetUserDocument = /*#__PURE__*/ `
     query GetUser($userId: String) {
   getUsers(userId: $userId) {
     items {
+      __typename
       id
       username
       firstName

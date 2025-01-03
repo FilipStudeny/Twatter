@@ -44,10 +44,6 @@ export class CommentDetail {
 				mapFrom((source) => source.comment_id),
 			),
 			forMember(
-				(destination) => destination.postId,
-				mapFrom((source) => source.post_id),
-			),
-			forMember(
 				(destination) => destination.createdAt,
 				mapFrom((source) => source.comment_createdat),
 			),

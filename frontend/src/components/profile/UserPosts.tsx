@@ -1,6 +1,6 @@
 // UserPosts.tsx
 
-import SinglePost from "@Components/post/PostCard";
+import SinglePost from "@Components/post/SinglePost";
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
 import { Box, Button, CircularProgress, Alert, Stack } from "@mui/material";
 import React from "react";
@@ -10,7 +10,7 @@ import { useInfiniteScroll } from "hooks/infiniteScroll";
 import { PostDetail, useInfiniteGetPostsListQuery } from "../../../../shared";
 
 interface UserPostsProps {
-	userId: string,
+	userId: string;
 }
 
 const UserPosts: React.FC<UserPostsProps> = ({ userId }) => {

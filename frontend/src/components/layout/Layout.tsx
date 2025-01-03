@@ -6,23 +6,16 @@ import { useAuthenticationStore } from "stores/authenticationStore";
 
 import { Header } from "./Header";
 import { LeftSidebar } from "./LeftSidebar";
-import { RightSidebar, User } from "./RightSidebar";
+import { RightSidebar } from "./RightSideBar/RightSidebar";
 
 const drawerWidthLeft = 240;
 const drawerWidthRight = 200;
-
-const onlineUsers: User[] = [
-	{ username: "Alice", avatar: "https://i.pravatar.cc/40?u=alice", onlineStatus: "online" },
-	{ username: "Bob", avatar: "https://i.pravatar.cc/40?u=bob", onlineStatus: "online" },
-	{ username: "Charlie", avatar: "https://i.pravatar.cc/40?u=charlie", onlineStatus: "offline" },
-	{ username: "Diana", avatar: "https://i.pravatar.cc/40?u=diana", onlineStatus: "offline" },
-];
 
 export const Layout = () => {
 	const theme = useTheme();
 	const lgUp = useMediaQuery(theme.breakpoints.up("lg"));
 
-	const isLoggedIn = useAuthenticationStore((state) => state.isLoggedIn);
+	const { isLoggedIn, getUserData } = useAuthenticationStore();
 
 	// Drawer states
 	const [leftOpen, setLeftOpen] = useState(lgUp);
@@ -127,7 +120,7 @@ export const Layout = () => {
 							open={rightOpen}
 							drawerWidth={drawerWidthRight}
 							onClose={handleRightToggle}
-							onlineUsers={onlineUsers}
+							friendOf={getUserData()?.id ?? ""}
 							lgUp={lgUp}
 						/>
 					</>

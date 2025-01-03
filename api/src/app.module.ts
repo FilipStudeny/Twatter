@@ -30,11 +30,13 @@ import { GroupModule } from "./Services/Group/group.module";
 import { InterestModule } from "./Services/Interest/interest.module";
 import { PostModule } from "./Services/Post/post.module";
 import { ReactionModule } from "./Services/Reaction/reaction.module";
+import { ReportModule } from "./Services/Report/report.module";
 import { UserModule } from "./Services/User/user.module";
 import { RedisModule } from "./Services/redis.module";
 
 @Module({
 	imports: [
+		ReportModule,
 		RedisModule,
 		EmailModule,
 		InterestModule,
@@ -88,7 +90,6 @@ import { RedisModule } from "./Services/redis.module";
 			driver: ApolloDriver,
 			autoSchemaFile: "schema.gql",
 			context: ({ request, response }) => ({ request, response }),
-			
 		}),
 	],
 	providers: [EntityMapper, JwtStrategy, AdminJwtStrategy],

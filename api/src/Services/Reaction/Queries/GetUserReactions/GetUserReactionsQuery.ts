@@ -47,11 +47,11 @@ export class GetUserReactionsQueryHandler implements IQueryHandler<GetUserReacti
                 c."createdAt" AS "comment_createdAt",
                 c."updatedAt" AS "comment_updatedAt",
                 c."postId" AS "comment_post_id",
-                u.id AS "creator_id",
-                u.username AS "creator_username",
-                u."firstName" AS "creator_firstName",
-                u."lastName" AS "creator_lastName",
-                u."profilePictureUrl" AS "creator_profilePictureUrl",
+                post_creator.id AS "creator_id",
+                post_creator.username AS "creator_username",
+                post_creator."firstName" AS "creator_firstName",
+                post_creator."lastName" AS "creator_lastName",
+                post_creator."profilePictureUrl" AS "creator_profilePictureUrl",
                 i.id AS "interest_id",
                 i.name AS "interest_name",
                 g.id AS "group_id",
@@ -71,7 +71,11 @@ export class GetUserReactionsQueryHandler implements IQueryHandler<GetUserReacti
                 reaction AS r
             LEFT JOIN post AS p ON r."postId" = p.id
             LEFT JOIN comment AS c ON r."commentId" = c.id
-            LEFT JOIN "user" AS u ON r."userId" = u.id
+            LEFT JOIN "user" AS post_creator ON 
+                CASE
+                    WHEN r."postId" IS NOT NULL THEN p."creatorId"
+                    WHEN r."commentId" IS NOT NULL THEN c."creatorId"
+                END = post_creator.id
             LEFT JOIN interest AS i ON p."interestId" = i.id
             LEFT JOIN "group" AS g ON p."groupId" = g.id
             LEFT JOIN reaction AS reactions ON reactions."postId" = p.id OR reactions."commentId" = c.id
@@ -79,7 +83,7 @@ export class GetUserReactionsQueryHandler implements IQueryHandler<GetUserReacti
             GROUP BY
                 p.id, p.content, p."postPicture", p."createdAt", p."updatedAt",
                 c.id, c.content, c."createdAt", c."updatedAt", c."postId",
-                u.id, u.username, u."firstName", u."lastName", u."profilePictureUrl",
+                post_creator.id, post_creator.username, post_creator."firstName", post_creator."lastName", post_creator."profilePictureUrl",
                 i.id, i.name,
                 g.id, g.name, r."postId", r."commentId", r."createdAt"
             ORDER BY r."createdAt" DESC

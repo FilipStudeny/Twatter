@@ -1,6 +1,6 @@
+import { ReportButton } from "@Components/report/ReportButton";
 import { reactionChipColors, reactionIcons } from "@Utils/reactions";
-import ReportIcon from "@mui/icons-material/Report";
-import { Box, Stack, Avatar, IconButton, Chip, Typography, useTheme, Paper } from "@mui/material";
+import { Box, Stack, Avatar, Chip, Typography, Paper } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
 
@@ -8,11 +8,9 @@ import { CommentDetail } from "../../../../../shared";
 
 interface CommentProps {
 	comment: CommentDetail,
-	onReportClick: (commentId: string, username: string)=> void,
 }
 
-const Comment: React.FC<CommentProps> = ({ comment, onReportClick }) => {
-	const theme = useTheme();
+const Comment: React.FC<CommentProps> = ({ comment }) => {
 
 	return (
 		<Paper
@@ -57,22 +55,7 @@ const Comment: React.FC<CommentProps> = ({ comment, onReportClick }) => {
 							</Typography>
 						</Stack>
 
-						<IconButton
-							aria-label='report comment'
-							size='small'
-							onClick={() =>
-								onReportClick(comment.id, comment.creator.username || comment.creator.firstName || "")
-							}
-							sx={{
-								color: theme.palette.error.main,
-								"&:hover": {
-									backgroundColor: theme.palette.error.light,
-									color: "white",
-								},
-							}}
-						>
-							<ReportIcon fontSize='small' />
-						</IconButton>
+						<ReportButton reportTarget={comment} />
 					</Stack>
 
 					{/* Row 2: Main comment text */}

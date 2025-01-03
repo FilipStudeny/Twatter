@@ -299,11 +299,6 @@ async function seedReactions(connection: Connection, users: User[], posts: Post[
 	const reactions = [];
 	const reactionTypes = ["like", "dislike", "smile", "angry", "sad", "love"];
 
-	/**
-	 * Returns a random subset of the array.
-	 * @param arr The array to sample from.
-	 * @param n The number of elements to select.
-	 */
 	function getRandomSubarray<T>(arr: T[], n: number): T[] {
 		const shuffled = arr.slice(0);
 		let i = arr.length;
@@ -320,45 +315,53 @@ async function seedReactions(connection: Connection, users: User[], posts: Post[
 		return shuffled.slice(min);
 	}
 
-	// For each user, have them react to multiple posts
 	users.forEach((user) => {
-		// Decide how many posts this user will react to
-		const numberOfPostReactions = Math.floor(Math.random() * (posts.length / 2)) + 1; // At least 1 reaction
-		// Get a random subset of posts
-		const postsToReactTo = getRandomSubarray(posts, numberOfPostReactions);
+		// Filter out posts without a creator or created by this user
+		const otherUsersPosts = posts.filter((post) => post.creator?.id && post.creator.id !== user.id);
 
-		postsToReactTo.forEach((post) => {
-			const randomReactionType = reactionTypes[Math.floor(Math.random() * reactionTypes.length)];
+		if (otherUsersPosts.length > 0) {
+			const numberOfPostReactions = Math.floor(Math.random() * (otherUsersPosts.length / 2)) + 1;
+			const postsToReactTo = getRandomSubarray(otherUsersPosts, numberOfPostReactions);
 
-			const reaction = new Reaction();
-			reaction.type = randomReactionType as ReactionType;
-			reaction.user = user;
-			reaction.post = post;
+			postsToReactTo.forEach((post) => {
+				const randomReactionType =
+					reactionTypes[Math.floor(Math.random() * reactionTypes.length)];
 
-			reactions.push(reaction);
-		});
+				const reaction = new Reaction();
+				reaction.type = randomReactionType as ReactionType;
+				reaction.user = user;
+				reaction.post = post;
+
+				reactions.push(reaction);
+			});
+		}
 	});
 
-	// For each user, have them react to multiple comments
 	users.forEach((user) => {
-		// Decide how many comments this user will react to
-		const numberOfCommentReactions = Math.floor(Math.random() * (comments.length / 2)) + 1; // At least 1 reaction
-		// Get a random subset of comments
-		const commentsToReactTo = getRandomSubarray(comments, numberOfCommentReactions);
+		// Filter out comments without a creator or created by this user
+		const otherUsersComments = comments.filter(
+			(comment) => comment.creator?.id && comment.creator.id !== user.id,
+		);
 
-		commentsToReactTo.forEach((comment) => {
-			const randomReactionType = reactionTypes[Math.floor(Math.random() * reactionTypes.length)];
+		if (otherUsersComments.length > 0) {
+			const numberOfCommentReactions =
+				Math.floor(Math.random() * (otherUsersComments.length / 2)) + 1;
+			const commentsToReactTo = getRandomSubarray(otherUsersComments, numberOfCommentReactions);
 
-			const reaction = new Reaction();
-			reaction.type = randomReactionType as ReactionType;
-			reaction.user = user;
-			reaction.comment = comment;
+			commentsToReactTo.forEach((comment) => {
+				const randomReactionType =
+					reactionTypes[Math.floor(Math.random() * reactionTypes.length)];
 
-			reactions.push(reaction);
-		});
+				const reaction = new Reaction();
+				reaction.type = randomReactionType as ReactionType;
+				reaction.user = user;
+				reaction.comment = comment;
+
+				reactions.push(reaction);
+			});
+		}
 	});
 
-	// Save all reactions to the database
 	await connection.manager.save(reactions);
 	console.log("Reactions have been inserted into the database.");
 }
@@ -515,13 +518,20 @@ async function main() {
 		await seedGroups(connection, users, interests);
 
 		// Seed posts into the database
-		const posts = await seedPosts(connection, users, interests);
+		const createdPosts = await seedPosts(connection, users, interests);
 
 		// Seed comments into the database
-		await seedComments(connection, users, posts);
+		await seedComments(connection, users, createdPosts);
 
 		// Fetch all comments for reaction and report seeding
-		const comments = await connection.getRepository(Comment).find();
+		const posts = await connection.getRepository(Post).find({
+			relations: ["creator", "interest"],
+		});
+
+		// Fetch comments with creator and post relations
+		const comments = await connection.getRepository(Comment).find({
+			relations: ["creator", "post"],
+		});
 
 		// Seed reactions into the database
 		await seedReactions(connection, users, posts, comments);
@@ -531,7 +541,6 @@ async function main() {
 
 		// Commit transaction
 		await connection.query("COMMIT");
-
 		console.log(
 			"Administrators, interests, users, groups, posts, comments, reactions, and reports have been inserted successfully.",
 		);
