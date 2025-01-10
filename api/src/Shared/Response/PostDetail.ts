@@ -52,36 +52,6 @@ export class PostDetail {
 	@Field(() => Boolean, { nullable: true })
 	isPinned: boolean;
 
-	constructor(
-		id?: string,
-		content?: string,
-		creator?: UserDetail,
-		commentsCount?: number,
-		reactions?: ReactionsCount,
-		createdAt?: Date,
-		updatedAt?: Date,
-		interest?: InterestDetail,
-		group?: GroupDetail,
-		reportsCount?: number,
-		strikesCount?: number,
-		pinnedComment?: CommentDetail,
-		isPinned?: boolean,
-	) {
-		this.id = id;
-		this.content = content;
-		this.creator = creator;
-		this.commentsCount = commentsCount;
-		this.reactions = reactions;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
-		this.interest = interest;
-		this.group = group;
-		this.reportsCount = reportsCount;
-		this.strikesCount = strikesCount;
-		this.pinnedComment = pinnedComment;
-		this.isPinned = isPinned;
-	}
-
 	static createMap(mapper: Mapper): void {
 		createMap(
 			mapper,
@@ -122,6 +92,7 @@ export class PostDetail {
 							username: source.creator_username,
 							firstName: source.creator_firstName,
 							lastName: source.creator_lastName,
+							profilePictureUrl: source.creator_profilePictureUrl,
 						}) as UserDetail,
 				),
 			),

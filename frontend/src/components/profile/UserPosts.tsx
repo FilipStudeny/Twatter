@@ -10,7 +10,7 @@ import { useInfiniteScroll } from "hooks/infiniteScroll";
 import { PostDetail, useInfiniteGetPostsListQuery } from "../../../../shared";
 
 interface UserPostsProps {
-	userId: string;
+	userId: string,
 }
 
 const UserPosts: React.FC<UserPostsProps> = ({ userId }) => {
@@ -61,7 +61,7 @@ const UserPosts: React.FC<UserPostsProps> = ({ userId }) => {
 
 			<Stack spacing={4}>
 				{allPosts.map((post: PostDetail) => (
-					<SinglePost key={post.id} post={post} />
+					<SinglePost key={post.id} post={post} canOpenComments/>
 				))}
 			</Stack>
 

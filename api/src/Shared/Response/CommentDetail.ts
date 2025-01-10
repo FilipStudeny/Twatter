@@ -63,15 +63,24 @@ export class CommentDetail {
 				(destination) => destination.updatedAt,
 				mapFrom((source) => source.comment_updatedAt),
 			),
-			forMember(
-				(destination) => destination.creator,
+			forMember<DbResponse, CommentDetail, UserDetail>(
+				(dest) => dest.creator,
 				mapFrom(
 					(source) =>
 						({
-							id: source.creator_id,
-							username: source.creator_username,
-							firstName: source.creator_firstName,
-							lastName: source.creator_lastName,
+							id: source.comment_creator_id ?? source.creator_id,
+							username:
+								source.comment_creator_username ??
+								source.creator_username,
+							firstName:
+								source.comment_creator_firstName ??
+								source.creator_firstName,
+							lastName:
+								source.comment_creator_lastName ??
+								source.creator_lastName,
+							profilePictureUrl:
+								source.comment_creator_profilePictureUrl ??
+								source.creator_profilePictureUrl,
 						}) as UserDetail,
 				),
 			),

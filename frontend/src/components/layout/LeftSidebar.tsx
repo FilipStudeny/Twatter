@@ -136,6 +136,21 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 						</RouterLink>
 					</ListItem>
 
+					<ListItem disablePadding>
+						<RouterLink
+							to='/users'
+							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
+							onClick={handleNavItemClick}
+						>
+							<ListItemButton selected={isActive("/users")}>
+								<ListItemIcon>
+									<PersonPinCircleOutlined />
+								</ListItemIcon>
+								<ListItemText primary='Users' />
+							</ListItemButton>
+						</RouterLink>
+					</ListItem>
+
 					{/* Home */}
 					<ListItem disablePadding>
 						<RouterLink

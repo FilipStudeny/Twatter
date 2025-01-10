@@ -212,6 +212,14 @@ export type PaginatedPostsListResponse = {
   total?: Maybe<Scalars['Int']['output']>;
 };
 
+export type PaginatedReportsListResponse = {
+  __typename?: 'PaginatedReportsListResponse';
+  items?: Maybe<Array<ReportDetail>>;
+  limit?: Maybe<Scalars['Int']['output']>;
+  page?: Maybe<Scalars['Int']['output']>;
+  total?: Maybe<Scalars['Int']['output']>;
+};
+
 export type PaginatedUserReactionsResponse = {
   __typename?: 'PaginatedUserReactionsResponse';
   items?: Maybe<Array<ReactedItemUnion>>;
@@ -254,6 +262,7 @@ export type PostGraphDataDto = {
 
 export type Query = {
   __typename?: 'Query';
+  GetReports: PaginatedReportsListResponse;
   getCommentsList: PaginatedCommentsListResponse;
   getInterests: PaginatedInterestsListResponse;
   getPosts: PaginatedPostsListResponse;
@@ -261,6 +270,13 @@ export type Query = {
   getUserReactions: PaginatedUserReactionsResponse;
   getUsers: PaginatedUsersResponse;
   hello: Scalars['String']['output'];
+};
+
+
+export type QueryGetReportsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  userId: Scalars['String']['input'];
 };
 
 
@@ -339,6 +355,21 @@ export type ReactionsCount = {
   smile: Scalars['Int']['output'];
 };
 
+export type ReportDetail = {
+  __typename?: 'ReportDetail';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['String']['output'];
+  reportMessage?: Maybe<Scalars['String']['output']>;
+  reportStatus: ReportStatus;
+  reportType: ReportType;
+  reportedComment?: Maybe<Scalars['String']['output']>;
+  reportedPost?: Maybe<Scalars['String']['output']>;
+  reportedUser?: Maybe<Scalars['String']['output']>;
+  reporter?: Maybe<UserDetail>;
+  resolutionMessage?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type ReportDto = {
   message: Scalars['String']['input'];
   reportType: ReportType;
@@ -346,6 +377,13 @@ export type ReportDto = {
   reportedPostId?: InputMaybe<Scalars['String']['input']>;
   reportedUserId?: InputMaybe<Scalars['String']['input']>;
 };
+
+export enum ReportStatus {
+  Closed = 'CLOSED',
+  InProgress = 'IN_PROGRESS',
+  Open = 'OPEN',
+  Resolved = 'RESOLVED'
+}
 
 export enum ReportType {
   Abuse = 'ABUSE',
@@ -565,13 +603,31 @@ export type CreateReportMutationVariables = Exact<{
 
 export type CreateReportMutation = { __typename?: 'Mutation', CreateReport: { __typename?: 'GenericResponse', message?: string | null } };
 
+export type GetReportsQueryVariables = Exact<{
+  userId: Scalars['String']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetReportsQuery = { __typename?: 'Query', GetReports: { __typename?: 'PaginatedReportsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'ReportDetail', id: string, reportMessage?: string | null, resolutionMessage?: string | null, reportedUser?: string | null, reportedComment?: string | null, reportedPost?: string | null, reportStatus: ReportStatus, reportType: ReportType, createdAt: any, updatedAt: any }> | null } };
+
+export type GetReportsAdministrationQueryVariables = Exact<{
+  userId: Scalars['String']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetReportsAdministrationQuery = { __typename?: 'Query', GetReports: { __typename?: 'PaginatedReportsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'ReportDetail', id: string, reportStatus: ReportStatus, reportMessage?: string | null, resolutionMessage?: string | null, createdAt: any, updatedAt: any, reportedUser?: string | null, reportedComment?: string | null, reportedPost?: string | null, reporter?: { __typename?: 'UserDetail', id: string, firstName?: string | null, lastName?: string | null, profilePictureUrl?: string | null, username?: string | null } | null }> | null } };
+
 export type GetUsersListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type GetUsersListQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'UserDetail', id: string, email?: string | null, firstName?: string | null, lastName?: string | null }> | null } };
+export type GetUsersListQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'UserDetail', id: string, email?: string | null, firstName?: string | null, lastName?: string | null, username?: string | null, profilePictureUrl?: string | null }> | null } };
 
 export type GetUserQueryVariables = Exact<{
   userId?: InputMaybe<Scalars['String']['input']>;
@@ -1495,6 +1551,146 @@ useCreateReportMutation.getKey = () => ['CreateReport'];
 
 useCreateReportMutation.fetcher = (variables: CreateReportMutationVariables, options?: RequestInit['headers']) => fetcher<CreateReportMutation, CreateReportMutationVariables>(CreateReportDocument, variables, options);
 
+export const GetReportsDocument = /*#__PURE__*/ `
+    query GetReports($userId: String!, $page: Int, $limit: Int) {
+  GetReports(userId: $userId, page: $page, limit: $limit) {
+    items {
+      __typename
+      id
+      reportMessage
+      resolutionMessage
+      reportedUser
+      reportedComment
+      reportedPost
+      reportStatus
+      reportType
+      createdAt
+      updatedAt
+    }
+    total
+    page
+    limit
+  }
+}
+    `;
+
+export const useGetReportsQuery = <
+      TData = GetReportsQuery,
+      TError = GraphQLResponse
+    >(
+      variables: GetReportsQueryVariables,
+      options?: Omit<UseQueryOptions<GetReportsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetReportsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetReportsQuery, TError, TData>(
+      {
+    queryKey: ['GetReports', variables],
+    queryFn: fetcher<GetReportsQuery, GetReportsQueryVariables>(GetReportsDocument, variables),
+    ...options
+  }
+    )};
+
+useGetReportsQuery.document = GetReportsDocument;
+
+useGetReportsQuery.getKey = (variables: GetReportsQueryVariables) => ['GetReports', variables];
+
+export const useInfiniteGetReportsQuery = <
+      TData = InfiniteData<GetReportsQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetReportsQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetReportsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetReportsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetReportsQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetReports.infinite', variables],
+      queryFn: (metaData) => fetcher<GetReportsQuery, GetReportsQueryVariables>(GetReportsDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetReportsQuery.getKey = (variables: GetReportsQueryVariables) => ['GetReports.infinite', variables];
+
+
+useGetReportsQuery.fetcher = (variables: GetReportsQueryVariables, options?: RequestInit['headers']) => fetcher<GetReportsQuery, GetReportsQueryVariables>(GetReportsDocument, variables, options);
+
+export const GetReportsAdministrationDocument = /*#__PURE__*/ `
+    query GetReportsAdministration($userId: String!, $page: Int, $limit: Int) {
+  GetReports(userId: $userId, page: $page, limit: $limit) {
+    items {
+      __typename
+      id
+      reporter {
+        id
+        firstName
+        lastName
+        profilePictureUrl
+        username
+      }
+      reportStatus
+      reportMessage
+      resolutionMessage
+      createdAt
+      updatedAt
+      reportedUser
+      reportedComment
+      reportedPost
+    }
+    total
+    page
+    limit
+  }
+}
+    `;
+
+export const useGetReportsAdministrationQuery = <
+      TData = GetReportsAdministrationQuery,
+      TError = GraphQLResponse
+    >(
+      variables: GetReportsAdministrationQueryVariables,
+      options?: Omit<UseQueryOptions<GetReportsAdministrationQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetReportsAdministrationQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetReportsAdministrationQuery, TError, TData>(
+      {
+    queryKey: ['GetReportsAdministration', variables],
+    queryFn: fetcher<GetReportsAdministrationQuery, GetReportsAdministrationQueryVariables>(GetReportsAdministrationDocument, variables),
+    ...options
+  }
+    )};
+
+useGetReportsAdministrationQuery.document = GetReportsAdministrationDocument;
+
+useGetReportsAdministrationQuery.getKey = (variables: GetReportsAdministrationQueryVariables) => ['GetReportsAdministration', variables];
+
+export const useInfiniteGetReportsAdministrationQuery = <
+      TData = InfiniteData<GetReportsAdministrationQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetReportsAdministrationQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetReportsAdministrationQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetReportsAdministrationQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetReportsAdministrationQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetReportsAdministration.infinite', variables],
+      queryFn: (metaData) => fetcher<GetReportsAdministrationQuery, GetReportsAdministrationQueryVariables>(GetReportsAdministrationDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetReportsAdministrationQuery.getKey = (variables: GetReportsAdministrationQueryVariables) => ['GetReportsAdministration.infinite', variables];
+
+
+useGetReportsAdministrationQuery.fetcher = (variables: GetReportsAdministrationQueryVariables, options?: RequestInit['headers']) => fetcher<GetReportsAdministrationQuery, GetReportsAdministrationQueryVariables>(GetReportsAdministrationDocument, variables, options);
+
 export const GetUsersListDocument = /*#__PURE__*/ `
     query GetUsersList($page: Int = 1, $limit: Int = 10) {
   getUsers(page: $page, limit: $limit) {
@@ -1503,6 +1699,8 @@ export const GetUsersListDocument = /*#__PURE__*/ `
       email
       firstName
       lastName
+      username
+      profilePictureUrl
     }
     total
     page

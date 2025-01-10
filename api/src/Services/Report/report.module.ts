@@ -8,10 +8,11 @@ import { CqrsModule } from "@nestjs/cqrs";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { CreateReportCommandHandler } from "./Mutations/CreateReport/CreateReportCommand";
+import { GetReportsQueryHanlder } from "./Queries/GetReportsQuery";
 import { ReportResolver } from "./report.resolver";
 
 @Module({
 	imports: [CqrsModule, ConfigModule, TypeOrmModule.forFeature([User, Post, Comment, Report])],
-	providers: [ReportResolver, CreateReportCommandHandler],
+	providers: [ReportResolver, CreateReportCommandHandler, GetReportsQueryHanlder],
 })
 export class ReportModule {}

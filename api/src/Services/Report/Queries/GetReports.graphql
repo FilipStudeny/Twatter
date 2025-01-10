@@ -1,0 +1,50 @@
+query GetReports($userId: String!, $page: Int, $limit: Int) {
+	GetReports(userId: $userId, page: $page, limit: $limit) {
+		items {
+			__typename
+			id
+			reportMessage
+			resolutionMessage
+
+			reportedUser
+			reportedComment
+			reportedPost
+
+			reportStatus
+			reportType
+
+			createdAt
+			updatedAt
+		}
+		total
+		page
+		limit
+	}
+}
+
+query GetReportsAdministration($userId: String!, $page: Int, $limit: Int) {
+	GetReports(userId: $userId, page: $page, limit: $limit) {
+		items {
+			__typename
+			id
+			reporter {
+				id
+				firstName
+				lastName
+				profilePictureUrl
+				username
+			}
+			reportStatus
+			reportMessage
+			resolutionMessage
+			createdAt
+			updatedAt
+			reportedUser
+			reportedComment
+			reportedPost
+		}
+		total
+		page
+		limit
+	}
+}

@@ -109,7 +109,7 @@ export const Layout = () => {
 					}}
 				>
 					<Toolbar />
-					<Container maxWidth='md' sx={{ py: 2 }}>
+					<Container maxWidth='lg' sx={{ py: 2 }}>
 						<Outlet />
 					</Container>
 				</Box>

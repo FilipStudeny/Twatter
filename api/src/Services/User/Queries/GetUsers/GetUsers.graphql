@@ -5,6 +5,8 @@ query GetUsersList($page: Int = 1, $limit: Int = 10) {
 			email
 			firstName
 			lastName
+			username
+			profilePictureUrl
 		}
 		total
 		page

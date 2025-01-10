@@ -3,6 +3,7 @@ import SignUpUserData from "@Services/Auth/Mutations/SignUp/SignUpUserData";
 import { CommentDetail } from "@Shared/Response/CommentDetail";
 import { InterestDetail } from "@Shared/Response/InterestDetail";
 import { PostDetail } from "@Shared/Response/PostDetail";
+import { ReportDetail } from "@Shared/Response/ReportDetail";
 import UserDetail from "@Shared/Response/UserDetail";
 import { Mapper } from "@automapper/core";
 import { AutomapperProfile, InjectMapper } from "@automapper/nestjs";
@@ -23,6 +24,7 @@ export default class EntityMapper extends AutomapperProfile {
 			UserDetail.createMap(mapper);
 			InterestDetail.createMap(mapper);
 			SignUpUserData.createMap(mapper);
+			ReportDetail.createMap(mapper);
 		};
 	}
 }

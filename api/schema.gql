@@ -85,6 +85,37 @@ type PostDetail {
   isPinned: Boolean
 }
 
+type ReportDetail {
+  id: String!
+  reporter: UserDetail
+  reportedUser: String
+  reportedComment: String
+  reportedPost: String
+  reportMessage: String
+  resolutionMessage: String
+  reportStatus: ReportStatus!
+  reportType: ReportType!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Different types of report status"""
+enum ReportStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+"""Different types of reports available"""
+enum ReportType {
+  SPAM
+  ABUSE
+  INAPPROPRIATE_CONTENT
+  HARASSMENT
+  OTHER
+}
+
 type GenericResponse {
   message: String
 }
@@ -130,6 +161,13 @@ type PaginatedUserReactionsResponse {
 
 union ReactedItemUnion = PostDetail | CommentDetail
 
+type PaginatedReportsListResponse {
+  total: Int
+  page: Int
+  limit: Int
+  items: [ReportDetail!]
+}
+
 type PaginatedUsersResponse {
   total: Int
   page: Int
@@ -138,6 +176,7 @@ type PaginatedUsersResponse {
 }
 
 type Query {
+  GetReports(userId: String!, page: Int = 1, limit: Int = 10): PaginatedReportsListResponse!
   hello: String!
   getInterests(page: Int! = 1, limit: Int! = 10, interestId: String): PaginatedInterestsListResponse!
   getUserReactions(userId: String!, page: Int = 1, limit: Int = 10): PaginatedUserReactionsResponse!
@@ -177,15 +216,6 @@ input ReportDto {
   reportedPostId: String
   reportedCommentId: String
   reportedUserId: String
-}
-
-"""Different types of reports available"""
-enum ReportType {
-  SPAM
-  ABUSE
-  INAPPROPRIATE_CONTENT
-  HARASSMENT
-  OTHER
 }
 
 input SignInCredentials {

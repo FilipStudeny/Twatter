@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { SignInResponse, UserDetail } from "../../../shared";
+import { setAuthorizationHeader, SignInResponse, UserDetail } from "../../../shared";
 
 enum UserSession {
 	accessToken = "accessToken",
@@ -18,6 +18,8 @@ type AuthenticationState = {
 export const useAuthenticationStore = create<AuthenticationState>((set) => ({
 	isLoggedIn: localStorage.getItem(UserSession.isAuthenticated) === "true",
 	signIn: (signInResponse: SignInResponse) => {
+		setAuthorizationHeader(signInResponse.accessToken);
+
 		localStorage.setItem(UserSession.isAuthenticated, "true");
 		localStorage.setItem(UserSession.accessToken, signInResponse.accessToken);
 		localStorage.setItem(UserSession.refreshToken, signInResponse.refreshToken);
@@ -30,6 +32,7 @@ export const useAuthenticationStore = create<AuthenticationState>((set) => ({
 		localStorage.removeItem(UserSession.accessToken);
 		localStorage.removeItem(UserSession.refreshToken);
 		localStorage.removeItem(UserSession.userData);
+		setAuthorizationHeader();
 
 		set({ isLoggedIn: false });
 	},

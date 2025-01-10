@@ -110,4 +110,36 @@ export class DbResponse {
 	comment_createdat: Date;
 
 	comment_updatedat: Date;
+
+	report_id: string;
+
+	report_message: string;
+
+	report_resolutionMessage: string;
+
+	report_status: string;
+
+	report_createdAt: Date;
+
+	report_updatedAt: Date;
+
+	reporter_id: string;
+
+	reporter_username: string;
+
+	reporter_firstName: string;
+
+	reporter_lastName: string;
+
+	reporter_profilePictureUrl: string;
+
+	comment_creator_id: string;
+
+	comment_creator_username: string;
+
+	comment_creator_firstName: string;
+
+	comment_creator_lastName: string;
+
+	comment_creator_profilePictureUrl: string;
 }

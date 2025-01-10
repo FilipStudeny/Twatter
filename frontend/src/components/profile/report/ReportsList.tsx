@@ -1,34 +1,33 @@
-import SinglePost from "@Components/post/SinglePost";
-import Comment from "@Components/post/comments/Comment";
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
 import { Box, Button, CircularProgress, Alert, Stack } from "@mui/material";
 import React from "react";
 
 import { useInfiniteScroll } from "hooks/infiniteScroll";
 
-import { CommentDetail, PostDetail, useInfiniteGetUserReactionsQuery } from "../../../../shared";
+import { ReportDetail, useInfiniteGetReportsQuery } from "../../../../../shared";
+import ReportCard from "./ReportCard";
 
-interface UserReactionsProps {
+interface FilledReportsListProps {
 	userId: string,
 }
 
-const UserReactions: React.FC<UserReactionsProps> = ({ userId }) => {
+const FilledReportsList: React.FC<FilledReportsListProps> = ({ userId }) => {
 	const {
-		data: reactionsPages,
-		isLoading: isLoadingReactions,
-		isError: reactionsFetchFailed,
-		error: reactionsError,
+		data: reportsPages,
+		isLoading: isLoadingReports,
+		isError: reportsFetchFailed,
+		error: reportsError,
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
-	} = useInfiniteGetUserReactionsQuery(
+	} = useInfiniteGetReportsQuery(
 		{ page: 0, limit: 0, userId },
 		{
 			initialPageParam: { page: 1, limit: 2, userId },
 			getNextPageParam: (lastPage) => {
-				const currentPage = lastPage?.getUserReactions?.page ?? 1;
-				const limit = lastPage?.getUserReactions?.limit ?? 5;
-				const total = lastPage?.getUserReactions?.total ?? 0;
+				const currentPage = lastPage?.GetReports?.page ?? 1;
+				const limit = lastPage?.GetReports?.limit ?? 5;
+				const total = lastPage?.GetReports?.total ?? 0;
 				if (currentPage * limit < total) {
 					return { page: currentPage + 1, limit };
 				}
@@ -40,43 +39,41 @@ const UserReactions: React.FC<UserReactionsProps> = ({ userId }) => {
 
 	const { sentinelRef } = useInfiniteScroll(Boolean(hasNextPage), isFetchingNextPage, fetchNextPage);
 
-	const allReactions: Array<CommentDetail | PostDetail> =
-		reactionsPages?.pages.flatMap((page) => page?.getUserReactions?.items ?? []) ?? [];
+	const allReports: ReportDetail[] = reportsPages?.pages.flatMap((page) => page?.GetReports.items ?? []) ?? [];
 
 	return (
 		<Box sx={{ mt: 3 }}>
-			{isLoadingReactions && (
+			{/* Loading State */}
+			{isLoadingReports && (
 				<Box display='flex' justifyContent='center' mb={2}>
 					<CircularProgress />
 				</Box>
 			)}
 
-			{reactionsFetchFailed && (
+			{/* Error State */}
+			{reportsFetchFailed && (
 				<Alert severity='error' sx={{ mb: 2 }}>
-					{GET_ERROR_LIST(reactionsError).map((errMsg, idx) => (
+					{GET_ERROR_LIST(reportsError).map((errMsg, idx) => (
 						<div key={idx}>{errMsg}</div>
 					))}
 				</Alert>
 			)}
 
-			{!isLoadingReactions && !reactionsFetchFailed && allReactions.length === 0 && (
+			{/* No Data State */}
+			{!isLoadingReports && !reportsFetchFailed && allReports.length === 0 && (
 				<Alert severity='info' sx={{ mb: 2 }}>
-					No reactions available.
+					No reports available.
 				</Alert>
 			)}
 
+			{/* Report List */}
 			<Stack spacing={2}>
-				{allReactions.map((reaction) => {
-					if (reaction.__typename === "CommentDetail") {
-						return (
-							<Comment key={reaction.id} comment={reaction}/>
-						);
-					} else {
-						return <SinglePost key={reaction.id} post={reaction as PostDetail} canOpenComments />;
-					}
-				})}
+				{allReports.map((report: ReportDetail) => (
+					<ReportCard key={report.id} report={report} />
+				))}
 			</Stack>
 
+			{/* Load More Button */}
 			{hasNextPage && (
 				<>
 					<Box mt={2} textAlign='center'>
@@ -84,16 +81,16 @@ const UserReactions: React.FC<UserReactionsProps> = ({ userId }) => {
 							variant='outlined'
 							onClick={() => fetchNextPage()}
 							disabled={isFetchingNextPage}
-							aria-label={isFetchingNextPage ? "Loading more reactions" : "Load more reactions"}
+							aria-label={isFetchingNextPage ? "Loading more reports" : "Load more reports"}
 						>
 							{isFetchingNextPage ? "Loading..." : "Load More"}
 						</Button>
 					</Box>
-
 					<Box ref={sentinelRef} height='1px' />
 				</>
 			)}
 
+			{/* Fetching More State */}
 			{isFetchingNextPage && (
 				<Box display='flex' justifyContent='center' mt={2}>
 					<CircularProgress />
@@ -103,4 +100,4 @@ const UserReactions: React.FC<UserReactionsProps> = ({ userId }) => {
 	);
 };
 
-export default UserReactions;
+export default FilledReportsList;
