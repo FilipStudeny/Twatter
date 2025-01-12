@@ -1,83 +1,97 @@
-// SinglePost.tsx
 import { RouterLink } from "@Components/navigation/routerLink";
 import { ReportButton } from "@Components/report/ReportButton";
-import CategoryIcon from "@mui/icons-material/Category";
-import CommentIcon from "@mui/icons-material/Comment";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import GroupIcon from "@mui/icons-material/Group";
-import MoodIcon from "@mui/icons-material/Mood";
-import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
-import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import { Card, CardHeader, CardContent, Typography, Stack, Chip, Avatar, Box, Dialog } from "@mui/material";
+import {
+	Category as CategoryIcon,
+	Comment as CommentIcon,
+	Favorite as FavoriteIcon,
+	Group as GroupIcon,
+	Mood as MoodIcon,
+	SentimentDissatisfied as SentimentDissatisfiedIcon,
+	SentimentVeryDissatisfied as SentimentVeryDissatisfiedIcon,
+	ThumbDown as ThumbDownIcon,
+	ThumbUp as ThumbUpIcon,
+	ZoomIn as ZoomInIcon,
+} from "@mui/icons-material";
+import {
+	Avatar,
+	Box,
+	Card,
+	CardContent,
+	CardHeader,
+	Chip,
+	Dialog,
+	IconButton,
+	Stack,
+	Tooltip,
+	Typography,
+	useTheme,
+} from "@mui/material";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import CommentsModal from "./comments/CommentsModal";
 import { PostDetail } from "../../../../shared";
 
-const reactionIcons: Record<string, JSX.Element> = {
-	like: <ThumbUpIcon fontSize='small' />,
-	dislike: <ThumbDownIcon fontSize='small' />,
-	sad: <SentimentDissatisfiedIcon fontSize='small' />,
-	smile: <MoodIcon fontSize='small' />,
-	angry: <SentimentVeryDissatisfiedIcon fontSize='small' />,
-	love: <FavoriteIcon fontSize='small' />,
-};
-
-const reactionChipColors: Record<
-	string,
-	"default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"
-> = {
-	like: "success",
-	dislike: "error",
-	sad: "info",
-	smile: "warning",
-	angry: "error",
-	love: "primary",
-};
+const REACTION_CONFIG = {
+	like: {
+		icon: <ThumbUpIcon fontSize='small' />,
+		color: "success",
+		label: "Likes",
+	},
+	dislike: {
+		icon: <ThumbDownIcon fontSize='small' />,
+		color: "error",
+		label: "Dislikes",
+	},
+	sad: {
+		icon: <SentimentDissatisfiedIcon fontSize='small' />,
+		color: "info",
+		label: "Sad reactions",
+	},
+	smile: {
+		icon: <MoodIcon fontSize='small' />,
+		color: "warning",
+		label: "Happy reactions",
+	},
+	angry: {
+		icon: <SentimentVeryDissatisfiedIcon fontSize='small' />,
+		color: "error",
+		label: "Angry reactions",
+	},
+	love: {
+		icon: <FavoriteIcon fontSize='small' />,
+		color: "primary",
+		label: "Love reactions",
+	},
+} as const;
 
 interface SinglePostProps {
 	post: PostDetail,
-	canOpenComments: boolean,
+	canOpenComments?: boolean,
 }
 
-const SinglePost: React.FC<SinglePostProps> = ({ post, canOpenComments }) => {
+export function SinglePost({ post, canOpenComments = false }: SinglePostProps) {
+	const theme = useTheme();
 	const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 	const [isImageOpen, setIsImageOpen] = useState(false);
 
-	const handleCommentsOpen = () => {
-		setIsCommentsOpen(true);
-	};
-
-	const handleCommentsClose = () => {
-		setIsCommentsOpen(false);
-	};
-
-	const handleImageClick = () => {
-		setIsImageOpen(true);
-	};
-
-	const handleImageClose = () => {
-		setIsImageOpen(false);
-	};
-
-	// Fallback for user’s avatar letter
-	const avatarLetter = post.creator.username ? post.creator.username.charAt(0).toUpperCase() : "?";
+	const avatarLetter = post.creator.username?.charAt(0).toUpperCase() ?? "?";
 
 	return (
 		<>
 			<Card
+				elevation={2}
 				sx={{
-					mb: 2,
-					maxWidth: "100%",
 					borderRadius: 2,
-					elevation: 2,
+					transition: theme.transitions.create(["box-shadow"]),
+					"&:hover": {
+						boxShadow: theme.shadows[4],
+					},
 				}}
 			>
 				<CardHeader
-					avatar={<Avatar>{avatarLetter}</Avatar>}
+					avatar={<Avatar src={post.creator.profilePictureUrl || undefined}>{avatarLetter}</Avatar>}
+					action={<ReportButton reportTarget={post} />}
 					title={
 						<Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
 							{post.creator.username}
@@ -88,141 +102,220 @@ const SinglePost: React.FC<SinglePostProps> = ({ post, canOpenComments }) => {
 							{dayjs(post.createdAt).format("MMM D, YYYY h:mm A")}
 						</Typography>
 					}
-					action={<ReportButton reportTarget={post} />}
-					sx={{ pb: 1, pt: 2 }}
+					sx={{ pb: 1 }}
 				/>
 
-				<CardContent sx={{ pt: 0 }}>
-					{/* Post text content */}
+				<CardContent>
+					{/* Content section remains the same */}
 					{post.content && (
 						<RouterLink to={`/post/${post.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-							<Typography variant='body2' sx={{ mb: 2, whiteSpace: "pre-line" }}>
+							<Typography
+								variant='body2'
+								sx={{
+									mb: 2,
+									whiteSpace: "pre-line",
+									"&:hover": {
+										color: theme.palette.primary.main,
+									},
+								}}
+							>
 								{post.content}
 							</Typography>
 						</RouterLink>
 					)}
 
-					{/* Clickable post picture (if present) */}
+					{/* Image section remains the same */}
 					{post.postPicture && (
-						<Box
-							sx={{
-								display: "flex",
-								justifyContent: "center",
-								mb: 2,
-								cursor: "pointer",
-							}}
-							onClick={handleImageClick}
-						>
+						<Box sx={{ position: "relative", mb: 2 }}>
 							<Box
 								component='img'
 								src={post.postPicture}
-								alt={`Post ${post.id} image`}
+								alt={`Post by ${post.creator.username}`}
 								sx={{
-									height: 233,
 									width: "100%",
-									maxHeight: { xs: 233, md: 167 },
 									borderRadius: 2,
+									aspectRatio: "16/9",
 									objectFit: "cover",
+									cursor: "pointer",
+									transition: theme.transitions.create(["transform", "filter"]),
+									"&:hover": {
+										transform: "scale(1.01)",
+										filter: "brightness(0.95)",
+									},
 								}}
+								onClick={() => setIsImageOpen(true)}
 							/>
+							<IconButton
+								size='small'
+								sx={{
+									position: "absolute",
+									right: 8,
+									bottom: 8,
+									bgcolor: "rgba(0, 0, 0, 0.5)",
+									color: "white",
+									"&:hover": {
+										bgcolor: "rgba(0, 0, 0, 0.7)",
+									},
+								}}
+								onClick={() => setIsImageOpen(true)}
+							>
+								<ZoomInIcon fontSize='small' />
+							</IconButton>
 						</Box>
 					)}
 
-					{/* Reactions (if any) */}
-					{post.reactions && (
-						<Stack direction='row' spacing={1} sx={{ mb: 2, flexWrap: "wrap" }}>
-							{Object.entries(post.reactions).map(([reactionType, count]) => (
-								<Chip
-									key={reactionType}
-									icon={reactionIcons[reactionType]}
-									label={count}
-									size='small'
-									variant='outlined'
-									color={reactionChipColors[reactionType] ?? "default"}
-									sx={{ textTransform: "capitalize" }}
-								/>
-							))}
+					{/* Updated reactions section */}
+					{post.reactions && Object.keys(post.reactions).length > 0 && (
+						<Stack
+							direction='row'
+							spacing={1}
+							sx={{
+								mb: 2,
+								flexWrap: "wrap",
+								gap: 0.5,
+							}}
+						>
+							{Object.entries(post.reactions).map(
+								([type, count]) =>
+									(count as number) > 0 && (
+										<Tooltip
+											key={type}
+											title={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.label}
+										>
+											<Chip
+												icon={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.icon}
+												label={count}
+												size='small'
+												variant='outlined'
+												color={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.color}
+												sx={{
+													textTransform: "capitalize",
+													fontWeight: 500,
+													height: "28px",
+													borderRadius: 2,
+													transition: "all 0.2s ease-in-out",
+													"& .MuiChip-icon": {
+														fontSize: "0.9rem",
+														marginLeft: "4px",
+													},
+													"& .MuiChip-label": {
+														px: 1,
+														fontSize: "0.8rem",
+													},
+													"&:hover": {
+														transform: "translateY(-1px)",
+														boxShadow: (theme) => `0 2px 8px ${theme.palette.action.hover}`,
+														backgroundColor: "action.hover",
+													},
+												}}
+											/>
+										</Tooltip>
+									),
+							)}
 						</Stack>
 					)}
 
-					{/* Interest, group, and comment count */}
-					<Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-						<Typography
-							variant='caption'
-							color='text.secondary'
+					{/* Bottom chips section */}
+					<Stack
+						direction='row'
+						spacing={2}
+						sx={{
+							flexWrap: "wrap",
+							gap: 2,
+						}}
+					>
+						<Chip
+							icon={<CategoryIcon />}
+							label={post.interest?.name ?? "—"}
+							size='small'
+							variant='outlined'
+							color='default'
 							sx={{
-								display: "flex",
-								alignItems: "center",
-								gap: 0.5,
-								cursor: "pointer",
+								height: "28px",
+								borderRadius: 2,
+								transition: "all 0.2s ease-in-out",
+								"&:hover": {
+									transform: "translateY(-1px)",
+									boxShadow: (theme) => `0 2px 8px ${theme.palette.action.hover}`,
+									backgroundColor: "action.hover",
+								},
 							}}
-							onClick={canOpenComments ? handleCommentsOpen : undefined}
-						>
-							<CategoryIcon fontSize='inherit' />
-							{post.interest?.name ?? "—"}
-						</Typography>
+							clickable
+						/>
 
 						{post.group && (
-							<Typography
-								variant='caption'
-								color='text.secondary'
+							<Chip
+								icon={<GroupIcon />}
+								label={post.group.name}
+								size='small'
+								variant='outlined'
+								color='default'
 								sx={{
-									display: "flex",
-									alignItems: "center",
-									gap: 0.5,
+									height: "28px",
+									borderRadius: 2,
+									transition: "all 0.2s ease-in-out",
+									"&:hover": {
+										transform: "translateY(-1px)",
+										boxShadow: (theme) => `0 2px 8px ${theme.palette.action.hover}`,
+										backgroundColor: "action.hover",
+									},
 								}}
-							>
-								<GroupIcon fontSize='inherit' />
-								{post.group.name}
-							</Typography>
+							/>
 						)}
 
-						<Typography
-							variant='caption'
-							color='text.secondary'
-							sx={{
-								display: "flex",
-								alignItems: "center",
-								gap: 0.5,
-								cursor: "pointer",
-							}}
-							onClick={handleCommentsOpen}
-						>
-							<CommentIcon fontSize='inherit' />
-							Comments: {post.commentsCount ?? 0}
-						</Typography>
-					</Box>
+						{canOpenComments && (
+							<Chip
+								icon={<CommentIcon />}
+								label={`Comments: ${post.commentsCount ?? 0}`}
+								size='small'
+								variant='outlined'
+								color='primary'
+								clickable
+								onClick={() => setIsCommentsOpen(true)}
+								sx={{
+									height: "28px",
+									borderRadius: 2,
+									transition: "all 0.2s ease-in-out",
+									"&:hover": {
+										transform: "translateY(-1px)",
+										boxShadow: (theme) => `0 2px 8px ${theme.palette.action.hover}`,
+										backgroundColor: "action.hover",
+									},
+								}}
+							/>
+						)}
+					</Stack>
 				</CardContent>
 			</Card>
 
-			{/* Comments Modal */}
-			<CommentsModal open={isCommentsOpen} onClose={handleCommentsClose} postId={post.id} />
+			<CommentsModal open={isCommentsOpen} onClose={() => setIsCommentsOpen(false)} postId={post.id} />
 
-			{/* Image Modal */}
 			<Dialog
 				open={isImageOpen}
-				onClose={handleImageClose}
+				onClose={() => setIsImageOpen(false)}
 				maxWidth='lg'
 				PaperProps={{
 					sx: {
-						backgroundColor: "transparent",
+						bgcolor: "transparent",
 						boxShadow: "none",
+						maxHeight: "90vh",
+						maxWidth: "90vw",
 					},
 				}}
 			>
 				<Box
 					component='img'
 					src={post.postPicture ?? ""}
-					alt={`Fullscreen post ${post.id} image`}
+					alt={`Post by ${post.creator.username}`}
 					sx={{
-						maxWidth: "90vw",
-						maxHeight: "90vh",
+						width: "100%",
+						height: "100%",
 						objectFit: "contain",
 					}}
 				/>
 			</Dialog>
 		</>
 	);
-};
+}
 
 export default SinglePost;

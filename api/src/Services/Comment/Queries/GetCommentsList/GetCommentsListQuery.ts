@@ -78,6 +78,9 @@ export class GetCommentsListQueryHandler implements IQueryHandler<GetCommentsLis
 			if (requestedFields.creator.lastName) {
 				creatorFields.push('creator."lastName" AS "creator_lastName"');
 			}
+			if (requestedFields.creator.profilePictureUrl) {
+				creatorFields.push('creator."profilePictureUrl" AS "creator_profilePictureUrl"');
+			}
 			if (creatorFields.length > 0) {
 				qb.addSelect(creatorFields);
 			}

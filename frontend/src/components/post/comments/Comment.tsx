@@ -11,61 +11,89 @@ interface CommentProps {
 }
 
 const Comment: React.FC<CommentProps> = ({ comment }) => {
+	// Get avatar fallback letter from username
+	const avatarFallback = comment.creator.username?.charAt(0).toUpperCase() ?? "?";
 
 	return (
 		<Paper
 			variant='outlined'
 			sx={{
-				p: 2,
-				borderRadius: 3,
-				transition: "box-shadow 0.2s",
-				boxShadow: "none",
+				p: 2.5,
+				borderRadius: 4,
+				transition: "all 0.2s ease-in-out",
+				backgroundColor: "background.paper",
+				borderColor: "divider",
 				"&:hover": {
-					boxShadow: 3,
+					boxShadow: (theme) => `0 4px 20px ${theme.palette.divider}`,
+					transform: "translateY(-2px)",
 				},
 			}}
 		>
-			<Stack direction='row' spacing={2} alignItems='flex-start'>
+			<Stack direction='row' spacing={2.5} alignItems='flex-start'>
 				<Avatar
-					src={comment.creator.firstName || undefined}
+					src={comment.creator.profilePictureUrl || undefined}
 					sx={{
 						width: 48,
 						height: 48,
-						boxShadow: 1,
+						fontSize: "1.2rem",
+						fontWeight: "bold",
 					}}
 				>
-					{(!comment.creator.firstName && comment.creator.username?.charAt(0).toUpperCase()) || "?"}
+					{avatarFallback}
 				</Avatar>
-
 				<Box sx={{ flexGrow: 1 }}>
-					{/* Row 1: Username + Timestamp + Report */}
 					<Stack
 						direction='row'
 						spacing={1}
 						alignItems='center'
 						justifyContent='space-between'
-						sx={{ mb: 1 }}
+						sx={{ mb: 1.5 }}
 					>
 						<Stack direction='row' spacing={2} alignItems='center'>
-							<Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+							<Typography
+								variant='subtitle1'
+								sx={{
+									fontWeight: 600,
+									fontSize: "0.95rem",
+									letterSpacing: "-0.02em",
+									color: "text.primary",
+								}}
+							>
 								{comment.creator.username}
 							</Typography>
-							<Typography variant='caption' color='text.secondary'>
+							<Typography
+								variant='caption'
+								sx={{
+									color: "text.secondary",
+									fontSize: "0.8rem",
+								}}
+							>
 								{dayjs(comment.createdAt).format("MMM D, YYYY h:mm A")}
 							</Typography>
 						</Stack>
-
 						<ReportButton reportTarget={comment} />
 					</Stack>
-
-					{/* Row 2: Main comment text */}
-					<Typography variant='body2' sx={{ whiteSpace: "pre-line", mb: 1.5 }}>
+					<Typography
+						variant='body2'
+						sx={{
+							whiteSpace: "pre-line",
+							mb: 2,
+							lineHeight: 1.6,
+							color: "text.primary",
+							fontSize: "0.925rem",
+						}}
+					>
 						{comment.content}
 					</Typography>
-
-					{/* Row 3: Reactions */}
 					{comment.reactions && (
-						<Stack direction='row' spacing={1} sx={{ flexWrap: "wrap" }}>
+						<Stack
+							direction='row'
+							spacing={1}
+							sx={{
+								flexWrap: "wrap",
+								gap: 0.5,
+							}}
+						>
 							{Object.entries(comment.reactions).map(
 								([reactionType, count]) =>
 									(count as number) > 0 && (
@@ -79,10 +107,21 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
 											sx={{
 												textTransform: "capitalize",
 												fontWeight: 500,
-												cursor: "pointer",
-												transition: "background-color 0.3s",
+												height: "28px",
+												borderRadius: 2,
+												transition: "all 0.2s ease-in-out",
+												"& .MuiChip-icon": {
+													fontSize: "0.9rem",
+													marginLeft: "4px",
+												},
+												"& .MuiChip-label": {
+													px: 1,
+													fontSize: "0.8rem",
+												},
 												"&:hover": {
-													backgroundColor: (theme) => theme.palette.action.hover,
+													transform: "translateY(-1px)",
+													boxShadow: (theme) => `0 2px 8px ${theme.palette.action.hover}`,
+													backgroundColor: "action.hover",
 												},
 											}}
 										/>

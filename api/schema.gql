@@ -178,7 +178,7 @@ type PaginatedUsersResponse {
 type Query {
   GetReports(userId: String!, page: Int = 1, limit: Int = 10): PaginatedReportsListResponse!
   hello: String!
-  getInterests(page: Int! = 1, limit: Int! = 10, interestId: String): PaginatedInterestsListResponse!
+  GetInterests(page: Int! = 1, limit: Int! = 10, interestId: String): PaginatedInterestsListResponse!
   getUserReactions(userId: String!, page: Int = 1, limit: Int = 10): PaginatedUserReactionsResponse!
   getCommentsList(page: Int!, limit: Int!, creatorId: String, postId: String, id: String): PaginatedCommentsListResponse!
   getPostsStatistics(filter: GraphFilter!, year: Int, weekNumber: Int): [PostGraphDataDto!]!

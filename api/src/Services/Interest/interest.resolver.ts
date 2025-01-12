@@ -24,7 +24,7 @@ export default class InterestResolver {
 
 	@Query(() => PaginatedInterestsListResponse)
 	@Public()
-	async getInterests(
+	async GetInterests(
 		@Args("page", { type: () => Int, defaultValue: 1 }) page: number,
 		@Args("limit", { type: () => Int, defaultValue: 10 }) limit: number,
 		@Args("interestId", { type: () => String, nullable: true }) interestId: string,

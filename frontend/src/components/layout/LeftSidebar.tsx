@@ -2,10 +2,8 @@
 
 import { RouterLink } from "@Components/navigation/routerLink";
 import {
-	PersonPinCircleOutlined,
 	Home as HomeIcon,
 	Search as SearchIcon,
-	Dashboard as DashboardIcon,
 	Settings as SettingsIcon,
 	ExpandLess,
 	ExpandMore,
@@ -14,6 +12,8 @@ import {
 	Logout as LogoutIcon,
 	HelpOutline as HelpOutlineIcon,
 	Info as InfoIcon,
+	PeopleOutlineOutlined,
+	Person,
 } from "@mui/icons-material";
 import {
 	Drawer,
@@ -119,19 +119,18 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 				)}
 				{/* Navigation List */}
 				<List component='nav'>
-					{/* Profile */}
+					{/* Home */}
 					<ListItem disablePadding>
 						<RouterLink
-							to='/profile/$id'
-							params={{ id: user?.id ?? "" }}
+							to='/'
 							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
 							onClick={handleNavItemClick}
 						>
-							<ListItemButton selected={isActive("/profile/$id")}>
+							<ListItemButton selected={isActive("/")}>
 								<ListItemIcon>
-									<PersonPinCircleOutlined />
+									<HomeIcon />
 								</ListItemIcon>
-								<ListItemText primary='Profile' />
+								<ListItemText primary='Home' />
 							</ListItemButton>
 						</RouterLink>
 					</ListItem>
@@ -144,30 +143,29 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 						>
 							<ListItemButton selected={isActive("/users")}>
 								<ListItemIcon>
-									<PersonPinCircleOutlined />
+									<PeopleOutlineOutlined />
 								</ListItemIcon>
 								<ListItemText primary='Users' />
 							</ListItemButton>
 						</RouterLink>
 					</ListItem>
 
-					{/* Home */}
 					<ListItem disablePadding>
 						<RouterLink
-							to='/home'
+							to='/users/$id'
+							params={{ id: user?.id ?? "" }}
 							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
 							onClick={handleNavItemClick}
 						>
-							<ListItemButton selected={isActive("/home")}>
+							<ListItemButton selected={isActive("/users/$id")}>
 								<ListItemIcon>
-									<HomeIcon />
+									<Person />
 								</ListItemIcon>
-								<ListItemText primary='Home' />
+								<ListItemText primary='Profile' />
 							</ListItemButton>
 						</RouterLink>
 					</ListItem>
 
-					{/* Search */}
 					<ListItem disablePadding>
 						<RouterLink
 							to='/search'
@@ -181,22 +179,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 									<SearchIcon />
 								</ListItemIcon>
 								<ListItemText primary='Search' />
-							</ListItemButton>
-						</RouterLink>
-					</ListItem>
-
-					{/* Dashboard */}
-					<ListItem disablePadding>
-						<RouterLink
-							to='/home' // Corrected path
-							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
-							onClick={handleNavItemClick}
-						>
-							<ListItemButton selected={isActive("/dashboard")}>
-								<ListItemIcon>
-									<DashboardIcon />
-								</ListItemIcon>
-								<ListItemText primary='Dashboard' />
 							</ListItemButton>
 						</RouterLink>
 					</ListItem>
@@ -216,7 +198,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 							{/* Profile Settings */}
 							<ListItem disablePadding>
 								<RouterLink
-									to='/home'
+									to='/'
 									style={{ textDecoration: "none", width: "100%", color: "inherit" }}
 									onClick={handleNavItemClick}
 								>
@@ -231,7 +213,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 							{/* Account Settings */}
 							<ListItem disablePadding>
 								<RouterLink
-									to='/home'
+									to='/'
 									style={{ textDecoration: "none", width: "100%", color: "inherit" }}
 									onClick={handleNavItemClick}
 								>
@@ -249,7 +231,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 					{/* Users */}
 					<ListItem disablePadding>
 						<RouterLink
-							to='/home'
+							to='/'
 							style={{ textDecoration: "none", width: "100%", color: "inherit" }}
 							onClick={handleNavItemClick}
 						>

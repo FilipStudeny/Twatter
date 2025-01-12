@@ -1,0 +1,9 @@
+query GetInterests {
+	GetInterests {
+		items {
+			id
+			name
+		}
+		total
+	}
+}

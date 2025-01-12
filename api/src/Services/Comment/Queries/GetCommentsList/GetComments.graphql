@@ -9,6 +9,7 @@ query GetCommentsByPostId($postId: String!, $page: Int!, $limit: Int!) {
 				username
 				firstName
 				lastName
+				profilePictureUrl
 			}
 			postId
 			reactions {
@@ -39,6 +40,7 @@ query GetCommentsByCreatorId($creatorId: String!, $page: Int!, $limit: Int!) {
 				username
 				firstName
 				lastName
+				profilePictureUrl
 			}
 			postId
 			reactions {
