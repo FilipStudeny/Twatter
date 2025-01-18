@@ -15,6 +15,8 @@ import { Route as SearchImport } from './routes/search'
 import { Route as ProfileImport } from './routes/profile'
 import { Route as IndexImport } from './routes/index'
 import { Route as UsersIndexImport } from './routes/users/index'
+import { Route as SettingsProfileImport } from './routes/settings/profile'
+import { Route as SettingsAccountImport } from './routes/settings/account'
 import { Route as PostIdImport } from './routes/post/$id'
 import { Route as AuthenticationSignUpImport } from './routes/_authentication/sign-up'
 import { Route as AuthenticationSignInImport } from './routes/_authentication/sign-in'
@@ -45,6 +47,18 @@ const IndexRoute = IndexImport.update({
 const UsersIndexRoute = UsersIndexImport.update({
   id: '/users/',
   path: '/users/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SettingsProfileRoute = SettingsProfileImport.update({
+  id: '/settings/profile',
+  path: '/settings/profile',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SettingsAccountRoute = SettingsAccountImport.update({
+  id: '/settings/account',
+  path: '/settings/account',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -138,6 +152,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostIdImport
       parentRoute: typeof rootRoute
     }
+    '/settings/account': {
+      id: '/settings/account'
+      path: '/settings/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof SettingsAccountImport
+      parentRoute: typeof rootRoute
+    }
+    '/settings/profile': {
+      id: '/settings/profile'
+      path: '/settings/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof SettingsProfileImport
+      parentRoute: typeof rootRoute
+    }
     '/users/': {
       id: '/users/'
       path: '/users'
@@ -172,6 +200,8 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof AuthenticationSignInRoute
   '/sign-up': typeof AuthenticationSignUpRoute
   '/post/$id': typeof PostIdRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/profile': typeof SettingsProfileRoute
   '/users': typeof UsersIndexRoute
   '/users/$id/reports': typeof UsersIdReportsRoute
   '/users/$id': typeof UsersIdIndexRoute
@@ -185,6 +215,8 @@ export interface FileRoutesByTo {
   '/sign-in': typeof AuthenticationSignInRoute
   '/sign-up': typeof AuthenticationSignUpRoute
   '/post/$id': typeof PostIdRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/profile': typeof SettingsProfileRoute
   '/users': typeof UsersIndexRoute
   '/users/$id/reports': typeof UsersIdReportsRoute
   '/users/$id': typeof UsersIdIndexRoute
@@ -199,6 +231,8 @@ export interface FileRoutesById {
   '/_authentication/sign-in': typeof AuthenticationSignInRoute
   '/_authentication/sign-up': typeof AuthenticationSignUpRoute
   '/post/$id': typeof PostIdRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/profile': typeof SettingsProfileRoute
   '/users/': typeof UsersIndexRoute
   '/users/$id/reports': typeof UsersIdReportsRoute
   '/users/$id/': typeof UsersIdIndexRoute
@@ -214,6 +248,8 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/post/$id'
+    | '/settings/account'
+    | '/settings/profile'
     | '/users'
     | '/users/$id/reports'
     | '/users/$id'
@@ -226,6 +262,8 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/post/$id'
+    | '/settings/account'
+    | '/settings/profile'
     | '/users'
     | '/users/$id/reports'
     | '/users/$id'
@@ -238,6 +276,8 @@ export interface FileRouteTypes {
     | '/_authentication/sign-in'
     | '/_authentication/sign-up'
     | '/post/$id'
+    | '/settings/account'
+    | '/settings/profile'
     | '/users/'
     | '/users/$id/reports'
     | '/users/$id/'
@@ -252,6 +292,8 @@ export interface RootRouteChildren {
   AuthenticationSignInRoute: typeof AuthenticationSignInRoute
   AuthenticationSignUpRoute: typeof AuthenticationSignUpRoute
   PostIdRoute: typeof PostIdRoute
+  SettingsAccountRoute: typeof SettingsAccountRoute
+  SettingsProfileRoute: typeof SettingsProfileRoute
   UsersIndexRoute: typeof UsersIndexRoute
   UsersIdReportsRoute: typeof UsersIdReportsRoute
   UsersIdIndexRoute: typeof UsersIdIndexRoute
@@ -265,6 +307,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticationSignInRoute: AuthenticationSignInRoute,
   AuthenticationSignUpRoute: AuthenticationSignUpRoute,
   PostIdRoute: PostIdRoute,
+  SettingsAccountRoute: SettingsAccountRoute,
+  SettingsProfileRoute: SettingsProfileRoute,
   UsersIndexRoute: UsersIndexRoute,
   UsersIdReportsRoute: UsersIdReportsRoute,
   UsersIdIndexRoute: UsersIdIndexRoute,
@@ -287,6 +331,8 @@ export const routeTree = rootRoute
         "/_authentication/sign-in",
         "/_authentication/sign-up",
         "/post/$id",
+        "/settings/account",
+        "/settings/profile",
         "/users/",
         "/users/$id/reports",
         "/users/$id/"
@@ -312,6 +358,12 @@ export const routeTree = rootRoute
     },
     "/post/$id": {
       "filePath": "post/$id.tsx"
+    },
+    "/settings/account": {
+      "filePath": "settings/account.tsx"
+    },
+    "/settings/profile": {
+      "filePath": "settings/profile.tsx"
     },
     "/users/": {
       "filePath": "users/index.tsx"

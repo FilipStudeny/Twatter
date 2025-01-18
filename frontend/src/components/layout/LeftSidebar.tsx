@@ -198,7 +198,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 							{/* Profile Settings */}
 							<ListItem disablePadding>
 								<RouterLink
-									to='/'
+									to='/settings/profile'
 									style={{ textDecoration: "none", width: "100%", color: "inherit" }}
 									onClick={handleNavItemClick}
 								>
@@ -213,7 +213,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 							{/* Account Settings */}
 							<ListItem disablePadding>
 								<RouterLink
-									to='/'
+									to='/settings/account'
 									style={{ textDecoration: "none", width: "100%", color: "inherit" }}
 									onClick={handleNavItemClick}
 								>

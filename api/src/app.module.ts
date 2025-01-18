@@ -33,6 +33,7 @@ import { ReactionModule } from "./Services/Reaction/reaction.module";
 import { ReportModule } from "./Services/Report/report.module";
 import { UserModule } from "./Services/User/user.module";
 import { RedisModule } from "./Services/redis.module";
+import { UserConfiguration } from "@Models/UserConfiguration";
 
 @Module({
 	imports: [
@@ -75,6 +76,7 @@ import { RedisModule } from "./Services/redis.module";
 					AdminNotification,
 					Administrator,
 					BanStrike,
+					UserConfiguration,
 				],
 			}),
 		}),

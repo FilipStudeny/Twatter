@@ -326,6 +326,7 @@ export type QueryGetUsersArgs = {
   groupId?: InputMaybe<Scalars['String']['input']>;
   limit?: Scalars['Int']['input'];
   page?: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -421,6 +422,19 @@ export type SignUpUserData = {
   repeatPassword: Scalars['String']['input'];
 };
 
+export type UserConfigurationDetail = {
+  __typename?: 'UserConfigurationDetail';
+  commentReactedTo_App_Notification?: Maybe<Scalars['Boolean']['output']>;
+  commentReactedTo_Email_Notification?: Maybe<Scalars['Boolean']['output']>;
+  friendRequest_App_Notification?: Maybe<Scalars['Boolean']['output']>;
+  friendRequest_Email_Notification?: Maybe<Scalars['Boolean']['output']>;
+  id: Scalars['String']['output'];
+  postReactedTo_App_Notification?: Maybe<Scalars['Boolean']['output']>;
+  postReactedTo_Email_Notification?: Maybe<Scalars['Boolean']['output']>;
+  profileBackgroundColor1: Scalars['String']['output'];
+  profileBackgroundColor2: Scalars['String']['output'];
+};
+
 export type UserDetail = {
   __typename?: 'UserDetail';
   banStrikesCount?: Maybe<Scalars['Float']['output']>;
@@ -441,6 +455,7 @@ export type UserDetail = {
   receivedReportsCount?: Maybe<Scalars['Float']['output']>;
   sentNotificationsCount?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  userConfiguration: UserConfigurationDetail;
   username?: Maybe<Scalars['String']['output']>;
 };
 
@@ -629,17 +644,18 @@ export type GetReportsAdministrationQuery = { __typename?: 'Query', GetReports: 
 export type GetUsersListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetUsersListQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename?: 'UserDetail', id: string, email?: string | null, firstName?: string | null, lastName?: string | null, username?: string | null, profilePictureUrl?: string | null }> | null } };
+export type GetUsersListQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'UserDetail', id: string, email?: string | null, firstName?: string | null, lastName?: string | null, username?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, joinedGroupsCount?: number | null, postsCount?: number | null, userConfiguration: { __typename: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string } }> | null } };
 
 export type GetUserQueryVariables = Exact<{
   userId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null, userConfiguration: { __typename?: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string } }> | null } };
 
 export type GetFriendsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -1756,15 +1772,25 @@ useInfiniteGetReportsAdministrationQuery.getKey = (variables: GetReportsAdminist
 useGetReportsAdministrationQuery.fetcher = (variables: GetReportsAdministrationQueryVariables, options?: RequestInit['headers']) => fetcher<GetReportsAdministrationQuery, GetReportsAdministrationQueryVariables>(GetReportsAdministrationDocument, variables, options);
 
 export const GetUsersListDocument = /*#__PURE__*/ `
-    query GetUsersList($page: Int = 1, $limit: Int = 10) {
-  getUsers(page: $page, limit: $limit) {
+    query GetUsersList($page: Int = 1, $limit: Int = 10, $search: String) {
+  getUsers(page: $page, limit: $limit, search: $search) {
     items {
+      __typename
       id
       email
       firstName
       lastName
       username
       profilePictureUrl
+      friendsCount
+      joinedGroupsCount
+      postsCount
+      userConfiguration {
+        __typename
+        id
+        profileBackgroundColor1
+        profileBackgroundColor2
+      }
     }
     total
     page
@@ -1839,6 +1865,11 @@ export const GetUserDocument = /*#__PURE__*/ `
         angry
         sad
         love
+      }
+      userConfiguration {
+        id
+        profileBackgroundColor1
+        profileBackgroundColor2
       }
       commentsCount
       createdAt

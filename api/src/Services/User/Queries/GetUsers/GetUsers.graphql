@@ -1,12 +1,22 @@
-query GetUsersList($page: Int = 1, $limit: Int = 10) {
-	getUsers(page: $page, limit: $limit) {
+query GetUsersList($page: Int = 1, $limit: Int = 10, $search: String) {
+	getUsers(page: $page, limit: $limit, search: $search) {
 		items {
+			__typename
 			id
 			email
 			firstName
 			lastName
 			username
 			profilePictureUrl
+			friendsCount
+			joinedGroupsCount
+			postsCount
+			userConfiguration {
+				__typename
+				id
+				profileBackgroundColor1
+				profileBackgroundColor2
+			}
 		}
 		total
 		page
@@ -15,8 +25,8 @@ query GetUsersList($page: Int = 1, $limit: Int = 10) {
 }
 
 query GetUser($userId: String) {
-	getUsers(userId: $userId){
-		items{
+	getUsers(userId: $userId) {
+		items {
 			__typename
 			id
 			username
@@ -35,6 +45,12 @@ query GetUser($userId: String) {
 				angry
 				sad
 				love
+			}
+			userConfiguration {
+				id
+				profileBackgroundColor1
+				profileBackgroundColor2
+				
 			}
 			commentsCount
 			createdAt

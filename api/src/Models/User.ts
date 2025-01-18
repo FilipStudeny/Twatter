@@ -9,6 +9,7 @@ import { Password } from "./Password";
 import { Post } from "./Post";
 import { Reaction } from "./Reaction";
 import { Report } from "./Report";
+import { UserConfiguration } from "./UserConfiguration";
 
 @Entity()
 export class User extends BaseEntity {
@@ -70,4 +71,13 @@ export class User extends BaseEntity {
 
 	@Column({ unique: true, nullable: true })
 	refreshToken: string;
+
+	@OneToOne(() => UserConfiguration, (configuration) => configuration.user, {
+		cascade: true,
+	})
+	@JoinColumn()
+	configuration: UserConfiguration;
+
+	@Column({ default: false })
+	accountDisabled: boolean;
 }

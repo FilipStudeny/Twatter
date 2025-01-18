@@ -24,6 +24,7 @@ import { Post } from "../Models/Post";
 import { Reaction } from "../Models/Reaction";
 import { Report } from "../Models/Report";
 import { User } from "../Models/User";
+import { UserConfiguration } from "../Models/UserConfiguration";
 
 // Load environment variables from .env
 dotenvConfig();
@@ -54,6 +55,7 @@ async function connectToDatabase(): Promise<Connection> {
 			AdminNotification,
 			Administrator,
 			BanStrike,
+			UserConfiguration,
 		],
 	});
 }
@@ -126,7 +128,9 @@ async function seedAdministrators(connection: Connection, password: string): Pro
  */
 async function seedInterests(connection: Connection): Promise<Interest[]> {
 	const interests = ["Tech", "Cars", "Vacation", "Food", "Latest", "News", "NSFW"];
-	const interestPromises = interests.map((interest) => connection.manager.save(Interest, { name: interest }));
+	const interestPromises = interests.map((interest) =>
+		connection.manager.save(Interest, { name: interest, color: faker.color.rgb() }),
+	);
 	const interestEntities = await Promise.all(interestPromises);
 	console.log("Interests have been inserted into the database.");
 	return interestEntities;
@@ -162,6 +166,11 @@ export async function seedUsers(connection: Connection, password: string): Promi
 			user.password = passwordEntity;
 			user.profilePictureUrl = profilePictureUrl;
 			user.friends = []; // Initialize with no friends
+
+			const userConfiguration = new UserConfiguration();
+			userConfiguration.profileBackgroundColor1 = faker.color.rgb();
+			userConfiguration.profileBackgroundColor2 = faker.color.rgb();
+			user.configuration = userConfiguration;
 
 			return user;
 		}),

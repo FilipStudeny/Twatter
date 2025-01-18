@@ -4,13 +4,13 @@ import { DbResponse } from "@Shared/DbResponse";
 import UserDetail from "@Shared/Response/UserDetail";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
+import { BadRequestException } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { EntityManager } from "typeorm";
 import { validate as isUUID } from "uuid";
 
 import PaginatedUsersResponse from "./PaginatedUsersResponse.type";
-import { BadRequestException } from "@nestjs/common";
 
 export class GetUsersQuery {
 	constructor(
@@ -21,6 +21,7 @@ export class GetUsersQuery {
 		public readonly groupId?: string,
 		public readonly getAll?: boolean,
 		public readonly friendOf?: string,
+		public readonly search?: string,
 	) {}
 }
 
@@ -32,7 +33,7 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 	) {}
 
 	async execute(query: GetUsersQuery): Promise<PaginatedUsersResponse> {
-		const { page, limit, requestedFields, userId, groupId, getAll, friendOf } = query;
+		const { page, limit, requestedFields, userId, groupId, getAll, friendOf, search } = query;
 		const skip = (page - 1) * limit;
 
 		if (userId && !isUUID(userId)) {
@@ -49,6 +50,28 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 
 		if (userId) {
 			qb.where("user.id = :userId", { userId });
+		}
+
+		if (search) {
+			qb.andWhere(
+				`(user.username ILIKE :search OR user.firstName ILIKE :search OR user.lastName ILIKE :search)`,
+				{ search: `%${search}%` },
+			);
+		}
+
+		qb.leftJoin("user.configuration", "config");
+		if (requestedFields.userConfiguration) {
+			qb.addSelect([
+				'config.id AS "user_configuration_id"',
+				'config.profileBackgroundColor1 AS "user_profileBackgroundColor1"',
+				'config.profileBackgroundColor2 AS "user_profileBackgroundColor2"',
+				'config.friendRequest_Email_Notification AS "user_friendRequest_Email_Notification"',
+				'config.friendRequest_App_Notification AS "user_friendRequest_App_Notification"',
+				'config.postReactedTo_Email_Notification AS "user_postReactedTo_Email_Notification"',
+				'config.postReactedTo_App_Notification AS "user_postReactedTo_App_Notification"',
+				'config.commentReactedTo_Email_Notification AS "user_commentReactedTo_Email_Notification"',
+				'config.commentReactedTo_App_Notification AS "user_commentReactedTo_App_Notification"',
+			]);
 		}
 
 		if (groupId) {
@@ -188,6 +211,20 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 
 		if (requestedFields.username) {
 			groupByFields.push("user.username");
+		}
+
+		if (requestedFields.userConfiguration) {
+			groupByFields.push(
+				"user_configuration_id",
+				"config.profileBackgroundColor1",
+				"config.profileBackgroundColor2",
+				"config.friendRequest_Email_Notification",
+				"config.friendRequest_App_Notification",
+				"config.postReactedTo_Email_Notification",
+				"config.postReactedTo_App_Notification",
+				"config.commentReactedTo_Email_Notification",
+				"config.commentReactedTo_App_Notification",
+			);
 		}
 
 		qb.groupBy(groupByFields.join(", "));

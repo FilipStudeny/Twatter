@@ -142,4 +142,22 @@ export class DbResponse {
 	comment_creator_lastName: string;
 
 	comment_creator_profilePictureUrl: string;
+
+	user_configuration_id: string;
+
+	user_profileBackgroundColor1: string;
+
+	user_profileBackgroundColor2: string;
+
+	user_friendRequest_Email_Notification: boolean;
+
+	user_friendRequest_App_Notification: boolean;
+
+	user_postReactedTo_Email_Notification: boolean;
+
+	user_postReactedTo_App_Notification: boolean;
+
+	user_commentReactedTo_Email_Notification: boolean;
+
+	user_commentReactedTo_App_Notification: boolean;
 }

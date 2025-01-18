@@ -2,47 +2,54 @@
 
 import SinglePost from "@Components/post/SinglePost";
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
-import { Box, Button, CircularProgress, Alert, Stack } from "@mui/material";
-import React from "react";
+import { Box, Button, Alert, Stack } from "@mui/material";
+import React, { useCallback, useMemo } from "react";
 
 import { useInfiniteScroll } from "hooks/infiniteScroll";
 
+import { PostSkeleton } from "./PostSkeleton";
 import { PostDetail, useInfiniteGetPostsListQuery } from "../../../../shared";
 
-interface UserPostsProps {
-	userId: string | undefined,
+interface PostsListProps {
+	userId?: string | undefined,
+	interestsId?: string | undefined,
 }
 
-const UserPosts: React.FC<UserPostsProps> = ({ userId }) => {
+const PostsList: React.FC<PostsListProps> = ({ userId, interestsId }) => {
 	const {
 		data: userPosts,
-		isLoading: postsLoading,
+		isLoading,
 		isError: postsError,
 		error: postsErrorMessage,
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
 	} = useInfiniteGetPostsListQuery(
-		{ creatorId: userId, page: 1, limit: 5 },
+		{ creatorId: userId, page: 1, limit: 5, interestId: interestsId },
 		{
-			initialPageParam: { page: 1, limit: 5, creatorId: userId },
+			initialPageParam: { page: 1, limit: 5, creatorId: userId, interestId: interestsId },
 
-			getNextPageParam: (lastPage) => {
+			getNextPageParam: useCallback((lastPage) => {
 				const currentPage = lastPage?.getPosts?.page ?? 1;
-				const limit = lastPage?.getPosts?.limit ?? 5;
+				const limit = lastPage?.getPosts?.limit ?? 10;
 				const total = lastPage?.getPosts?.total ?? 0;
-				if (currentPage * limit < total) {
-					return { page: currentPage + 1, limit };
-				}
 
-				return undefined;
-			},
+				return currentPage * limit < total ? { page: currentPage + 1, limit } : undefined;
+			}, []),
 		},
 	);
 
 	const { sentinelRef } = useInfiniteScroll(Boolean(hasNextPage), isFetchingNextPage, fetchNextPage);
 
-	const allPosts: PostDetail[] = userPosts?.pages?.flatMap((page) => page?.getPosts?.items ?? []) ?? [];
+	const allPosts = useMemo(() => userPosts?.pages?.flatMap((page) => page?.getPosts?.items ?? []) ?? [], [userPosts]);
+
+	const renderLoadingSkeletons = () => (
+		<Stack spacing={4} sx={{ width: "100%" }}>
+			{[1, 2, 3].map((i) => (
+				<PostSkeleton key={i} />
+			))}
+		</Stack>
+	);
 
 	return (
 		<Box sx={{ px: 2, py: 1 }} role='tabpanel' id='tabpanel-posts' aria-labelledby='tab-posts'>
@@ -53,7 +60,7 @@ const UserPosts: React.FC<UserPostsProps> = ({ userId }) => {
 					</Alert>
 				))}
 
-			{!postsLoading && allPosts.length === 0 && !postsError && (
+			{!isLoading && allPosts.length === 0 && !postsError && (
 				<Alert severity='info' sx={{ marginTop: "5px" }}>
 					No posts available.
 				</Alert>
@@ -61,7 +68,7 @@ const UserPosts: React.FC<UserPostsProps> = ({ userId }) => {
 
 			<Stack spacing={4}>
 				{allPosts.map((post: PostDetail) => (
-					<SinglePost key={post.id} post={post} canOpenComments/>
+					<SinglePost key={post.id} post={post} canOpenComments />
 				))}
 			</Stack>
 
@@ -77,13 +84,9 @@ const UserPosts: React.FC<UserPostsProps> = ({ userId }) => {
 				</>
 			)}
 
-			{postsLoading && (
-				<Box p={2} display='flex' justifyContent='center' alignItems='center'>
-					<CircularProgress />
-				</Box>
-			)}
+			{(isLoading || isFetchingNextPage) && renderLoadingSkeletons()}
 		</Box>
 	);
 };
 
-export default UserPosts;
+export default PostsList;

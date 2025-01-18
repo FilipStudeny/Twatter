@@ -2,7 +2,9 @@ import { User } from "@Models/User";
 import { DbResponse } from "@Shared/DbResponse";
 import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
 import { Field, ObjectType } from "@nestjs/graphql";
+
 import { ReactionsCount } from "./ReactionsCount";
+import UserConfigurationDetail from "./UserConfigurationResponse";
 
 @ObjectType()
 export default class UserDetail {
@@ -32,6 +34,9 @@ export default class UserDetail {
 
 	@Field(() => ReactionsCount, { nullable: true })
 	reactions?: ReactionsCount;
+
+	@Field(() => UserConfigurationDetail)
+	userConfiguration: UserConfigurationDetail;
 
 	@Field({ nullable: true })
 	joinedGroupsCount?: number;
@@ -161,6 +166,29 @@ export default class UserDetail {
 							sad: parseInt(source.sad_count || "0", 10),
 							love: parseInt(source.love_count || "0", 10),
 						}) as ReactionsCount,
+				),
+			),
+			forMember(
+				(destination) => destination.userConfiguration,
+				mapFrom(
+					(source) =>
+						({
+							id: source.user_configuration_id,
+							profileBackgroundColor1: source.user_profileBackgroundColor1,
+							profileBackgroundColor2: source.user_profileBackgroundColor2,
+							friendRequest_Email_Notification:
+								source.user_friendRequest_Email_Notification,
+							friendRequest_App_Notification:
+								source.user_friendRequest_App_Notification,
+							postReactedTo_Email_Notification:
+								source.user_postReactedTo_Email_Notification,
+							postReactedTo_App_Notification:
+								source.user_postReactedTo_App_Notification,
+							commentReactedTo_Email_Notification:
+								source.user_commentReactedTo_Email_Notification,
+							commentReactedTo_App_Notification:
+								source.user_commentReactedTo_App_Notification,
+						}) as UserConfigurationDetail,
 				),
 			),
 		);

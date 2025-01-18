@@ -113,7 +113,7 @@ function RouteComponent() {
 				{/* Header Banner */}
 				<Box
 					sx={{
-						background: "linear-gradient(45deg, #6a11cb 30%, #2575fc 90%)",
+						background: `linear-gradient(45deg, ${user.userConfiguration.profileBackgroundColor1} 30%, ${user.userConfiguration.profileBackgroundColor2} 90%)`,
 						height: 140,
 						position: "relative",
 					}}

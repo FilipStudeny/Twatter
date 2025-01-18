@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, useTheme, Toolbar, Container } from "@mui/material";
+import { Box, useMediaQuery, useTheme, Toolbar } from "@mui/material";
 import { Outlet } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 
@@ -102,16 +102,14 @@ export const Layout = () => {
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
-						justifyContent: "flex-start",
 						order: 0,
 						transition: "margin 0.3s",
 						px: 2,
+						py: 2,
 					}}
 				>
 					<Toolbar />
-					<Container maxWidth='lg' sx={{ py: 2 }}>
-						<Outlet />
-					</Container>
+					<Outlet />
 				</Box>
 				{/* Right Sidebar and FAB */}
 				{isLoggedIn && (

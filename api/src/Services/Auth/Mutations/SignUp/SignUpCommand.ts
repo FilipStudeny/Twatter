@@ -1,5 +1,6 @@
 import { Password } from "@Models/Password";
 import { User } from "@Models/User";
+import { UserConfiguration } from "@Models/UserConfiguration";
 import { EmailService } from "@Services/Email/email.service";
 import GenericResponse from "@Shared/Response/GenericResponse";
 import { Mapper } from "@automapper/core";
@@ -45,6 +46,9 @@ export class SignUpCommandHandler implements ICommandHandler<SignUpCommand> {
 		userPassword.salt = salt;
 
 		user.password = userPassword;
+
+		const userConfiguration = new UserConfiguration();
+		user.configuration = userConfiguration;
 
 		try {
 			await this.entityManager.save(User, user);
