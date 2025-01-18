@@ -1,0 +1,5 @@
+mutation UpdateUserConfiguration($updateDto: UpdateUserConfigurationDto!) {
+	UpdateUserConfiguration(updateDto: $updateDto) {
+		message
+	}
+}

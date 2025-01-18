@@ -7,6 +7,8 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
+import { UpdateUserConfigurationCommandHandler } from "./Mutations/UpdateUserConfiguration/UpdateUserConfiguration";
+import { GetUserConfigurationQueryHandler } from "./Queries/GetUserConfiguration/GetUserConfigurationQuery";
 import GetUsersQueryHandler from "./Queries/GetUsers/GetUsersQuery";
 import UserResolver from "./user.resolver";
 
@@ -27,6 +29,11 @@ import UserResolver from "./user.resolver";
 		}),
 		TypeOrmModule.forFeature([User, Password]),
 	],
-	providers: [UserResolver, GetUsersQueryHandler],
+	providers: [
+		UserResolver,
+		GetUsersQueryHandler,
+		UpdateUserConfigurationCommandHandler,
+		GetUserConfigurationQueryHandler,
+	],
 })
 export class UserModule {}

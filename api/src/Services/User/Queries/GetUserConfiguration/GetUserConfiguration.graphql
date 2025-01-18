@@ -1,0 +1,15 @@
+query GetUserConfiguration($userId: String!) {
+  GetUserConfiguration(userId: $userId) {
+    id
+    profileVisibility
+    profileBackgroundColor1
+    profileBackgroundColor2
+    friendRequest_Email_Notification
+    friendRequest_App_Notification
+    postReactedTo_Email_Notification
+    postReactedTo_App_Notification
+    commentReactedTo_Email_Notification
+    commentReactedTo_App_Notification
+    
+  }
+}

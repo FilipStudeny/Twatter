@@ -124,7 +124,13 @@ function RouteComponent() {
 
 					<BannerPreview />
 
-					<Stack direction='row' spacing={4} justifyContent={"space-between"} alignItems='center' sx={{ mb: 3 }}>
+					<Stack
+						direction='row'
+						spacing={4}
+						justifyContent={"space-between"}
+						alignItems='center'
+						sx={{ mb: 3 }}
+					>
 						{/* Primary Color */}
 						<Box>
 							<Typography variant='subtitle2' sx={{ mb: 2, fontWeight: "medium" }}>
@@ -139,10 +145,10 @@ function RouteComponent() {
 						</Box>
 
 						<Box display='flex' flexDirection='column' alignItems='center'>
-							<DirectionPicker value={angle} onChange={setAngle} size={100} />
-							<Typography variant='body2' sx={{ mt: 1 }}>
-								Angle: <strong>{Math.round(angle)}°</strong>
+							<Typography variant='body2' sx={{ mb: 1 }}>
+								Color smoothing direction: <strong>{Math.round(angle)}°</strong>
 							</Typography>
+							<DirectionPicker value={angle} onChange={setAngle} size={100} />
 						</Box>
 
 						{/* Secondary Color */}

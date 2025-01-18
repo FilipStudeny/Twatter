@@ -1,3 +1,5 @@
+import ProfileVisibility from "@Models/Enums/ProfileVisibility";
+import { UserConfiguration } from "@Models/UserConfiguration";
 import { DbResponse } from "@Shared/DbResponse";
 import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
 import { Field, ObjectType } from "@nestjs/graphql";
@@ -6,6 +8,9 @@ import { Field, ObjectType } from "@nestjs/graphql";
 export default class UserConfigurationDetail {
 	@Field()
 	id: string;
+
+	@Field(() => ProfileVisibility)
+	profileVisibility: ProfileVisibility;
 
 	@Field()
 	profileBackgroundColor1: string;
@@ -72,6 +77,52 @@ export default class UserConfigurationDetail {
 			forMember(
 				(destination) => destination.commentReactedTo_App_Notification,
 				mapFrom((source) => source.user_commentReactedTo_App_Notification),
+			),
+		);
+
+		createMap(
+			mapper,
+			UserConfiguration,
+			UserConfigurationDetail,
+			forMember(
+				(destination) => destination.id,
+				mapFrom((source) => source.id),
+			),
+			forMember(
+				(destination) => destination.profileBackgroundColor1,
+				mapFrom((source) => source.profileBackgroundColor1),
+			),
+			forMember(
+				(destination) => destination.profileBackgroundColor2,
+				mapFrom((source) => source.profileBackgroundColor2),
+			),
+			forMember(
+				(destination) => destination.friendRequest_Email_Notification,
+				mapFrom((source) => source.friendRequest_Email_Notification),
+			),
+			forMember(
+				(destination) => destination.friendRequest_App_Notification,
+				mapFrom((source) => source.friendRequest_App_Notification),
+			),
+			forMember(
+				(destination) => destination.postReactedTo_Email_Notification,
+				mapFrom((source) => source.postReactedTo_Email_Notification),
+			),
+			forMember(
+				(destination) => destination.postReactedTo_App_Notification,
+				mapFrom((source) => source.postReactedTo_App_Notification),
+			),
+			forMember(
+				(destination) => destination.commentReactedTo_Email_Notification,
+				mapFrom((source) => source.commentReactedTo_Email_Notification),
+			),
+			forMember(
+				(destination) => destination.commentReactedTo_App_Notification,
+				mapFrom((source) => source.commentReactedTo_App_Notification),
+			),
+			forMember(
+				(destination) => destination.profileVisibility,
+				mapFrom((source) => source.profileVisibility),
 			),
 		);
 	}

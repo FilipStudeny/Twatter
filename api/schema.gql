@@ -13,6 +13,7 @@ type ReactionsCount {
 
 type UserConfigurationDetail {
   id: String!
+  profileVisibility: ProfileVisibility!
   profileBackgroundColor1: String!
   profileBackgroundColor2: String!
   friendRequest_Email_Notification: Boolean
@@ -21,6 +22,13 @@ type UserConfigurationDetail {
   postReactedTo_App_Notification: Boolean
   commentReactedTo_Email_Notification: Boolean
   commentReactedTo_App_Notification: Boolean
+}
+
+"""Different types of profile visibility"""
+enum ProfileVisibility {
+  PUBLIC
+  ONLY_FRIENDS
+  PRIVATE
 }
 
 type UserDetail {
@@ -197,6 +205,7 @@ type Query {
   getPostsStatistics(filter: GraphFilter!, year: Int, weekNumber: Int): [PostGraphDataDto!]!
   getPosts(page: Int!, limit: Int!, creatorId: String, postId: String, interestId: String, groupId: String): PaginatedPostsListResponse!
   getUsers(page: Int! = 1, limit: Int! = 10, userId: String, groupId: String, getAll: Boolean, search: String, friendOf: String): PaginatedUsersResponse!
+  GetUserConfiguration(userId: String!): UserConfigurationDetail!
 }
 
 """Filter options for the graph data"""
@@ -221,6 +230,7 @@ type Mutation {
   SignOutUser(userId: String!): GenericResponse!
   forgotPassword(email: String!): GenericResponse!
   resetPassword(resetPassword: ResetPasswordInput!): GenericResponse!
+  UpdateUserConfiguration(updateDto: UpdateUserConfigurationDto!): GenericResponse!
 }
 
 input ReportDto {
@@ -303,4 +313,15 @@ input ResetPasswordInput {
   token: String!
   newPassword: String!
   repeatPassword: String!
+}
+
+input UpdateUserConfigurationDto {
+  profileBackgroundColor1: String
+  profileBackgroundColor2: String
+  friendRequest_Email_Notification: Boolean
+  friendRequest_App_Notification: Boolean
+  postReactedTo_Email_Notification: Boolean
+  postReactedTo_App_Notification: Boolean
+  commentReactedTo_Email_Notification: Boolean
+  commentReactedTo_App_Notification: Boolean
 }

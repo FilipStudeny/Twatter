@@ -1,12 +1,20 @@
 import { Entity, Column, OneToOne } from "typeorm";
 
 import { BaseEntity } from "./BaseEntity";
+import ProfileVisibility from "./Enums/ProfileVisibility";
 import { User } from "./User";
 
 @Entity()
 export class UserConfiguration extends BaseEntity {
 	@OneToOne(() => User, (user) => user.configuration)
 	user: User;
+
+	@Column({
+		type: "enum",
+		enum: ProfileVisibility,
+		default: ProfileVisibility.PUBLIC,
+	})
+	profileVisibility: ProfileVisibility;
 
 	@Column()
 	profileBackgroundColor1: string = "#6a11cb";
