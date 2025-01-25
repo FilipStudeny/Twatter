@@ -21,6 +21,7 @@ export class UpdateUserConfigurationDto {
 	@Field(() => ProfileVisibility, { nullable: true })
 	@IsEnum(ProfileVisibility)
 	@IsNotEmpty()
+	@IsOptional()
 	profileVisibility?: ProfileVisibility;
 
 	@Field({ nullable: true })
