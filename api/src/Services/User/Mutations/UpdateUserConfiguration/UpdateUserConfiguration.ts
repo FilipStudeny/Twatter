@@ -26,7 +26,6 @@ export class UpdateUserConfigurationCommandHandler implements ICommandHandler<Up
 
 	async execute(command: UpdateUserConfigurationCommand): Promise<GenericResponse> {
 		const { updateDto, userId } = command;
-
 		const user = await this.entityManager.findOne(User, {
 			where: { id: userId },
 			relations: ["configuration"],
@@ -69,6 +68,14 @@ export class UpdateUserConfigurationCommandHandler implements ICommandHandler<Up
 			configuration.commentReactedTo_App_Notification = updateDto.commentReactedTo_App_Notification;
 		}
 
+		if (updateDto.profileBackgroundLightAngle !== undefined) {
+			configuration.profileBackgroundLightAngle = updateDto.profileBackgroundLightAngle;
+		}
+
+		if (updateDto.profileVisibility !== undefined) {
+			configuration.profileVisibility = updateDto.profileVisibility;
+		}
+
 		try {
 			await this.entityManager.save(UserConfiguration, configuration);
 			if (!user.configuration) {
@@ -76,7 +83,7 @@ export class UpdateUserConfigurationCommandHandler implements ICommandHandler<Up
 				await this.entityManager.save(User, user);
 			}
 
-			return new GenericResponse("Configuration updated successfully");
+			return new GenericResponse("Account settings updated successfully");
 		} catch (error) {
 			if (error.code === "23503") {
 				throw new NotFoundException("Invalid foreign key provided.");

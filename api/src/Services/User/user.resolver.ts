@@ -60,11 +60,12 @@ export default class UserResolver {
 	async GetUserConfiguration(
 		@Args("userId", { type: () => String }) userId: string,
 		@CurrentUser() payload: JwtPayload,
-	) {
+	): Promise<GenericResponse> {
 		if (payload.id !== userId) {
 			throw new NotFoundException("User not found");
 		}
 
-		return this.queryBus.execute(new GetUserConfigurationQuery(userId));
+		const response = await this.queryBus.execute(new GetUserConfigurationQuery(userId));
+		return response;
 	}
 }

@@ -22,6 +22,12 @@ export class UserConfiguration extends BaseEntity {
 	@Column()
 	profileBackgroundColor2: string = "#2575fc";
 
+	@Column({
+		type: "decimal",
+		default: 90,
+	})
+	profileBackgroundLightAngle: number;
+
 	//* ** NOTIFICATIONS CONFIG ** */
 	@Column({ default: true })
 	friendRequest_Email_Notification: boolean;

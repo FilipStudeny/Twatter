@@ -35,8 +35,8 @@ export default class UserDetail {
 	@Field(() => ReactionsCount, { nullable: true })
 	reactions?: ReactionsCount;
 
-	@Field(() => UserConfigurationDetail)
-	userConfiguration: UserConfigurationDetail;
+	@Field(() => UserConfigurationDetail, { nullable: true })
+	userConfiguration?: UserConfigurationDetail;
 
 	@Field({ nullable: true })
 	joinedGroupsCount?: number;
@@ -176,6 +176,9 @@ export default class UserDetail {
 							id: source.user_configuration_id,
 							profileBackgroundColor1: source.user_profileBackgroundColor1,
 							profileBackgroundColor2: source.user_profileBackgroundColor2,
+							profileBackgroundLightAngle:
+								+source.user_profileBackgroundLightAngle,
+							profileVisibility: +source.user_profileVisibility,
 							friendRequest_Email_Notification:
 								source.user_friendRequest_Email_Notification,
 							friendRequest_App_Notification:

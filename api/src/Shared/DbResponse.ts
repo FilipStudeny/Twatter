@@ -160,4 +160,8 @@ export class DbResponse {
 	user_commentReactedTo_Email_Notification: boolean;
 
 	user_commentReactedTo_App_Notification: boolean;
+
+	user_profileBackgroundLightAngle: string;
+
+	user_profileVisibility: string;
 }

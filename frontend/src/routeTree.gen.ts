@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SettingsImport } from './routes/settings'
 import { Route as SearchImport } from './routes/search'
 import { Route as ProfileImport } from './routes/profile'
 import { Route as IndexImport } from './routes/index'
@@ -25,6 +26,12 @@ import { Route as UsersIdIndexImport } from './routes/users/$id/index'
 import { Route as UsersIdReportsImport } from './routes/users/$id/reports'
 
 // Create/Update Routes
+
+const SettingsRoute = SettingsImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const SearchRoute = SearchImport.update({
   id: '/search',
@@ -51,15 +58,15 @@ const UsersIndexRoute = UsersIndexImport.update({
 } as any)
 
 const SettingsProfileRoute = SettingsProfileImport.update({
-  id: '/settings/profile',
-  path: '/settings/profile',
-  getParentRoute: () => rootRoute,
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SettingsRoute,
 } as any)
 
 const SettingsAccountRoute = SettingsAccountImport.update({
-  id: '/settings/account',
-  path: '/settings/account',
-  getParentRoute: () => rootRoute,
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => SettingsRoute,
 } as any)
 
 const PostIdRoute = PostIdImport.update({
@@ -124,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchImport
       parentRoute: typeof rootRoute
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsImport
+      parentRoute: typeof rootRoute
+    }
     '/_authentication/forgotten-password': {
       id: '/_authentication/forgotten-password'
       path: '/forgotten-password'
@@ -154,17 +168,17 @@ declare module '@tanstack/react-router' {
     }
     '/settings/account': {
       id: '/settings/account'
-      path: '/settings/account'
+      path: '/account'
       fullPath: '/settings/account'
       preLoaderRoute: typeof SettingsAccountImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof SettingsImport
     }
     '/settings/profile': {
       id: '/settings/profile'
-      path: '/settings/profile'
+      path: '/profile'
       fullPath: '/settings/profile'
       preLoaderRoute: typeof SettingsProfileImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof SettingsImport
     }
     '/users/': {
       id: '/users/'
@@ -192,10 +206,25 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
+interface SettingsRouteChildren {
+  SettingsAccountRoute: typeof SettingsAccountRoute
+  SettingsProfileRoute: typeof SettingsProfileRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsAccountRoute: SettingsAccountRoute,
+  SettingsProfileRoute: SettingsProfileRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/forgotten-password': typeof AuthenticationForgottenPasswordRoute
   '/sign-in': typeof AuthenticationSignInRoute
   '/sign-up': typeof AuthenticationSignUpRoute
@@ -211,6 +240,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/forgotten-password': typeof AuthenticationForgottenPasswordRoute
   '/sign-in': typeof AuthenticationSignInRoute
   '/sign-up': typeof AuthenticationSignUpRoute
@@ -227,6 +257,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/_authentication/forgotten-password': typeof AuthenticationForgottenPasswordRoute
   '/_authentication/sign-in': typeof AuthenticationSignInRoute
   '/_authentication/sign-up': typeof AuthenticationSignUpRoute
@@ -244,6 +275,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/search'
+    | '/settings'
     | '/forgotten-password'
     | '/sign-in'
     | '/sign-up'
@@ -258,6 +290,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/search'
+    | '/settings'
     | '/forgotten-password'
     | '/sign-in'
     | '/sign-up'
@@ -272,6 +305,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/search'
+    | '/settings'
     | '/_authentication/forgotten-password'
     | '/_authentication/sign-in'
     | '/_authentication/sign-up'
@@ -288,12 +322,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProfileRoute: typeof ProfileRoute
   SearchRoute: typeof SearchRoute
+  SettingsRoute: typeof SettingsRouteWithChildren
   AuthenticationForgottenPasswordRoute: typeof AuthenticationForgottenPasswordRoute
   AuthenticationSignInRoute: typeof AuthenticationSignInRoute
   AuthenticationSignUpRoute: typeof AuthenticationSignUpRoute
   PostIdRoute: typeof PostIdRoute
-  SettingsAccountRoute: typeof SettingsAccountRoute
-  SettingsProfileRoute: typeof SettingsProfileRoute
   UsersIndexRoute: typeof UsersIndexRoute
   UsersIdReportsRoute: typeof UsersIdReportsRoute
   UsersIdIndexRoute: typeof UsersIdIndexRoute
@@ -303,12 +336,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProfileRoute: ProfileRoute,
   SearchRoute: SearchRoute,
+  SettingsRoute: SettingsRouteWithChildren,
   AuthenticationForgottenPasswordRoute: AuthenticationForgottenPasswordRoute,
   AuthenticationSignInRoute: AuthenticationSignInRoute,
   AuthenticationSignUpRoute: AuthenticationSignUpRoute,
   PostIdRoute: PostIdRoute,
-  SettingsAccountRoute: SettingsAccountRoute,
-  SettingsProfileRoute: SettingsProfileRoute,
   UsersIndexRoute: UsersIndexRoute,
   UsersIdReportsRoute: UsersIdReportsRoute,
   UsersIdIndexRoute: UsersIdIndexRoute,
@@ -327,12 +359,11 @@ export const routeTree = rootRoute
         "/",
         "/profile",
         "/search",
+        "/settings",
         "/_authentication/forgotten-password",
         "/_authentication/sign-in",
         "/_authentication/sign-up",
         "/post/$id",
-        "/settings/account",
-        "/settings/profile",
         "/users/",
         "/users/$id/reports",
         "/users/$id/"
@@ -347,6 +378,13 @@ export const routeTree = rootRoute
     "/search": {
       "filePath": "search.tsx"
     },
+    "/settings": {
+      "filePath": "settings.tsx",
+      "children": [
+        "/settings/account",
+        "/settings/profile"
+      ]
+    },
     "/_authentication/forgotten-password": {
       "filePath": "_authentication/forgotten-password.tsx"
     },
@@ -360,10 +398,12 @@ export const routeTree = rootRoute
       "filePath": "post/$id.tsx"
     },
     "/settings/account": {
-      "filePath": "settings/account.tsx"
+      "filePath": "settings/account.tsx",
+      "parent": "/settings"
     },
     "/settings/profile": {
-      "filePath": "settings/profile.tsx"
+      "filePath": "settings/profile.tsx",
+      "parent": "/settings"
     },
     "/users/": {
       "filePath": "users/index.tsx"

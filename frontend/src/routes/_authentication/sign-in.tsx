@@ -52,7 +52,7 @@ function RouteComponent() {
 
 		if (!isError){
 			signInStore({ accessToken, refreshToken, userData });
-			navigate({ to: "/home" });
+			navigate({ to: "/" });
 		}
 	};
 

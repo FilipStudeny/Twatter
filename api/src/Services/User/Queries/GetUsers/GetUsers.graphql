@@ -50,7 +50,8 @@ query GetUser($userId: String) {
 				id
 				profileBackgroundColor1
 				profileBackgroundColor2
-				
+				profileVisibility
+				profileBackgroundLightAngle
 			}
 			commentsCount
 			createdAt

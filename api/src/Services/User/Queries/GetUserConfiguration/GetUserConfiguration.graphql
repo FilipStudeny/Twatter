@@ -4,6 +4,7 @@ query GetUserConfiguration($userId: String!) {
     profileVisibility
     profileBackgroundColor1
     profileBackgroundColor2
+    profileBackgroundLightAngle
     friendRequest_Email_Notification
     friendRequest_App_Notification
     postReactedTo_Email_Notification

@@ -14,6 +14,7 @@ type AuthenticationState = {
 	signIn: (signInResponse: SignInResponse)=> void,
 	signOut: ()=> void,
 	getUserData: ()=> UserDetail | null,
+	getRefreshToken: ()=> string | null,
 };
 export const useAuthenticationStore = create<AuthenticationState>((set) => ({
 	isLoggedIn: localStorage.getItem(UserSession.isAuthenticated) === "true",
@@ -45,5 +46,8 @@ export const useAuthenticationStore = create<AuthenticationState>((set) => ({
 		const parsedUserData = JSON.parse(storedUserData) as UserDetail;
 
 		return parsedUserData;
+	},
+	getRefreshToken: () => {
+		return localStorage.getItem(UserSession.refreshToken);
 	},
 }));

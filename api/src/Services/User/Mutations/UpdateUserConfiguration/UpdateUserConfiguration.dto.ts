@@ -1,5 +1,6 @@
+import ProfileVisibility from "@Models/Enums/ProfileVisibility";
 import { Field, InputType } from "@nestjs/graphql";
-import { IsBoolean, IsHexColor, IsOptional } from "class-validator";
+import { IsBoolean, IsEnum, IsHexColor, IsNotEmpty, IsOptional } from "class-validator";
 
 @InputType()
 export class UpdateUserConfigurationDto {
@@ -12,6 +13,15 @@ export class UpdateUserConfigurationDto {
 	@IsHexColor()
 	@IsOptional()
 	profileBackgroundColor2?: string;
+
+	@Field({ nullable: true })
+	@IsOptional()
+	profileBackgroundLightAngle?: number;
+
+	@Field(() => ProfileVisibility, { nullable: true })
+	@IsEnum(ProfileVisibility)
+	@IsNotEmpty()
+	profileVisibility?: ProfileVisibility;
 
 	@Field({ nullable: true })
 	@IsBoolean()

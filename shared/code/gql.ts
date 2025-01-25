@@ -110,6 +110,7 @@ export type Mutation = {
   SignInUser: SignInResponse;
   SignOutUser: GenericResponse;
   SignUpUser: GenericResponse;
+  UpdateUserConfiguration: GenericResponse;
   createGroup: GenericResponse;
   forgotPassword: GenericResponse;
   refreshToken: SignInResponse;
@@ -166,6 +167,11 @@ export type MutationSignOutUserArgs = {
 
 export type MutationSignUpUserArgs = {
   signUp: SignUpUserData;
+};
+
+
+export type MutationUpdateUserConfigurationArgs = {
+  updateDto: UpdateUserConfigurationDto;
 };
 
 
@@ -260,10 +266,17 @@ export type PostGraphDataDto = {
   period: Scalars['String']['output'];
 };
 
+export enum ProfileVisibility {
+  OnlyFriends = 'ONLY_FRIENDS',
+  Private = 'PRIVATE',
+  Public = 'PUBLIC'
+}
+
 export type Query = {
   __typename?: 'Query';
   GetInterests: PaginatedInterestsListResponse;
   GetReports: PaginatedReportsListResponse;
+  GetUserConfiguration: UserConfigurationDetail;
   getCommentsList: PaginatedCommentsListResponse;
   getPosts: PaginatedPostsListResponse;
   getPostsStatistics: Array<PostGraphDataDto>;
@@ -283,6 +296,11 @@ export type QueryGetInterestsArgs = {
 export type QueryGetReportsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
+  userId: Scalars['String']['input'];
+};
+
+
+export type QueryGetUserConfigurationArgs = {
   userId: Scalars['String']['input'];
 };
 
@@ -422,6 +440,19 @@ export type SignUpUserData = {
   repeatPassword: Scalars['String']['input'];
 };
 
+export type UpdateUserConfigurationDto = {
+  commentReactedTo_App_Notification?: InputMaybe<Scalars['Boolean']['input']>;
+  commentReactedTo_Email_Notification?: InputMaybe<Scalars['Boolean']['input']>;
+  friendRequest_App_Notification?: InputMaybe<Scalars['Boolean']['input']>;
+  friendRequest_Email_Notification?: InputMaybe<Scalars['Boolean']['input']>;
+  postReactedTo_App_Notification?: InputMaybe<Scalars['Boolean']['input']>;
+  postReactedTo_Email_Notification?: InputMaybe<Scalars['Boolean']['input']>;
+  profileBackgroundColor1?: InputMaybe<Scalars['String']['input']>;
+  profileBackgroundColor2?: InputMaybe<Scalars['String']['input']>;
+  profileBackgroundLightAngle?: InputMaybe<Scalars['Float']['input']>;
+  profileVisibility?: InputMaybe<ProfileVisibility>;
+};
+
 export type UserConfigurationDetail = {
   __typename?: 'UserConfigurationDetail';
   commentReactedTo_App_Notification?: Maybe<Scalars['Boolean']['output']>;
@@ -433,6 +464,8 @@ export type UserConfigurationDetail = {
   postReactedTo_Email_Notification?: Maybe<Scalars['Boolean']['output']>;
   profileBackgroundColor1: Scalars['String']['output'];
   profileBackgroundColor2: Scalars['String']['output'];
+  profileBackgroundLightAngle: Scalars['Float']['output'];
+  profileVisibility: ProfileVisibility;
 };
 
 export type UserDetail = {
@@ -455,7 +488,7 @@ export type UserDetail = {
   receivedReportsCount?: Maybe<Scalars['Float']['output']>;
   sentNotificationsCount?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
-  userConfiguration: UserConfigurationDetail;
+  userConfiguration?: Maybe<UserConfigurationDetail>;
   username?: Maybe<Scalars['String']['output']>;
 };
 
@@ -641,6 +674,20 @@ export type GetReportsAdministrationQueryVariables = Exact<{
 
 export type GetReportsAdministrationQuery = { __typename?: 'Query', GetReports: { __typename?: 'PaginatedReportsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'ReportDetail', id: string, reportStatus: ReportStatus, reportMessage?: string | null, resolutionMessage?: string | null, createdAt: any, updatedAt: any, reportedUser?: string | null, reportedComment?: string | null, reportedPost?: string | null, reporter?: { __typename?: 'UserDetail', id: string, firstName?: string | null, lastName?: string | null, profilePictureUrl?: string | null, username?: string | null } | null }> | null } };
 
+export type UpdateUserConfigurationMutationVariables = Exact<{
+  updateDto: UpdateUserConfigurationDto;
+}>;
+
+
+export type UpdateUserConfigurationMutation = { __typename?: 'Mutation', UpdateUserConfiguration: { __typename?: 'GenericResponse', message?: string | null } };
+
+export type GetUserConfigurationQueryVariables = Exact<{
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type GetUserConfigurationQuery = { __typename?: 'Query', GetUserConfiguration: { __typename?: 'UserConfigurationDetail', id: string, profileVisibility: ProfileVisibility, profileBackgroundColor1: string, profileBackgroundColor2: string, profileBackgroundLightAngle: number, friendRequest_Email_Notification?: boolean | null, friendRequest_App_Notification?: boolean | null, postReactedTo_Email_Notification?: boolean | null, postReactedTo_App_Notification?: boolean | null, commentReactedTo_Email_Notification?: boolean | null, commentReactedTo_App_Notification?: boolean | null } };
+
 export type GetUsersListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -648,14 +695,14 @@ export type GetUsersListQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersListQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'UserDetail', id: string, email?: string | null, firstName?: string | null, lastName?: string | null, username?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, joinedGroupsCount?: number | null, postsCount?: number | null, userConfiguration: { __typename: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string } }> | null } };
+export type GetUsersListQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'UserDetail', id: string, email?: string | null, firstName?: string | null, lastName?: string | null, username?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, joinedGroupsCount?: number | null, postsCount?: number | null, userConfiguration?: { __typename: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string } | null }> | null } };
 
 export type GetUserQueryVariables = Exact<{
   userId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null, userConfiguration: { __typename?: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string } }> | null } };
+export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null, userConfiguration?: { __typename?: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string, profileVisibility: ProfileVisibility, profileBackgroundLightAngle: number } | null }> | null } };
 
 export type GetFriendsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -1771,6 +1818,94 @@ useInfiniteGetReportsAdministrationQuery.getKey = (variables: GetReportsAdminist
 
 useGetReportsAdministrationQuery.fetcher = (variables: GetReportsAdministrationQueryVariables, options?: RequestInit['headers']) => fetcher<GetReportsAdministrationQuery, GetReportsAdministrationQueryVariables>(GetReportsAdministrationDocument, variables, options);
 
+export const UpdateUserConfigurationDocument = /*#__PURE__*/ `
+    mutation UpdateUserConfiguration($updateDto: UpdateUserConfigurationDto!) {
+  UpdateUserConfiguration(updateDto: $updateDto) {
+    message
+  }
+}
+    `;
+
+export const useUpdateUserConfigurationMutation = <
+      TError = GraphQLResponse,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateUserConfigurationMutation, TError, UpdateUserConfigurationMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateUserConfigurationMutation, TError, UpdateUserConfigurationMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateUserConfiguration'],
+    mutationFn: (variables?: UpdateUserConfigurationMutationVariables) => fetcher<UpdateUserConfigurationMutation, UpdateUserConfigurationMutationVariables>(UpdateUserConfigurationDocument, variables)(),
+    ...options
+  }
+    )};
+
+useUpdateUserConfigurationMutation.getKey = () => ['UpdateUserConfiguration'];
+
+
+useUpdateUserConfigurationMutation.fetcher = (variables: UpdateUserConfigurationMutationVariables, options?: RequestInit['headers']) => fetcher<UpdateUserConfigurationMutation, UpdateUserConfigurationMutationVariables>(UpdateUserConfigurationDocument, variables, options);
+
+export const GetUserConfigurationDocument = /*#__PURE__*/ `
+    query GetUserConfiguration($userId: String!) {
+  GetUserConfiguration(userId: $userId) {
+    id
+    profileVisibility
+    profileBackgroundColor1
+    profileBackgroundColor2
+    profileBackgroundLightAngle
+    friendRequest_Email_Notification
+    friendRequest_App_Notification
+    postReactedTo_Email_Notification
+    postReactedTo_App_Notification
+    commentReactedTo_Email_Notification
+    commentReactedTo_App_Notification
+  }
+}
+    `;
+
+export const useGetUserConfigurationQuery = <
+      TData = GetUserConfigurationQuery,
+      TError = GraphQLResponse
+    >(
+      variables: GetUserConfigurationQueryVariables,
+      options?: Omit<UseQueryOptions<GetUserConfigurationQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUserConfigurationQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetUserConfigurationQuery, TError, TData>(
+      {
+    queryKey: ['GetUserConfiguration', variables],
+    queryFn: fetcher<GetUserConfigurationQuery, GetUserConfigurationQueryVariables>(GetUserConfigurationDocument, variables),
+    ...options
+  }
+    )};
+
+useGetUserConfigurationQuery.document = GetUserConfigurationDocument;
+
+useGetUserConfigurationQuery.getKey = (variables: GetUserConfigurationQueryVariables) => ['GetUserConfiguration', variables];
+
+export const useInfiniteGetUserConfigurationQuery = <
+      TData = InfiniteData<GetUserConfigurationQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetUserConfigurationQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetUserConfigurationQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUserConfigurationQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetUserConfigurationQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetUserConfiguration.infinite', variables],
+      queryFn: (metaData) => fetcher<GetUserConfigurationQuery, GetUserConfigurationQueryVariables>(GetUserConfigurationDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetUserConfigurationQuery.getKey = (variables: GetUserConfigurationQueryVariables) => ['GetUserConfiguration.infinite', variables];
+
+
+useGetUserConfigurationQuery.fetcher = (variables: GetUserConfigurationQueryVariables, options?: RequestInit['headers']) => fetcher<GetUserConfigurationQuery, GetUserConfigurationQueryVariables>(GetUserConfigurationDocument, variables, options);
+
 export const GetUsersListDocument = /*#__PURE__*/ `
     query GetUsersList($page: Int = 1, $limit: Int = 10, $search: String) {
   getUsers(page: $page, limit: $limit, search: $search) {
@@ -1870,6 +2005,8 @@ export const GetUserDocument = /*#__PURE__*/ `
         id
         profileBackgroundColor1
         profileBackgroundColor2
+        profileVisibility
+        profileBackgroundLightAngle
       }
       commentsCount
       createdAt

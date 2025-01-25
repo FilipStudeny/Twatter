@@ -18,6 +18,9 @@ export default class UserConfigurationDetail {
 	@Field()
 	profileBackgroundColor2: string;
 
+	@Field(() => Number)
+	profileBackgroundLightAngle: number;
+
 	@Field(() => Boolean, { nullable: true })
 	friendRequest_Email_Notification?: boolean;
 
@@ -78,6 +81,14 @@ export default class UserConfigurationDetail {
 				(destination) => destination.commentReactedTo_App_Notification,
 				mapFrom((source) => source.user_commentReactedTo_App_Notification),
 			),
+			forMember(
+				(destination) => destination.profileVisibility,
+				mapFrom((source) => +source.user_profileVisibility),
+			),
+			forMember(
+				(destination) => destination.profileBackgroundLightAngle,
+				mapFrom((source) => +source.user_profileBackgroundLightAngle),
+			),
 		);
 
 		createMap(
@@ -123,6 +134,11 @@ export default class UserConfigurationDetail {
 			forMember(
 				(destination) => destination.profileVisibility,
 				mapFrom((source) => source.profileVisibility),
+			),
+
+			forMember(
+				(destination) => destination.profileBackgroundLightAngle,
+				mapFrom((source) => source.profileBackgroundLightAngle),
 			),
 		);
 	}

@@ -16,6 +16,7 @@ type UserConfigurationDetail {
   profileVisibility: ProfileVisibility!
   profileBackgroundColor1: String!
   profileBackgroundColor2: String!
+  profileBackgroundLightAngle: Float!
   friendRequest_Email_Notification: Boolean
   friendRequest_App_Notification: Boolean
   postReactedTo_Email_Notification: Boolean
@@ -41,7 +42,7 @@ type UserDetail {
   postsCount: Float
   commentsCount: Float
   reactions: ReactionsCount
-  userConfiguration: UserConfigurationDetail!
+  userConfiguration: UserConfigurationDetail
   joinedGroupsCount: Float
   banStrikesCount: Float
   sentNotificationsCount: Float
@@ -318,6 +319,8 @@ input ResetPasswordInput {
 input UpdateUserConfigurationDto {
   profileBackgroundColor1: String
   profileBackgroundColor2: String
+  profileBackgroundLightAngle: Float
+  profileVisibility: ProfileVisibility
   friendRequest_Email_Notification: Boolean
   friendRequest_App_Notification: Boolean
   postReactedTo_Email_Notification: Boolean

@@ -26,7 +26,12 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { useGetUserQuery } from "../../../../../shared";
+// If your enum is numeric: { PUBLIC = 0, ONLY_FRIENDS = 1, PRIVATE = 2 }
+// Or if it's string-based, adjust accordingly.
+import { ProfileVisibility, useGetUserQuery } from "../../../../../shared";
+
+// Import the overlay
+import { ProfileVisibilityOverlay } from "@Components/profile/ProfileVisibilityOverlay";
 
 export const Route = createFileRoute("/users/$id/")({
 	component: RouteComponent,
@@ -37,6 +42,7 @@ function RouteComponent() {
 	const { id } = Route.useParams();
 	const [tabValue, setTabValue] = useState<number>(0);
 
+	// Fetch user data
 	const {
 		data: userData,
 		isLoading: userLoading,
@@ -44,10 +50,12 @@ function RouteComponent() {
 		error: userErrorMessage,
 	} = useGetUserQuery({ userId: id });
 
+	// Handle tab change
 	const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
 		setTabValue(newValue);
 	};
 
+	// Loading state
 	if (userLoading) {
 		return (
 			<Box display='flex' justifyContent='center' alignItems='center' height='80vh'>
@@ -56,6 +64,7 @@ function RouteComponent() {
 		);
 	}
 
+	// Error or user not found
 	if (userError || !userData?.getUsers?.items?.length) {
 		return (
 			<Container maxWidth='md' sx={{ mt: 4 }}>
@@ -97,8 +106,14 @@ function RouteComponent() {
 		);
 	}
 
+	// We have user data
 	const user = userData.getUsers.items[0];
 	const fullName = `${user.firstName} ${user.lastName}`.trim();
+
+	// Example flags to check if we're the owner or a friend:
+	const myUserId = "1234";
+	const isOwner = myUserId === user.id;
+	const isFriend = false; // or check your friend relationships
 
 	return (
 		<Container maxWidth='lg' sx={{ py: 1 }}>
@@ -110,17 +125,19 @@ function RouteComponent() {
 					background: "linear-gradient(to bottom right, #fff, #f7f9fc)",
 				}}
 			>
-				{/* Header Banner */}
+				{/* Header Banner (always visible) */}
 				<Box
 					sx={{
-						background: `linear-gradient(45deg, ${user.userConfiguration.profileBackgroundColor1} 30%, ${user.userConfiguration.profileBackgroundColor2} 90%)`,
+						background: `linear-gradient(${user.userConfiguration?.profileBackgroundLightAngle}deg, ${
+							user?.userConfiguration?.profileBackgroundColor1
+						} 30%, ${user?.userConfiguration?.profileBackgroundColor2} 90%)`,
 						height: 140,
 						position: "relative",
 					}}
 				/>
 
-				{/* Profile Section */}
-				<Box sx={{ px: 4, pb: 4 }}>
+				{/* Top section with avatar, name, and action buttons (always visible) */}
+				<Box sx={{ px: 4, pb: 0 }}>
 					<Box
 						sx={{
 							position: "relative",
@@ -131,7 +148,13 @@ function RouteComponent() {
 							alignItems: "flex-end",
 						}}
 					>
-						<Box sx={{ position: "relative", display: "flex", alignItems: "center" }}>
+						<Box
+							sx={{
+								position: "relative",
+								display: "flex",
+								alignItems: "center",
+							}}
+						>
 							<Avatar
 								src={user.profilePictureUrl || undefined}
 								alt={fullName}
@@ -166,19 +189,32 @@ function RouteComponent() {
 						</Box>
 						<Stack direction='row' spacing={1} alignItems='flex-end'>
 							<Tooltip title='Add Friend'>
-								<IconButton sx={{ bgcolor: "background.paper", "&:hover": { bgcolor: "grey.100" } }}>
+								<IconButton
+									sx={{
+										bgcolor: "background.paper",
+										"&:hover": { bgcolor: "grey.100" },
+									}}
+								>
 									<PersonAdd />
 								</IconButton>
 							</Tooltip>
 							<Tooltip title='Send Message'>
-								<IconButton sx={{ bgcolor: "background.paper", "&:hover": { bgcolor: "grey.100" } }}>
+								<IconButton
+									sx={{
+										bgcolor: "background.paper",
+										"&:hover": { bgcolor: "grey.100" },
+									}}
+								>
 									<Message />
 								</IconButton>
 							</Tooltip>
 							<Tooltip title='View Reports'>
 								<RouterLink to={`/users/${user.id}/reports`} style={{ color: "inherit" }}>
 									<IconButton
-										sx={{ bgcolor: "background.paper", "&:hover": { bgcolor: "grey.100" } }}
+										sx={{
+											bgcolor: "background.paper",
+											"&:hover": { bgcolor: "grey.100" },
+										}}
 									>
 										<Report />
 									</IconButton>
@@ -187,80 +223,90 @@ function RouteComponent() {
 							<ReportButton reportTarget={user} />
 						</Stack>
 					</Box>
-
-					{/* User Details */}
-					<Grid container spacing={3} sx={{ mt: 1 }}>
-						<Grid item xs={12} sm={6} md={4}>
-							<Typography variant='body2' color='text.secondary'>
-								Email
-							</Typography>
-							<Typography variant='body1' gutterBottom>
-								{user.email}
-							</Typography>
-						</Grid>
-						<Grid item xs={12} sm={6} md={4}>
-							<Typography variant='body2' color='text.secondary'>
-								Friends
-							</Typography>
-							<Typography variant='body1' gutterBottom>
-								{user.friendsCount ?? 0}
-							</Typography>
-						</Grid>
-						<Grid item xs={12} sm={6} md={4}>
-							<Typography variant='body2' color='text.secondary'>
-								Groups
-							</Typography>
-							<Typography variant='body1' gutterBottom>
-								{user.joinedGroupsCount ?? 0}
-							</Typography>
-						</Grid>
-						<Grid item xs={12} sm={6} md={4}>
-							<Typography variant='body2' color='text.secondary'>
-								Member Since
-							</Typography>
-							<Typography variant='body1' gutterBottom>
-								{new Date(user.createdAt).toLocaleDateString()}
-							</Typography>
-						</Grid>
-						<Grid item xs={12} sm={6} md={4}>
-							<Typography variant='body2' color='text.secondary'>
-								Last Updated
-							</Typography>
-							<Typography variant='body1' gutterBottom>
-								{new Date(user.updatedAt).toLocaleDateString()}
-							</Typography>
-						</Grid>
-					</Grid>
-
-					<Divider sx={{ my: 4 }} />
-
-					{/* Friends Section */}
-					<FriendsList friendOf={id} />
-
-					<Divider sx={{ my: 4 }} />
-
-					{/* Content Tabs */}
-					<Tabs
-						value={tabValue}
-						onChange={handleTabChange}
-						variant='fullWidth'
-						sx={{
-							mb: 3,
-							"& .MuiTab-root": {
-								py: 1.5,
-							},
-						}}
-					>
-						<Tab label='Posts' />
-						<Tab label='Comments' />
-						<Tab label='Reactions' />
-					</Tabs>
-
-					{tabValue === 0 && <UserPosts userId={id} />}
-					{tabValue === 1 && <UserComments userId={id} />}
-					{tabValue === 2 && <UserReactions userId={id} />}
 				</Box>
+
+				{/* Now wrap the REMAINING content in the overlay */}
+				<ProfileVisibilityOverlay
+					visibility={user.userConfiguration?.profileVisibility ?? ProfileVisibility.Public}
+					isOwner={isOwner}
+					isFriend={isFriend}
+				>
+					<Box sx={{ px: 4, pb: 4 }}>
+						{/* User Details */}
+						<Grid container spacing={3} sx={{ mt: 1 }}>
+							<Grid item xs={12} sm={6} md={4}>
+								<Typography variant='body2' color='text.secondary'>
+									Email
+								</Typography>
+								<Typography variant='body1' gutterBottom>
+									{user.email}
+								</Typography>
+							</Grid>
+							<Grid item xs={12} sm={6} md={4}>
+								<Typography variant='body2' color='text.secondary'>
+									Friends
+								</Typography>
+								<Typography variant='body1' gutterBottom>
+									{user.friendsCount ?? 0}
+								</Typography>
+							</Grid>
+							<Grid item xs={12} sm={6} md={4}>
+								<Typography variant='body2' color='text.secondary'>
+									Groups
+								</Typography>
+								<Typography variant='body1' gutterBottom>
+									{user.joinedGroupsCount ?? 0}
+								</Typography>
+							</Grid>
+							<Grid item xs={12} sm={6} md={4}>
+								<Typography variant='body2' color='text.secondary'>
+									Member Since
+								</Typography>
+								<Typography variant='body1' gutterBottom>
+									{new Date(user.createdAt).toLocaleDateString()}
+								</Typography>
+							</Grid>
+							<Grid item xs={12} sm={6} md={4}>
+								<Typography variant='body2' color='text.secondary'>
+									Last Updated
+								</Typography>
+								<Typography variant='body1' gutterBottom>
+									{new Date(user.updatedAt).toLocaleDateString()}
+								</Typography>
+							</Grid>
+						</Grid>
+
+						<Divider sx={{ my: 4 }} />
+
+						{/* Friends Section */}
+						<FriendsList friendOf={id} />
+
+						<Divider sx={{ my: 4 }} />
+
+						{/* Content Tabs */}
+						<Tabs
+							value={tabValue}
+							onChange={handleTabChange}
+							variant='fullWidth'
+							sx={{
+								mb: 3,
+								"& .MuiTab-root": {
+									py: 1.5,
+								},
+							}}
+						>
+							<Tab label='Posts' />
+							<Tab label='Comments' />
+							<Tab label='Reactions' />
+						</Tabs>
+
+						{tabValue === 0 && <UserPosts userId={id} />}
+						{tabValue === 1 && <UserComments userId={id} />}
+						{tabValue === 2 && <UserReactions userId={id} />}
+					</Box>
+				</ProfileVisibilityOverlay>
 			</Paper>
+
 			{/* Profile Image Modal */}
 			<Dialog
 				open={isProfileImageOpen}

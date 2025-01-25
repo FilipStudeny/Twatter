@@ -65,6 +65,8 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 				'config.id AS "user_configuration_id"',
 				'config.profileBackgroundColor1 AS "user_profileBackgroundColor1"',
 				'config.profileBackgroundColor2 AS "user_profileBackgroundColor2"',
+				'config.profileBackgroundLightAngle AS "user_profileBackgroundLightAngle"',
+				'config.profileVisibility AS "user_profileVisibility"',
 				'config.friendRequest_Email_Notification AS "user_friendRequest_Email_Notification"',
 				'config.friendRequest_App_Notification AS "user_friendRequest_App_Notification"',
 				'config.postReactedTo_Email_Notification AS "user_postReactedTo_Email_Notification"',
