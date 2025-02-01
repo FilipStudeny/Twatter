@@ -10,6 +10,7 @@ import { Post } from "@Models/Post";
 import { Reaction } from "@Models/Reaction";
 import { Report } from "@Models/Report";
 import { User } from "@Models/User";
+import { UserConfiguration } from "@Models/UserConfiguration";
 import EntityMapper from "@Utils/EntityMapper.mapper";
 import { AdminJwtStrategy } from "@Utils/JWT/AdminJwtStrategy.strategy";
 import JwtStrategy from "@Utils/JWT/JwtStrategy.strategy";
@@ -28,15 +29,16 @@ import { CommentModule } from "./Services/Comment/comment.module";
 import { EmailModule } from "./Services/Email/email.module";
 import { GroupModule } from "./Services/Group/group.module";
 import { InterestModule } from "./Services/Interest/interest.module";
+import { NotificationsModule } from "./Services/Notifications/notifications.module";
 import { PostModule } from "./Services/Post/post.module";
 import { ReactionModule } from "./Services/Reaction/reaction.module";
 import { ReportModule } from "./Services/Report/report.module";
 import { UserModule } from "./Services/User/user.module";
 import { RedisModule } from "./Services/redis.module";
-import { UserConfiguration } from "@Models/UserConfiguration";
 
 @Module({
 	imports: [
+		NotificationsModule,
 		ReportModule,
 		RedisModule,
 		EmailModule,

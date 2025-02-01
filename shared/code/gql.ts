@@ -100,6 +100,7 @@ export type InterestDetail = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  AddFriendRequest: GenericResponse;
   AddReaction: GenericResponse;
   CreateAdmin: GenericResponse;
   CreateComment: GenericResponse;
@@ -115,6 +116,11 @@ export type Mutation = {
   forgotPassword: GenericResponse;
   refreshToken: SignInResponse;
   resetPassword: GenericResponse;
+};
+
+
+export type MutationAddFriendRequestArgs = {
+  addFriendDto: NotificationDto;
 };
 
 
@@ -193,6 +199,25 @@ export type MutationRefreshTokenArgs = {
 export type MutationResetPasswordArgs = {
   resetPassword: ResetPasswordInput;
 };
+
+export type NotificationDto = {
+  message?: InputMaybe<Scalars['String']['input']>;
+  receiverId: Scalars['String']['input'];
+  type?: NotificationType;
+};
+
+export enum NotificationType {
+  AcceptedIntoGroup = 'ACCEPTED_INTO_GROUP',
+  Comment = 'COMMENT',
+  FriendRequest = 'FRIEND_REQUEST',
+  KickedOutOfGroup = 'KICKED_OUT_OF_GROUP',
+  Reaction = 'REACTION',
+  ReceivedBanStrike = 'RECEIVED_BAN_STRIKE',
+  ReportAssigned = 'REPORT_ASSIGNED',
+  ReportClosed = 'REPORT_CLOSED',
+  ReportRejected = 'REPORT_REJECTED',
+  ReportSubmitted = 'REPORT_SUBMITTED'
+}
 
 export type PaginatedCommentsListResponse = {
   __typename?: 'PaginatedCommentsListResponse';
@@ -477,6 +502,7 @@ export type UserDetail = {
   email?: Maybe<Scalars['String']['output']>;
   filedReportsCount?: Maybe<Scalars['Float']['output']>;
   firstName?: Maybe<Scalars['String']['output']>;
+  friendRequestSend?: Maybe<Scalars['Boolean']['output']>;
   friendsCount?: Maybe<Scalars['Float']['output']>;
   id: Scalars['String']['output'];
   joinedGroupsCount?: Maybe<Scalars['Float']['output']>;
@@ -674,6 +700,13 @@ export type GetReportsAdministrationQueryVariables = Exact<{
 
 export type GetReportsAdministrationQuery = { __typename?: 'Query', GetReports: { __typename?: 'PaginatedReportsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'ReportDetail', id: string, reportStatus: ReportStatus, reportMessage?: string | null, resolutionMessage?: string | null, createdAt: any, updatedAt: any, reportedUser?: string | null, reportedComment?: string | null, reportedPost?: string | null, reporter?: { __typename?: 'UserDetail', id: string, firstName?: string | null, lastName?: string | null, profilePictureUrl?: string | null, username?: string | null } | null }> | null } };
 
+export type SendFriendRequestMutationVariables = Exact<{
+  dto: NotificationDto;
+}>;
+
+
+export type SendFriendRequestMutation = { __typename?: 'Mutation', AddFriendRequest: { __typename?: 'GenericResponse', message?: string | null } };
+
 export type UpdateUserConfigurationMutationVariables = Exact<{
   updateDto: UpdateUserConfigurationDto;
 }>;
@@ -702,7 +735,7 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null, userConfiguration?: { __typename?: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string, profileVisibility: ProfileVisibility, profileBackgroundLightAngle: number } | null }> | null } };
+export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, friendRequestSend?: boolean | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null, userConfiguration?: { __typename?: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string, profileVisibility: ProfileVisibility, profileBackgroundLightAngle: number } | null }> | null } };
 
 export type GetFriendsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -1818,6 +1851,32 @@ useInfiniteGetReportsAdministrationQuery.getKey = (variables: GetReportsAdminist
 
 useGetReportsAdministrationQuery.fetcher = (variables: GetReportsAdministrationQueryVariables, options?: RequestInit['headers']) => fetcher<GetReportsAdministrationQuery, GetReportsAdministrationQueryVariables>(GetReportsAdministrationDocument, variables, options);
 
+export const SendFriendRequestDocument = /*#__PURE__*/ `
+    mutation SendFriendRequest($dto: NotificationDto!) {
+  AddFriendRequest(addFriendDto: $dto) {
+    message
+  }
+}
+    `;
+
+export const useSendFriendRequestMutation = <
+      TError = GraphQLResponse,
+      TContext = unknown
+    >(options?: UseMutationOptions<SendFriendRequestMutation, TError, SendFriendRequestMutationVariables, TContext>) => {
+    
+    return useMutation<SendFriendRequestMutation, TError, SendFriendRequestMutationVariables, TContext>(
+      {
+    mutationKey: ['SendFriendRequest'],
+    mutationFn: (variables?: SendFriendRequestMutationVariables) => fetcher<SendFriendRequestMutation, SendFriendRequestMutationVariables>(SendFriendRequestDocument, variables)(),
+    ...options
+  }
+    )};
+
+useSendFriendRequestMutation.getKey = () => ['SendFriendRequest'];
+
+
+useSendFriendRequestMutation.fetcher = (variables: SendFriendRequestMutationVariables, options?: RequestInit['headers']) => fetcher<SendFriendRequestMutation, SendFriendRequestMutationVariables>(SendFriendRequestDocument, variables, options);
+
 export const UpdateUserConfigurationDocument = /*#__PURE__*/ `
     mutation UpdateUserConfiguration($updateDto: UpdateUserConfigurationDto!) {
   UpdateUserConfiguration(updateDto: $updateDto) {
@@ -2008,6 +2067,7 @@ export const GetUserDocument = /*#__PURE__*/ `
         profileVisibility
         profileBackgroundLightAngle
       }
+      friendRequestSend
       commentsCount
       createdAt
       updatedAt

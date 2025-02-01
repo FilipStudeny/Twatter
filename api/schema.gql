@@ -53,6 +53,7 @@ type UserDetail {
   createdGroupsCount: Float
   createdAt: DateTime
   updatedAt: DateTime
+  friendRequestSend: Boolean
 }
 
 """
@@ -232,6 +233,7 @@ type Mutation {
   forgotPassword(email: String!): GenericResponse!
   resetPassword(resetPassword: ResetPasswordInput!): GenericResponse!
   UpdateUserConfiguration(updateDto: UpdateUserConfigurationDto!): GenericResponse!
+  AddFriendRequest(addFriendDto: NotificationDto!): GenericResponse!
 }
 
 input ReportDto {
@@ -327,4 +329,24 @@ input UpdateUserConfigurationDto {
   postReactedTo_App_Notification: Boolean
   commentReactedTo_Email_Notification: Boolean
   commentReactedTo_App_Notification: Boolean
+}
+
+input NotificationDto {
+  receiverId: String!
+  message: String
+  type: NotificationType! = FRIEND_REQUEST
+}
+
+"""Different types of notificaitons available"""
+enum NotificationType {
+  FRIEND_REQUEST
+  REACTION
+  COMMENT
+  ACCEPTED_INTO_GROUP
+  KICKED_OUT_OF_GROUP
+  RECEIVED_BAN_STRIKE
+  REPORT_ASSIGNED
+  REPORT_SUBMITTED
+  REPORT_REJECTED
+  REPORT_CLOSED
 }

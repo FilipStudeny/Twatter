@@ -1,0 +1,5 @@
+mutation SendFriendRequest($dto: NotificationDto!){
+    AddFriendRequest(addFriendDto: $dto){
+        message
+    }
+}

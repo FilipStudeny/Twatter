@@ -1,11 +1,11 @@
 import { Entity, Column, ManyToOne } from "typeorm";
+
 import { BaseEntity } from "./BaseEntity";
-import { User } from "./User";
 import NotificationType from "./Enums/NotificationType";
+import { User } from "./User";
 
 @Entity()
 export class Notification extends BaseEntity {
-	
 	@ManyToOne(() => User, (user) => user.notifications)
 	receiver: User;
 
@@ -23,7 +23,4 @@ export class Notification extends BaseEntity {
 
 	@Column({ default: false })
 	isRead: boolean;
-
-	@Column({ nullable: true })
-	relatedEntityId: string;
 }

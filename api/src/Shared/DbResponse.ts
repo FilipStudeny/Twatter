@@ -164,4 +164,6 @@ export class DbResponse {
 	user_profileBackgroundLightAngle: string;
 
 	user_profileVisibility: string;
+
+	friendRequestSend: boolean;
 }

@@ -35,8 +35,12 @@ export class RouterGuard extends AuthGuard(["admin-jwt", "jwt"]) {
 			context.getClass(),
 		]);
 
-		if (isPublic) {
-			return true;
+		try {
+			await super.canActivate(context);
+		} catch (err) {
+			if (!isPublic) {
+				throw err;
+			}
 		}
 
 		// Proceed with authentication

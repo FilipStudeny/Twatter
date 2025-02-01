@@ -53,6 +53,7 @@ query GetUser($userId: String) {
 				profileVisibility
 				profileBackgroundLightAngle
 			}
+			friendRequestSend
 			commentsCount
 			createdAt
 			updatedAt

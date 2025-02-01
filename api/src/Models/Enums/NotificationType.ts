@@ -1,3 +1,5 @@
+import { registerEnumType } from "@nestjs/graphql";
+
 export enum NotificationType {
 	FRIEND_REQUEST,
 	REACTION,
@@ -11,5 +13,10 @@ export enum NotificationType {
 	REPORT_REJECTED,
 	REPORT_CLOSED,
 }
+
+registerEnumType(NotificationType, {
+	name: "NotificationType",
+	description: "Different types of notificaitons available",
+});
 
 export default NotificationType;

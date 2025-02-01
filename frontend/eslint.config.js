@@ -38,7 +38,8 @@ export default tseslint.config(
 		rules: {
 			"@stylistic/no-multiple-empty-lines": ["warn", { max: 1 }],
 			"unused-imports/no-unused-imports": "error",
-			"unused-imports/no-unused-vars": [
+			"@typescript-eslint/no-explicit-any": "off",
+ 			"unused-imports/no-unused-vars": [
 				"warn",
 				{
 					vars: "all",

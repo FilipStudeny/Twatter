@@ -50,7 +50,7 @@ function RouteComponent() {
 		);
 		const { accessToken, refreshToken, userData } = response.SignInUser;
 
-		if (!isError){
+		if (!isError && response.SignInUser) {
 			signInStore({ accessToken, refreshToken, userData });
 			navigate({ to: "/" });
 		}

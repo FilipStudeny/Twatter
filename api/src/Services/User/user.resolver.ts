@@ -1,3 +1,4 @@
+import { NotificationDto } from "@Shared/Input/NotificationDto";
 import GenericResponse from "@Shared/Response/GenericResponse";
 import UserConfigurationDetail from "@Shared/Response/UserConfigurationResponse";
 import { CurrentUser } from "@Utils/JWT/CurrentUser";
@@ -9,6 +10,7 @@ import { GraphQLResolveInfo } from "graphql";
 import * as graphqlFields from "graphql-fields";
 import { Public, RouterGuard } from "src/Guards/RouteGuard.guard";
 
+import { AddFriendRequestCommand } from "./Mutations/AddFriendRequest/AddFriendRequestCommand";
 import { UpdateUserConfigurationCommand } from "./Mutations/UpdateUserConfiguration/UpdateUserConfiguration";
 import { UpdateUserConfigurationDto } from "./Mutations/UpdateUserConfiguration/UpdateUserConfiguration.dto";
 import { GetUserConfigurationQuery } from "./Queries/GetUserConfiguration/GetUserConfigurationQuery";
@@ -39,11 +41,24 @@ export default class UserResolver {
 		@Args("getAll", { type: () => Boolean, nullable: true }) getAll: boolean,
 		@Args("search", { type: () => String, nullable: true }) search: string,
 		@Args("friendOf", { type: () => String, nullable: true }) friendOf: string,
+		@CurrentUser() payload: JwtPayload,
 		@Info() info: GraphQLResolveInfo,
 	) {
 		const fields = graphqlFields(info);
+		const authenticatedUserId = payload.id;
+
 		return this.queryBus.execute(
-			new GetUsersQuery(page, limit, fields.items, userId, groupId, getAll, friendOf, search),
+			new GetUsersQuery(
+				page,
+				limit,
+				fields.items,
+				userId,
+				groupId,
+				getAll,
+				friendOf,
+				search,
+				authenticatedUserId,
+			),
 		);
 	}
 
@@ -67,5 +82,14 @@ export default class UserResolver {
 
 		const response = await this.queryBus.execute(new GetUserConfigurationQuery(userId));
 		return response;
+	}
+
+	@Mutation(() => GenericResponse)
+	async AddFriendRequest(
+		@Args("addFriendDto") dto: NotificationDto,
+		@CurrentUser() payload: JwtPayload,
+	): Promise<GenericResponse> {
+		const userId = payload.id;
+		return this.commandBus.execute(new AddFriendRequestCommand(userId, dto));
 	}
 }
