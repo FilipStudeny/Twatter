@@ -70,6 +70,7 @@ export type CreatePostDto = {
 export type GenericResponse = {
   __typename?: 'GenericResponse';
   message?: Maybe<Scalars['String']['output']>;
+  result?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export enum GraphFilter {
@@ -202,7 +203,8 @@ export type MutationResetPasswordArgs = {
 
 export type NotificationDto = {
   message?: InputMaybe<Scalars['String']['input']>;
-  receiverId: Scalars['String']['input'];
+  notificationId?: InputMaybe<Scalars['String']['input']>;
+  receiverId?: InputMaybe<Scalars['String']['input']>;
   type?: NotificationType;
 };
 
@@ -299,15 +301,22 @@ export enum ProfileVisibility {
 
 export type Query = {
   __typename?: 'Query';
+  GetFriendRequest: GenericResponse;
   GetInterests: PaginatedInterestsListResponse;
   GetReports: PaginatedReportsListResponse;
   GetUserConfiguration: UserConfigurationDetail;
+  GetUserIsFriend: GenericResponse;
   getCommentsList: PaginatedCommentsListResponse;
   getPosts: PaginatedPostsListResponse;
   getPostsStatistics: Array<PostGraphDataDto>;
   getUserReactions: PaginatedUserReactionsResponse;
   getUsers: PaginatedUsersResponse;
   hello: Scalars['String']['output'];
+};
+
+
+export type QueryGetFriendRequestArgs = {
+  userId: Scalars['String']['input'];
 };
 
 
@@ -326,6 +335,11 @@ export type QueryGetReportsArgs = {
 
 
 export type QueryGetUserConfigurationArgs = {
+  userId: Scalars['String']['input'];
+};
+
+
+export type QueryGetUserIsFriendArgs = {
   userId: Scalars['String']['input'];
 };
 
@@ -714,12 +728,26 @@ export type UpdateUserConfigurationMutationVariables = Exact<{
 
 export type UpdateUserConfigurationMutation = { __typename?: 'Mutation', UpdateUserConfiguration: { __typename?: 'GenericResponse', message?: string | null } };
 
+export type GetFriendRequestQueryVariables = Exact<{
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type GetFriendRequestQuery = { __typename?: 'Query', GetFriendRequest: { __typename?: 'GenericResponse', message?: string | null, result?: boolean | null } };
+
 export type GetUserConfigurationQueryVariables = Exact<{
   userId: Scalars['String']['input'];
 }>;
 
 
 export type GetUserConfigurationQuery = { __typename?: 'Query', GetUserConfiguration: { __typename?: 'UserConfigurationDetail', id: string, profileVisibility: ProfileVisibility, profileBackgroundColor1: string, profileBackgroundColor2: string, profileBackgroundLightAngle: number, friendRequest_Email_Notification?: boolean | null, friendRequest_App_Notification?: boolean | null, postReactedTo_Email_Notification?: boolean | null, postReactedTo_App_Notification?: boolean | null, commentReactedTo_Email_Notification?: boolean | null, commentReactedTo_App_Notification?: boolean | null } };
+
+export type GetUserIsFriendQueryVariables = Exact<{
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type GetUserIsFriendQuery = { __typename?: 'Query', GetUserIsFriend: { __typename?: 'GenericResponse', result?: boolean | null } };
 
 export type GetUsersListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -735,7 +763,7 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, friendRequestSend?: boolean | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null, userConfiguration?: { __typename?: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string, profileVisibility: ProfileVisibility, profileBackgroundLightAngle: number } | null }> | null } };
+export type GetUserQuery = { __typename?: 'Query', getUsers: { __typename?: 'PaginatedUsersResponse', items?: Array<{ __typename: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, email?: string | null, profilePictureUrl?: string | null, friendsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, joinedGroupsCount?: number | null, commentsCount?: number | null, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null, userConfiguration?: { __typename?: 'UserConfigurationDetail', id: string, profileBackgroundColor1: string, profileBackgroundColor2: string, profileVisibility: ProfileVisibility, profileBackgroundLightAngle: number } | null }> | null } };
 
 export type GetFriendsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -1903,6 +1931,59 @@ useUpdateUserConfigurationMutation.getKey = () => ['UpdateUserConfiguration'];
 
 useUpdateUserConfigurationMutation.fetcher = (variables: UpdateUserConfigurationMutationVariables, options?: RequestInit['headers']) => fetcher<UpdateUserConfigurationMutation, UpdateUserConfigurationMutationVariables>(UpdateUserConfigurationDocument, variables, options);
 
+export const GetFriendRequestDocument = /*#__PURE__*/ `
+    query GetFriendRequest($userId: String!) {
+  GetFriendRequest(userId: $userId) {
+    message
+    result
+  }
+}
+    `;
+
+export const useGetFriendRequestQuery = <
+      TData = GetFriendRequestQuery,
+      TError = GraphQLResponse
+    >(
+      variables: GetFriendRequestQueryVariables,
+      options?: Omit<UseQueryOptions<GetFriendRequestQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetFriendRequestQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetFriendRequestQuery, TError, TData>(
+      {
+    queryKey: ['GetFriendRequest', variables],
+    queryFn: fetcher<GetFriendRequestQuery, GetFriendRequestQueryVariables>(GetFriendRequestDocument, variables),
+    ...options
+  }
+    )};
+
+useGetFriendRequestQuery.document = GetFriendRequestDocument;
+
+useGetFriendRequestQuery.getKey = (variables: GetFriendRequestQueryVariables) => ['GetFriendRequest', variables];
+
+export const useInfiniteGetFriendRequestQuery = <
+      TData = InfiniteData<GetFriendRequestQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetFriendRequestQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetFriendRequestQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetFriendRequestQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetFriendRequestQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetFriendRequest.infinite', variables],
+      queryFn: (metaData) => fetcher<GetFriendRequestQuery, GetFriendRequestQueryVariables>(GetFriendRequestDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetFriendRequestQuery.getKey = (variables: GetFriendRequestQueryVariables) => ['GetFriendRequest.infinite', variables];
+
+
+useGetFriendRequestQuery.fetcher = (variables: GetFriendRequestQueryVariables, options?: RequestInit['headers']) => fetcher<GetFriendRequestQuery, GetFriendRequestQueryVariables>(GetFriendRequestDocument, variables, options);
+
 export const GetUserConfigurationDocument = /*#__PURE__*/ `
     query GetUserConfiguration($userId: String!) {
   GetUserConfiguration(userId: $userId) {
@@ -1964,6 +2045,58 @@ useInfiniteGetUserConfigurationQuery.getKey = (variables: GetUserConfigurationQu
 
 
 useGetUserConfigurationQuery.fetcher = (variables: GetUserConfigurationQueryVariables, options?: RequestInit['headers']) => fetcher<GetUserConfigurationQuery, GetUserConfigurationQueryVariables>(GetUserConfigurationDocument, variables, options);
+
+export const GetUserIsFriendDocument = /*#__PURE__*/ `
+    query GetUserIsFriend($userId: String!) {
+  GetUserIsFriend(userId: $userId) {
+    result
+  }
+}
+    `;
+
+export const useGetUserIsFriendQuery = <
+      TData = GetUserIsFriendQuery,
+      TError = GraphQLResponse
+    >(
+      variables: GetUserIsFriendQueryVariables,
+      options?: Omit<UseQueryOptions<GetUserIsFriendQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUserIsFriendQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetUserIsFriendQuery, TError, TData>(
+      {
+    queryKey: ['GetUserIsFriend', variables],
+    queryFn: fetcher<GetUserIsFriendQuery, GetUserIsFriendQueryVariables>(GetUserIsFriendDocument, variables),
+    ...options
+  }
+    )};
+
+useGetUserIsFriendQuery.document = GetUserIsFriendDocument;
+
+useGetUserIsFriendQuery.getKey = (variables: GetUserIsFriendQueryVariables) => ['GetUserIsFriend', variables];
+
+export const useInfiniteGetUserIsFriendQuery = <
+      TData = InfiniteData<GetUserIsFriendQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetUserIsFriendQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetUserIsFriendQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUserIsFriendQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetUserIsFriendQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetUserIsFriend.infinite', variables],
+      queryFn: (metaData) => fetcher<GetUserIsFriendQuery, GetUserIsFriendQueryVariables>(GetUserIsFriendDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetUserIsFriendQuery.getKey = (variables: GetUserIsFriendQueryVariables) => ['GetUserIsFriend.infinite', variables];
+
+
+useGetUserIsFriendQuery.fetcher = (variables: GetUserIsFriendQueryVariables, options?: RequestInit['headers']) => fetcher<GetUserIsFriendQuery, GetUserIsFriendQueryVariables>(GetUserIsFriendDocument, variables, options);
 
 export const GetUsersListDocument = /*#__PURE__*/ `
     query GetUsersList($page: Int = 1, $limit: Int = 10, $search: String) {
@@ -2067,7 +2200,6 @@ export const GetUserDocument = /*#__PURE__*/ `
         profileVisibility
         profileBackgroundLightAngle
       }
-      friendRequestSend
       commentsCount
       createdAt
       updatedAt

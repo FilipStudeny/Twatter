@@ -19,14 +19,16 @@ export class AddFriendRequestCommandHandler implements ICommandHandler<AddFriend
 		const { senderId, dto } = command;
 
 		try {
-			await this.notificationsService.createNotification(
+			// Pass the notificationId from the DTO (if provided) along with the other parameters.
+			const response = await this.notificationsService.toggleNotification(
+				dto.notificationId,
 				dto.receiverId,
 				senderId,
 				dto.message,
 				dto.type,
 			);
 
-			return new GenericResponse("Notification created successfully");
+			return response;
 		} catch (error) {
 			if (error.code === "23503") {
 				throw new NotFoundException("Invalid foreign key provided.");

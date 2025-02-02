@@ -5,7 +5,11 @@ export default class GenericResponse {
 	@Field(() => String, { nullable: true })
 	message?: string;
 
-	constructor(message?: string) {
+	@Field(() => Boolean, { nullable: true })
+	result: boolean;
+
+	constructor(message?: string, result?: boolean) {
 		this.message = message;
+		this.result = result;
 	}
 }

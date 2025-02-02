@@ -13,7 +13,9 @@ import { Public, RouterGuard } from "src/Guards/RouteGuard.guard";
 import { AddFriendRequestCommand } from "./Mutations/AddFriendRequest/AddFriendRequestCommand";
 import { UpdateUserConfigurationCommand } from "./Mutations/UpdateUserConfiguration/UpdateUserConfiguration";
 import { UpdateUserConfigurationDto } from "./Mutations/UpdateUserConfiguration/UpdateUserConfiguration.dto";
+import { GetFriendRequestNotificationQuery } from "./Queries/GetSendFriendRequest/GetSendFriendRequestQuery";
 import { GetUserConfigurationQuery } from "./Queries/GetUserConfiguration/GetUserConfigurationQuery";
+import { GetUserIsFriendQuery } from "./Queries/GetUserIsFriend/GetUserIsFriendQuery";
 import { GetUsersQuery } from "./Queries/GetUsers/GetUsersQuery";
 import PaginatedUsersResponse from "./Queries/GetUsers/PaginatedUsersResponse.type";
 
@@ -91,5 +93,29 @@ export default class UserResolver {
 	): Promise<GenericResponse> {
 		const userId = payload.id;
 		return this.commandBus.execute(new AddFriendRequestCommand(userId, dto));
+	}
+
+	@Query(() => GenericResponse)
+	async GetUserIsFriend(
+		@Args("userId", { type: () => String }) userId: string,
+		@CurrentUser() payload: JwtPayload,
+	): Promise<GenericResponse> {
+		const authenticatedUserId = payload.id;
+
+		const response = await this.queryBus.execute(new GetUserIsFriendQuery(userId, authenticatedUserId));
+		return response;
+	}
+
+	@Query(() => GenericResponse)
+	async GetFriendRequest(
+		@Args("userId", { type: () => String }) userId: string,
+		@CurrentUser() payload: JwtPayload,
+	): Promise<GenericResponse> {
+		const authenticatedUserId = payload.id;
+
+		const response = await this.queryBus.execute(
+			new GetFriendRequestNotificationQuery(userId, authenticatedUserId),
+		);
+		return response;
 	}
 }

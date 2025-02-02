@@ -4,15 +4,19 @@ import { IsEnum, IsNotEmpty, IsOptional } from "class-validator";
 
 @InputType()
 export class NotificationDto {
-	@Field()
-	@IsNotEmpty()
+	@Field({ nullable: true })
+	@IsOptional()
+	notificationId: string;
+
+	@Field({ nullable: true })
+	@IsOptional()
 	receiverId: string;
 
 	@Field({ nullable: true })
 	@IsOptional()
 	message: string;
 
-	@Field(() => NotificationType)
+	@Field(() => NotificationType, { nullable: true })
 	@IsEnum(NotificationType)
 	@IsNotEmpty()
 	type: NotificationType = NotificationType.FRIEND_REQUEST;

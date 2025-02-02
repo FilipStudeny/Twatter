@@ -11,7 +11,9 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AddFriendRequestCommandHandler } from "./Mutations/AddFriendRequest/AddFriendRequestCommand";
 import { UpdateFriendCommandHandler } from "./Mutations/UpdateFriend/UpdateFriendCommand";
 import { UpdateUserConfigurationCommandHandler } from "./Mutations/UpdateUserConfiguration/UpdateUserConfiguration";
+import { GetFriendRequestNotificationQueryHandler } from "./Queries/GetSendFriendRequest/GetSendFriendRequestQuery";
 import { GetUserConfigurationQueryHandler } from "./Queries/GetUserConfiguration/GetUserConfigurationQuery";
+import { GetUserIsFriendQueryHandler } from "./Queries/GetUserIsFriend/GetUserIsFriendQuery";
 import GetUsersQueryHandler from "./Queries/GetUsers/GetUsersQuery";
 import UserResolver from "./user.resolver";
 
@@ -39,6 +41,8 @@ import UserResolver from "./user.resolver";
 		GetUserConfigurationQueryHandler,
 		UpdateFriendCommandHandler,
 		AddFriendRequestCommandHandler,
+		GetUserIsFriendQueryHandler,
+		GetFriendRequestNotificationQueryHandler,
 	],
 })
 export class UserModule {}

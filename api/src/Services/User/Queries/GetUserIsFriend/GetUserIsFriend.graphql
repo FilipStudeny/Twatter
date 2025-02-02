@@ -1,0 +1,5 @@
+query GetUserIsFriend($userId: String!) {
+    GetUserIsFriend(userId: $userId){
+        result
+    }
+}

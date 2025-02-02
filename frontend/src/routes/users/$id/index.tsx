@@ -7,7 +7,7 @@ import UserReactions from "@Components/profile/UserReactions";
 import { ReportButton } from "@Components/report/ReportButton";
 import { useAuthenticationStore } from "@Stores/authenticationStore";
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
-import { PersonAdd, Message, Report } from "@mui/icons-material";
+import { PersonAdd, Message } from "@mui/icons-material";
 import {
 	Box,
 	Container,
@@ -32,6 +32,7 @@ import {
 	NotificationDto,
 	NotificationType,
 	ProfileVisibility,
+	useGetFriendRequestQuery,
 	useGetUserQuery,
 	useSendFriendRequestMutation,
 } from "../../../../../shared";
@@ -52,8 +53,10 @@ function RouteComponent() {
 		error: userErrorMessage,
 	} = useGetUserQuery({ userId: id });
 
+	const { data: friendRequestResponse, refetch: refetchFriendRequest } = useGetFriendRequestQuery({ userId: id });
 	const { mutateAsync: sendFriendRequest, isPending } = useSendFriendRequestMutation();
 	const { getUserData } = useAuthenticationStore();
+	const authenticatedUserId = getUserData()?.id ?? "";
 
 	const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
 		setTabValue(newValue);
@@ -64,7 +67,9 @@ function RouteComponent() {
 		const displayName =
 			authUserData?.username ?? `${authUserData?.firstName ?? ""} ${authUserData?.lastName ?? ""}`.trim();
 		const message = `${displayName} wants to be your friend`;
+
 		const dto: NotificationDto = {
+			notificationId: friendRequestResponse?.GetFriendRequest.message,
 			receiverId: user.id,
 			message,
 			type: NotificationType.FriendRequest,
@@ -72,6 +77,7 @@ function RouteComponent() {
 
 		try {
 			await sendFriendRequest({ dto });
+			await refetchFriendRequest();
 		} catch (err) {
 			console.error("Failed to send friend request", err);
 		}
@@ -91,6 +97,8 @@ function RouteComponent() {
 	const myUserId = "1234";
 	const isOwner = myUserId === user.id;
 	const isFriend = false;
+
+	const friendRequestSent = friendRequestResponse?.GetFriendRequest.result ?? false;
 
 	return (
 		<Container maxWidth='lg' sx={{ py: 1 }}>
@@ -116,8 +124,9 @@ function RouteComponent() {
 					fullName={fullName}
 					handleSendFriendRequest={handleSendFriendRequest}
 					isPending={isPending}
-					friendRequestSend={user.friendRequestSend ?? false}
+					friendRequestSend={friendRequestSent}
 					onAvatarClick={() => setIsProfileImageOpen(true)}
+					authenticatedUserId={authenticatedUserId}
 				/>
 				<ProfileVisibilityOverlay
 					visibility={user.userConfiguration?.profileVisibility ?? ProfileVisibility.Public}
@@ -187,8 +196,8 @@ function ErrorState({ errorMessage, onReload }: { errorMessage: any, onReload: (
 		</Container>
 	);
 }
-// #endregion
 
+// #endregion
 // #region Profile header
 function UserProfileHeader({
 	user,
@@ -197,6 +206,7 @@ function UserProfileHeader({
 	isPending,
 	friendRequestSend,
 	onAvatarClick,
+	authenticatedUserId,
 }: {
 	user: any,
 	fullName: string,
@@ -204,6 +214,7 @@ function UserProfileHeader({
 	isPending: boolean,
 	friendRequestSend?: boolean,
 	onAvatarClick: ()=> void,
+	authenticatedUserId: string,
 }) {
 	return (
 		<Box sx={{ px: 4, pb: 0 }}>
@@ -214,7 +225,7 @@ function UserProfileHeader({
 					mb: 3,
 					display: "flex",
 					justifyContent: "space-between",
-					alignItems: "flex-end",
+					alignItems: "center",
 				}}
 			>
 				{/* Avatar and Name */}
@@ -252,20 +263,23 @@ function UserProfileHeader({
 					</Box>
 				</Box>
 				{/* Action Buttons */}
-				<Stack direction='row' spacing={1} alignItems='flex-end'>
-					<Tooltip title='Add Friend'>
-						<IconButton
-							onClick={handleSendFriendRequest}
-							disabled={isPending}
-							color={friendRequestSend ? "error" : "primary"}
-							sx={{
-								bgcolor: "background.paper",
-								"&:hover": { bgcolor: "grey.100" },
-							}}
-						>
-							<PersonAdd />
-						</IconButton>
-					</Tooltip>
+				<Stack direction='row' spacing={1} alignItems='center' mt={4}>
+					{/* Friend Request Button */}
+					<Button
+						onClick={handleSendFriendRequest}
+						disabled={isPending}
+						variant={"outlined"}
+						color={friendRequestSend ? "error" : "primary"}
+						startIcon={<PersonAdd />}
+						sx={{
+							textTransform: "none",
+							px: 2,
+						}}
+					>
+						{friendRequestSend ? "Cancel friend request" : "Add Friend"}
+					</Button>
+
+					{/* Send Message Button */}
 					<Tooltip title='Send Message'>
 						<IconButton
 							sx={{
@@ -276,19 +290,11 @@ function UserProfileHeader({
 							<Message />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title='View Reports'>
-						<RouterLink to={`/users/${user.id}/reports`} style={{ color: "inherit" }}>
-							<IconButton
-								sx={{
-									bgcolor: "background.paper",
-									"&:hover": { bgcolor: "grey.100" },
-								}}
-							>
-								<Report />
-							</IconButton>
-						</RouterLink>
-					</Tooltip>
-					<ReportButton reportTarget={user} />
+
+					{user.id !== authenticatedUserId && (
+
+						<ReportButton reportTarget={user} />
+					)}
 				</Stack>
 			</Box>
 		</Box>
