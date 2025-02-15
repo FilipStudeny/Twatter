@@ -1,0 +1,20 @@
+query GetNotifications($page: Int, $limit: Int) {
+	GetNotifications(page: $page, limit: $limit) {
+		total
+		page
+		items {
+			id
+			message
+			isRead
+			createdAt
+			notificationType
+			creator {
+				id
+				firstName
+				lastName
+				username
+				profilePictureUrl
+			}
+		}
+	}
+}

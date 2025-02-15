@@ -80,6 +80,30 @@ type InterestDetail {
   groupsCount: Int
 }
 
+type NotificationDetail {
+  id: String!
+  message: String!
+  isRead: Boolean!
+  creator: UserDetail!
+  notificationType: NotificationType!
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""Different types of notificaitons available"""
+enum NotificationType {
+  FRIEND_REQUEST
+  REACTION
+  COMMENT
+  ACCEPTED_INTO_GROUP
+  KICKED_OUT_OF_GROUP
+  RECEIVED_BAN_STRIKE
+  REPORT_ASSIGNED
+  REPORT_SUBMITTED
+  REPORT_REJECTED
+  REPORT_CLOSED
+}
+
 type GroupDetail {
   id: String
   name: String
@@ -164,6 +188,13 @@ type PaginatedInterestsListResponse {
   items: [InterestDetail!]
 }
 
+type PaginatedNotificationsResponse {
+  total: Int
+  page: Int
+  limit: Int
+  items: [NotificationDetail!]
+}
+
 type PostGraphDataDto {
   period: String!
   count: Int!
@@ -200,8 +231,10 @@ type PaginatedUsersResponse {
 }
 
 type Query {
-  GetReports(userId: String!, page: Int = 1, limit: Int = 10): PaginatedReportsListResponse!
   hello: String!
+  GetUnreadNotificationsCount: Float!
+  GetNotifications(page: Int! = 1, limit: Int! = 10): PaginatedNotificationsResponse!
+  GetReports(userId: String!, page: Int = 1, limit: Int = 10): PaginatedReportsListResponse!
   GetInterests(page: Int! = 1, limit: Int! = 10, interestId: String): PaginatedInterestsListResponse!
   getUserReactions(userId: String!, page: Int = 1, limit: Int = 10): PaginatedUserReactionsResponse!
   getCommentsList(page: Int!, limit: Int!, creatorId: String, postId: String, id: String): PaginatedCommentsListResponse!
@@ -339,18 +372,4 @@ input NotificationDto {
   receiverId: String
   message: String
   type: NotificationType = FRIEND_REQUEST
-}
-
-"""Different types of notificaitons available"""
-enum NotificationType {
-  FRIEND_REQUEST
-  REACTION
-  COMMENT
-  ACCEPTED_INTO_GROUP
-  KICKED_OUT_OF_GROUP
-  RECEIVED_BAN_STRIKE
-  REPORT_ASSIGNED
-  REPORT_SUBMITTED
-  REPORT_REJECTED
-  REPORT_CLOSED
 }

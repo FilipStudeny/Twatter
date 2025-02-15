@@ -4,7 +4,7 @@ import { User } from "@Models/User";
 import GenericResponse from "@Shared/Response/GenericResponse";
 import { Injectable, Logger, NotFoundException, InternalServerErrorException } from "@nestjs/common";
 import { InjectEntityManager } from "@nestjs/typeorm";
-import { EntityManager } from "typeorm";
+import { EntityManager, In } from "typeorm";
 
 @Injectable()
 export class NotificationsService {
@@ -61,29 +61,11 @@ export class NotificationsService {
 	 * @returns A GenericResponse indicating whether the notification was created successfully.
 	 */
 	async createNotification(
-		receiverId: string,
-		senderId: string,
+		receiver: User,
+		sender: User,
 		message: string,
 		type: NotificationType,
 	): Promise<GenericResponse> {
-		// Verify the existence of the receiver.
-		const receiver = await this.entityManager.findOne(User, {
-			where: { id: receiverId },
-			select: ["id"],
-		});
-		if (!receiver) {
-			throw new NotFoundException("Receiver not found");
-		}
-
-		// Verify the existence of the sender.
-		const sender = await this.entityManager.findOne(User, {
-			where: { id: senderId },
-			select: ["id"],
-		});
-		if (!sender) {
-			throw new NotFoundException("Sender not found");
-		}
-
 		const notification = new Notification();
 		notification.receiver = receiver;
 		notification.sender = sender;
@@ -167,8 +149,8 @@ export class NotificationsService {
 	 */
 	async toggleNotification(
 		notificationId: string | undefined,
-		receiverId: string,
-		senderId: string,
+		receiver: User,
+		sender: User,
 		message: string,
 		type: NotificationType,
 	): Promise<GenericResponse> {
@@ -178,10 +160,88 @@ export class NotificationsService {
 				return this.removeNotificationById(notificationId);
 			}
 		}
-		const existingNotification = await this.checkNotificationByComposite(receiverId, senderId, type);
+		const existingNotification = await this.checkNotificationByComposite(receiver.id, sender.id, type);
 		if (existingNotification) {
-			return this.removeNotificationByComposite(receiverId, senderId, type);
+			return this.removeNotificationByComposite(receiver.id, sender.id, type);
 		}
-		return this.createNotification(receiverId, senderId, message, type);
+		return this.createNotification(receiver, sender, message, type);
+	}
+
+	/**
+	 * Retrieves the count of unread notifications for a specific user.
+	 *
+	 * @param receiverId - The ID of the user.
+	 * @returns The count of unread notifications.
+	 */
+	async getUnreadNotificationsCount(receiverId: string): Promise<number> {
+		return this.entityManager.count(Notification, {
+			where: {
+				receiver: { id: receiverId },
+				isRead: false,
+			},
+		});
+	}
+
+	/**
+	 * Retrieves a paginated list of notifications for a specific user,
+	 * including sender details and total notifications count.
+	 *
+	 * @param receiverId - The ID of the user.
+	 * @param page - The page number (default: 1).
+	 * @param pageSize - The number of notifications per page (default: 10).
+	 * @returns An object containing the paginated notifications and the total count.
+	 */
+	async getPaginatedNotifications(
+		receiverId: string,
+		page: number = 1,
+		pageSize: number = 10,
+	): Promise<{ notifications: Notification[]; total: number }> {
+		const [notifications, total] = await this.entityManager.findAndCount(Notification, {
+			where: {
+				receiver: { id: receiverId },
+			},
+			relations: ["sender"],
+			select: {
+				id: true,
+				message: true,
+				type: true,
+				isRead: true,
+				createdAt: true,
+				sender: {
+					id: true,
+					firstName: true,
+					lastName: true,
+					username: true,
+					profilePictureUrl: true,
+				},
+			},
+			order: {
+				createdAt: "DESC",
+			},
+			take: pageSize,
+			skip: (page - 1) * pageSize,
+		});
+
+		return { notifications, total };
+	}
+
+	/**
+	 * Marks notifications as read based on a list of IDs.
+	 *
+	 * @param notificationIds - An array of notification IDs to be marked as read.
+	 * @returns A GenericResponse indicating the update result.
+	 */
+	async markNotificationsAsRead(notificationIds: string[]): Promise<GenericResponse> {
+		if (!notificationIds.length) {
+			return new GenericResponse("No notifications provided", false);
+		}
+
+		try {
+			await this.entityManager.update(Notification, { id: In(notificationIds) }, { isRead: true });
+			return new GenericResponse("Notifications marked as read successfully");
+		} catch (error) {
+			this.logger.error("Error marking notifications as read", error.stack);
+			throw new InternalServerErrorException("Failed to mark notifications as read");
+		}
 	}
 }

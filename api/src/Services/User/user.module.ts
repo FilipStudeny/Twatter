@@ -1,5 +1,6 @@
 import { Password } from "@Models/Password";
 import { User } from "@Models/User";
+import { EmailModule } from "@Services/Email/email.module";
 import { NotificationsModule } from "@Services/Notifications/notifications.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -33,6 +34,7 @@ import UserResolver from "./user.resolver";
 		}),
 		TypeOrmModule.forFeature([User, Password]),
 		NotificationsModule,
+		EmailModule,
 	],
 	providers: [
 		UserResolver,

@@ -76,4 +76,44 @@ export class EmailService {
 			},
 		});
 	}
+
+	/**
+	 * Sends a notification email to a user confirming that they have received a friend request.
+	 *
+	 * @param email - The recipient's email address where the notification will be sent.
+	 * @param username - The sender's username or display name (if available).
+	 * @param firstName - The sender's first name.
+	 * @param lastName - The sender's last name.
+	 * @param profilePicture - The URL of the sender's profile picture.
+	 * @param userUrl - The URL to view the sender's profile.
+	 * @returns A promise that resolves once the email has been sent.
+	 */
+	async sendFriendRequest(
+		email: string,
+		username: string | undefined,
+		firstName: string,
+		lastName: string,
+		profilePictureUrl: string,
+		userUrl: string,
+	): Promise<void> {
+		try {
+			await this.mailerService.sendMail({
+				to: email,
+				subject: `${username ?? `${firstName} ${lastName}`} has sent you a friend request`,
+				template: "friend-request",
+				context: {
+					username,
+					email,
+					firstName,
+					lastName,
+					profilePictureUrl,
+					userUrl,
+				},
+			});
+
+			this.logger.log(`Friend request email sent successfully to ${email}`);
+		} catch (error) {
+			this.logger.error(`Failed to send friend request email to ${email}`, error.stack);
+		}
+	}
 }

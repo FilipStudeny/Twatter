@@ -201,11 +201,22 @@ export type MutationResetPasswordArgs = {
   resetPassword: ResetPasswordInput;
 };
 
+export type NotificationDetail = {
+  __typename?: 'NotificationDetail';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  creator: UserDetail;
+  id: Scalars['String']['output'];
+  isRead: Scalars['Boolean']['output'];
+  message: Scalars['String']['output'];
+  notificationType: NotificationType;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
 export type NotificationDto = {
   message?: InputMaybe<Scalars['String']['input']>;
   notificationId?: InputMaybe<Scalars['String']['input']>;
   receiverId?: InputMaybe<Scalars['String']['input']>;
-  type?: NotificationType;
+  type?: InputMaybe<NotificationType>;
 };
 
 export enum NotificationType {
@@ -232,6 +243,14 @@ export type PaginatedCommentsListResponse = {
 export type PaginatedInterestsListResponse = {
   __typename?: 'PaginatedInterestsListResponse';
   items?: Maybe<Array<InterestDetail>>;
+  limit?: Maybe<Scalars['Int']['output']>;
+  page?: Maybe<Scalars['Int']['output']>;
+  total?: Maybe<Scalars['Int']['output']>;
+};
+
+export type PaginatedNotificationsResponse = {
+  __typename?: 'PaginatedNotificationsResponse';
+  items?: Maybe<Array<NotificationDetail>>;
   limit?: Maybe<Scalars['Int']['output']>;
   page?: Maybe<Scalars['Int']['output']>;
   total?: Maybe<Scalars['Int']['output']>;
@@ -303,7 +322,9 @@ export type Query = {
   __typename?: 'Query';
   GetFriendRequest: GenericResponse;
   GetInterests: PaginatedInterestsListResponse;
+  GetNotifications: PaginatedNotificationsResponse;
   GetReports: PaginatedReportsListResponse;
+  GetUnreadNotificationsCount: Scalars['Float']['output'];
   GetUserConfiguration: UserConfigurationDetail;
   GetUserIsFriend: GenericResponse;
   getCommentsList: PaginatedCommentsListResponse;
@@ -322,6 +343,12 @@ export type QueryGetFriendRequestArgs = {
 
 export type QueryGetInterestsArgs = {
   interestId?: InputMaybe<Scalars['String']['input']>;
+  limit?: Scalars['Int']['input'];
+  page?: Scalars['Int']['input'];
+};
+
+
+export type QueryGetNotificationsArgs = {
   limit?: Scalars['Int']['input'];
   page?: Scalars['Int']['input'];
 };
@@ -636,6 +663,19 @@ export type GetInterestsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetInterestsQuery = { __typename?: 'Query', GetInterests: { __typename?: 'PaginatedInterestsListResponse', total?: number | null, items?: Array<{ __typename?: 'InterestDetail', id?: string | null, name?: string | null }> | null } };
+
+export type GetNotificationsQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetNotificationsQuery = { __typename?: 'Query', GetNotifications: { __typename?: 'PaginatedNotificationsResponse', total?: number | null, page?: number | null, items?: Array<{ __typename?: 'NotificationDetail', id: string, message: string, isRead: boolean, createdAt?: any | null, notificationType: NotificationType, creator: { __typename?: 'UserDetail', id: string, firstName?: string | null, lastName?: string | null, username?: string | null, profilePictureUrl?: string | null } }> | null } };
+
+export type GetUnreadNotificationsCountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUnreadNotificationsCountQuery = { __typename?: 'Query', GetUnreadNotificationsCount: number };
 
 export type CreatePostMutationVariables = Exact<{
   input: CreatePostDto;
@@ -1303,6 +1343,123 @@ useInfiniteGetInterestsQuery.getKey = (variables?: GetInterestsQueryVariables) =
 
 
 useGetInterestsQuery.fetcher = (variables?: GetInterestsQueryVariables, options?: RequestInit['headers']) => fetcher<GetInterestsQuery, GetInterestsQueryVariables>(GetInterestsDocument, variables, options);
+
+export const GetNotificationsDocument = /*#__PURE__*/ `
+    query GetNotifications($page: Int, $limit: Int) {
+  GetNotifications(page: $page, limit: $limit) {
+    total
+    page
+    items {
+      id
+      message
+      isRead
+      createdAt
+      notificationType
+      creator {
+        id
+        firstName
+        lastName
+        username
+        profilePictureUrl
+      }
+    }
+  }
+}
+    `;
+
+export const useGetNotificationsQuery = <
+      TData = GetNotificationsQuery,
+      TError = GraphQLResponse
+    >(
+      variables?: GetNotificationsQueryVariables,
+      options?: Omit<UseQueryOptions<GetNotificationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetNotificationsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetNotificationsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetNotifications'] : ['GetNotifications', variables],
+    queryFn: fetcher<GetNotificationsQuery, GetNotificationsQueryVariables>(GetNotificationsDocument, variables),
+    ...options
+  }
+    )};
+
+useGetNotificationsQuery.document = GetNotificationsDocument;
+
+useGetNotificationsQuery.getKey = (variables?: GetNotificationsQueryVariables) => variables === undefined ? ['GetNotifications'] : ['GetNotifications', variables];
+
+export const useInfiniteGetNotificationsQuery = <
+      TData = InfiniteData<GetNotificationsQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetNotificationsQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetNotificationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetNotificationsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetNotificationsQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetNotifications.infinite'] : ['GetNotifications.infinite', variables],
+      queryFn: (metaData) => fetcher<GetNotificationsQuery, GetNotificationsQueryVariables>(GetNotificationsDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetNotificationsQuery.getKey = (variables?: GetNotificationsQueryVariables) => variables === undefined ? ['GetNotifications.infinite'] : ['GetNotifications.infinite', variables];
+
+
+useGetNotificationsQuery.fetcher = (variables?: GetNotificationsQueryVariables, options?: RequestInit['headers']) => fetcher<GetNotificationsQuery, GetNotificationsQueryVariables>(GetNotificationsDocument, variables, options);
+
+export const GetUnreadNotificationsCountDocument = /*#__PURE__*/ `
+    query GetUnreadNotificationsCount {
+  GetUnreadNotificationsCount
+}
+    `;
+
+export const useGetUnreadNotificationsCountQuery = <
+      TData = GetUnreadNotificationsCountQuery,
+      TError = GraphQLResponse
+    >(
+      variables?: GetUnreadNotificationsCountQueryVariables,
+      options?: Omit<UseQueryOptions<GetUnreadNotificationsCountQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUnreadNotificationsCountQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetUnreadNotificationsCountQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['GetUnreadNotificationsCount'] : ['GetUnreadNotificationsCount', variables],
+    queryFn: fetcher<GetUnreadNotificationsCountQuery, GetUnreadNotificationsCountQueryVariables>(GetUnreadNotificationsCountDocument, variables),
+    ...options
+  }
+    )};
+
+useGetUnreadNotificationsCountQuery.document = GetUnreadNotificationsCountDocument;
+
+useGetUnreadNotificationsCountQuery.getKey = (variables?: GetUnreadNotificationsCountQueryVariables) => variables === undefined ? ['GetUnreadNotificationsCount'] : ['GetUnreadNotificationsCount', variables];
+
+export const useInfiniteGetUnreadNotificationsCountQuery = <
+      TData = InfiniteData<GetUnreadNotificationsCountQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetUnreadNotificationsCountQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetUnreadNotificationsCountQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUnreadNotificationsCountQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetUnreadNotificationsCountQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? variables === undefined ? ['GetUnreadNotificationsCount.infinite'] : ['GetUnreadNotificationsCount.infinite', variables],
+      queryFn: (metaData) => fetcher<GetUnreadNotificationsCountQuery, GetUnreadNotificationsCountQueryVariables>(GetUnreadNotificationsCountDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetUnreadNotificationsCountQuery.getKey = (variables?: GetUnreadNotificationsCountQueryVariables) => variables === undefined ? ['GetUnreadNotificationsCount.infinite'] : ['GetUnreadNotificationsCount.infinite', variables];
+
+
+useGetUnreadNotificationsCountQuery.fetcher = (variables?: GetUnreadNotificationsCountQueryVariables, options?: RequestInit['headers']) => fetcher<GetUnreadNotificationsCountQuery, GetUnreadNotificationsCountQueryVariables>(GetUnreadNotificationsCountDocument, variables, options);
 
 export const CreatePostDocument = /*#__PURE__*/ `
     mutation CreatePost($input: CreatePostDto!) {

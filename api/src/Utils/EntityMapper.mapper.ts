@@ -2,6 +2,7 @@ import { CreateAdminDto } from "@Services/Admin/Mutations/CreateAdmin/CreateAdmi
 import SignUpUserData from "@Services/Auth/Mutations/SignUp/SignUpUserData";
 import { CommentDetail } from "@Shared/Response/CommentDetail";
 import { InterestDetail } from "@Shared/Response/InterestDetail";
+import { NotificationDetail } from "@Shared/Response/NotificationDetail";
 import { PostDetail } from "@Shared/Response/PostDetail";
 import { ReportDetail } from "@Shared/Response/ReportDetail";
 import UserConfigurationDetail from "@Shared/Response/UserConfigurationResponse";
@@ -27,6 +28,7 @@ export default class EntityMapper extends AutomapperProfile {
 			SignUpUserData.createMap(mapper);
 			ReportDetail.createMap(mapper);
 			UserConfigurationDetail.createMap(mapper);
+			NotificationDetail.createMap(mapper);
 		};
 	}
 }
