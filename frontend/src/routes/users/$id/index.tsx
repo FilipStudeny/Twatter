@@ -267,10 +267,10 @@ function UserProfileHeader({
 					{/* Friend Request Button */}
 					<Button
 						onClick={handleSendFriendRequest}
-						disabled={isPending}
 						variant={"outlined"}
 						color={friendRequestSend ? "error" : "primary"}
 						startIcon={<PersonAdd />}
+						loading={isPending}
 						sx={{
 							textTransform: "none",
 							px: 2,
@@ -291,10 +291,7 @@ function UserProfileHeader({
 						</IconButton>
 					</Tooltip>
 
-					{user.id !== authenticatedUserId && (
-
-						<ReportButton reportTarget={user} />
-					)}
+					{user.id !== authenticatedUserId && <ReportButton reportTarget={user} />}
 				</Stack>
 			</Box>
 		</Box>

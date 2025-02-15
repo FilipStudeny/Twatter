@@ -1,10 +1,9 @@
-// Header.tsx
-
+import NotificationBell from "@Components/Notifications/NotificationBell";
 import { RouterLink } from "@Components/navigation/routerLink";
 import CloseIcon from "@mui/icons-material/Close";
 import HomeIcon from "@mui/icons-material/Home";
 import MenuIcon from "@mui/icons-material/Menu";
-import PeopleIcon from "@mui/icons-material/People"; // Icon for Friends
+import PeopleIcon from "@mui/icons-material/People";
 import {
 	AppBar,
 	Toolbar,
@@ -32,7 +31,9 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ leftOpen, rightOpen, lgUp, onLeftToggle, onRightToggle }) => {
+
 	const { isLoggedIn, getUserData, signOut } = useAuthenticationStore();
+
 	const user = getUserData();
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -74,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({ leftOpen, rightOpen, lgUp, onLef
 						</Tooltip>
 					)}
 					{/* Logo */}
-					<RouterLink to='/home' style={{ color: "white" }}>
+					<RouterLink to='/' style={{ color: "white" }}>
 						<Box sx={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
 							<Typography
 								variant='h6'
@@ -95,6 +96,8 @@ export const Header: React.FC<HeaderProps> = ({ leftOpen, rightOpen, lgUp, onLef
 				<Box sx={{ display: "flex", alignItems: "center" }}>
 					{isLoggedIn && (
 						<>
+							<NotificationBell />
+
 							<Tooltip title={rightOpen ? "Close friends list" : "Open friends list"}>
 								<IconButton
 									color='inherit'

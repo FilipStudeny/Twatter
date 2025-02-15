@@ -62,7 +62,7 @@ export class NotificationDetail {
 							username: source.sender.username,
 							firstName: source.sender.firstName,
 							lastName: source.sender.lastName,
-							profilePictureUrl: source.sender.lastName,
+							profilePictureUrl: source.sender.profilePictureUrl,
 						}) as UserDetail,
 				),
 			),
