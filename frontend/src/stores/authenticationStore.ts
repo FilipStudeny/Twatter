@@ -1,53 +1,54 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 import { setAuthorizationHeader, SignInResponse, UserDetail } from "../../../shared";
 
-enum UserSession {
-	accessToken = "accessToken",
-	refreshToken = "refreshToken",
-	isAuthenticated = "isAuthenticated",
-	userData = "userData",
-}
-
 type AuthenticationState = {
 	isLoggedIn: boolean,
+	userData: UserDetail | null,
+	accessToken: string | null,
+	refreshToken: string | null,
 	signIn: (signInResponse: SignInResponse)=> void,
 	signOut: ()=> void,
 	getUserData: ()=> UserDetail | null,
 	getRefreshToken: ()=> string | null,
+	getAccessToken: ()=> string | null,
 };
-export const useAuthenticationStore = create<AuthenticationState>((set) => ({
-	isLoggedIn: localStorage.getItem(UserSession.isAuthenticated) === "true",
-	signIn: (signInResponse: SignInResponse) => {
-		setAuthorizationHeader(signInResponse.accessToken);
 
-		localStorage.setItem(UserSession.isAuthenticated, "true");
-		localStorage.setItem(UserSession.accessToken, signInResponse.accessToken);
-		localStorage.setItem(UserSession.refreshToken, signInResponse.refreshToken);
-		localStorage.setItem(UserSession.userData, JSON.stringify(signInResponse.userData));
+export const useAuthenticationStore = create<AuthenticationState>()(
+	persist(
+		(set, get) => ({
+			isLoggedIn: false,
+			userData: null,
+			accessToken: null,
+			refreshToken: null,
 
-		set({ isLoggedIn: true });
-	},
-	signOut: () => {
-		localStorage.removeItem(UserSession.isAuthenticated);
-		localStorage.removeItem(UserSession.accessToken);
-		localStorage.removeItem(UserSession.refreshToken);
-		localStorage.removeItem(UserSession.userData);
-		setAuthorizationHeader();
+			signIn: (signInResponse: SignInResponse) => {
+				setAuthorizationHeader(signInResponse.accessToken);
+				set({
+					isLoggedIn: true,
+					userData: signInResponse.userData,
+					accessToken: signInResponse.accessToken,
+					refreshToken: signInResponse.refreshToken,
+				});
+			},
 
-		set({ isLoggedIn: false });
-	},
-	getUserData: () => {
-		const storedUserData = localStorage.getItem(UserSession.userData);
-		if (!storedUserData) {
-			return null;
-		}
+			signOut: () => {
+				setAuthorizationHeader();
+				set({
+					isLoggedIn: false,
+					userData: null,
+					accessToken: null,
+					refreshToken: null,
+				});
+			},
 
-		const parsedUserData = JSON.parse(storedUserData) as UserDetail;
-
-		return parsedUserData;
-	},
-	getRefreshToken: () => {
-		return localStorage.getItem(UserSession.refreshToken);
-	},
-}));
+			getUserData: () => get().userData,
+			getRefreshToken: () => get().refreshToken,
+			getAccessToken: () => get().accessToken,
+		}),
+		{
+			name: "auth-storage",
+		},
+	),
+);

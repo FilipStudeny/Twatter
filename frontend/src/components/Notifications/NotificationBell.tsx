@@ -1,4 +1,7 @@
-import { NotificationsActiveOutlined } from "@mui/icons-material";
+import {
+	NotificationsOutlined,
+	Close as CloseIcon,
+} from "@mui/icons-material";
 import {
 	Badge,
 	IconButton,
@@ -6,24 +9,27 @@ import {
 	Box,
 	Typography,
 	Button,
-	List,
-	ListItem,
-	ListItemAvatar,
-	Avatar,
-	ListItemText,
-	CircularProgress,
+	Fade,
+	Tooltip,
+	useTheme,
+	alpha,
 } from "@mui/material";
 import { useState, useEffect, useRef, useMemo } from "react";
 
-import { useGetNotificationsQuery, useGetUnreadNotificationsCountQuery } from "../../../../shared";
+import { NotificationList } from "./NotificationBellList";
+import {
+	useGetNotificationsQuery,
+	useGetUnreadNotificationsCountQuery,
+} from "../../../../shared";
 
 const NotificationBell = () => {
+	const [open, setOpen] = useState(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+	const theme = useTheme();
+
 	const { data: notificationsCount } = useGetUnreadNotificationsCountQuery(undefined, {
 		refetchInterval: 30000,
 	});
-
-	const [open, setOpen] = useState(false);
-	const menuRef = useRef<HTMLDivElement>(null);
 
 	const {
 		data: notificationsData,
@@ -53,8 +59,6 @@ const NotificationBell = () => {
 	useEffect(() => {
 		if (open) {
 			document.addEventListener("mousedown", handleClickOutside);
-		} else {
-			document.removeEventListener("mousedown", handleClickOutside);
 		}
 
 		return () => {
@@ -64,59 +68,99 @@ const NotificationBell = () => {
 
 	return (
 		<Box position='relative' ref={menuRef}>
-			<IconButton color='inherit' aria-label='notifications' edge='start' sx={{ mr: 2 }} onClick={handleClick}>
-				<Badge badgeContent={notificationsCount?.GetUnreadNotificationsCount} color='error'>
-					<NotificationsActiveOutlined />
-				</Badge>
-			</IconButton>
-			{open && (
+			<Tooltip title='Notifications'>
+				<IconButton
+					color='inherit'
+					edge='start'
+					onClick={handleClick}
+					sx={{
+						transition: theme.transitions.create(["background-color"]),
+						"&:hover": {
+							backgroundColor: alpha(theme.palette.primary.main, 0.08),
+						},
+						mr: 2,
+					}}
+				>
+					<Badge
+						badgeContent={notificationsCount?.GetUnreadNotificationsCount}
+						color='error'
+						sx={{
+							"& .MuiBadge-badge": {
+								right: -3,
+								top: 3,
+								border: `2px solid ${theme.palette.background.paper}`,
+								padding: "0 4px",
+							},
+						}}
+					>
+						<NotificationsOutlined />
+					</Badge>
+				</IconButton>
+			</Tooltip>
+
+			<Fade in={open}>
 				<Paper
-					elevation={3}
+					elevation={8}
 					sx={{
 						position: "absolute",
 						top: "100%",
 						right: 0,
-						width: 250,
+						width: 360,
+						maxWidth: "90vw",
 						mt: 1,
-						p: 2,
-						zIndex: 10,
+						borderRadius: 2,
+						overflow: "hidden",
+						zIndex: theme.zIndex.modal,
 					}}
 				>
-					<Typography variant='subtitle1'>Notifications</Typography>
-					{isPending ? (
-						<Box display='flex' justifyContent='center' alignItems='center' height={100}>
-							<CircularProgress size={24} />
-						</Box>
-					) : (
-						<List>
-							{notifications.length > 0 ? (
-								notifications.map((notification) => (
-									<ListItem key={notification.id}>
-										<ListItemAvatar>
-											<Avatar src={notification.creator.profilePictureUrl || undefined}>
-												{!notification.creator.profilePictureUrl &&
-													(notification.creator.firstName?.charAt(0) ?? "").toUpperCase() +
-														(notification.creator.lastName?.charAt(0) ?? "").toUpperCase()}
-											</Avatar>
-										</ListItemAvatar>
-										<ListItemText
-											primary={notification.message}
-											secondary={notification.createdAt}
-										/>
-									</ListItem>
-								))
-							) : (
-								<Typography variant='body2' color='textSecondary'>
-									No new notifications
-								</Typography>
-							)}
-						</List>
-					)}
-					<Button fullWidth sx={{ mt: 2 }} variant='contained' color='primary'>
-						View all notifications
-					</Button>
+					{/* Header */}
+					<Box
+						sx={{
+							p: 2,
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "space-between",
+							borderBottom: `1px solid ${theme.palette.divider}`,
+							backgroundColor: theme.palette.background.default,
+						}}
+					>
+						<Typography variant='h6' sx={{ fontWeight: 600 }}>
+							Notifications
+						</Typography>
+						<IconButton size='small' onClick={() => setOpen(false)}>
+							<CloseIcon fontSize='small' />
+						</IconButton>
+					</Box>
+
+					{/* Content */}
+					<Box sx={{ maxHeight: 400, overflow: "auto" }}>
+						<NotificationList notifications={notifications} isPending={isPending} theme={theme} />
+					</Box>
+
+					{/* Footer */}
+					<Box
+						sx={{
+							p: 2,
+							borderTop: `1px solid ${theme.palette.divider}`,
+							backgroundColor: theme.palette.background.default,
+						}}
+					>
+						<Button
+							fullWidth
+							variant='contained'
+							color='primary'
+							size='medium'
+							sx={{
+								borderRadius: 1,
+								textTransform: "none",
+								fontWeight: 500,
+							}}
+						>
+							View all notifications
+						</Button>
+					</Box>
 				</Paper>
-			)}
+			</Fade>
 		</Box>
 	);
 };

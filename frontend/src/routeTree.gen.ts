@@ -13,7 +13,6 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as SearchImport } from './routes/search'
-import { Route as ProfileImport } from './routes/profile'
 import { Route as IndexImport } from './routes/index'
 import { Route as UsersIndexImport } from './routes/users/index'
 import { Route as SettingsProfileImport } from './routes/settings/profile'
@@ -36,12 +35,6 @@ const SettingsRoute = SettingsImport.update({
 const SearchRoute = SearchImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ProfileRoute = ProfileImport.update({
-  id: '/profile',
-  path: '/profile',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -115,13 +108,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileImport
       parentRoute: typeof rootRoute
     }
     '/search': {
@@ -222,7 +208,6 @@ const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/forgotten-password': typeof AuthenticationForgottenPasswordRoute
@@ -238,7 +223,6 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/forgotten-password': typeof AuthenticationForgottenPasswordRoute
@@ -255,7 +239,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/_authentication/forgotten-password': typeof AuthenticationForgottenPasswordRoute
@@ -273,7 +256,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/profile'
     | '/search'
     | '/settings'
     | '/forgotten-password'
@@ -288,7 +270,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/profile'
     | '/search'
     | '/settings'
     | '/forgotten-password'
@@ -303,7 +284,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/profile'
     | '/search'
     | '/settings'
     | '/_authentication/forgotten-password'
@@ -320,7 +300,6 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ProfileRoute: typeof ProfileRoute
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   AuthenticationForgottenPasswordRoute: typeof AuthenticationForgottenPasswordRoute
@@ -334,7 +313,6 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ProfileRoute: ProfileRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRouteWithChildren,
   AuthenticationForgottenPasswordRoute: AuthenticationForgottenPasswordRoute,
@@ -357,7 +335,6 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/profile",
         "/search",
         "/settings",
         "/_authentication/forgotten-password",
@@ -371,9 +348,6 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/profile": {
-      "filePath": "profile.tsx"
     },
     "/search": {
       "filePath": "search.tsx"
