@@ -122,7 +122,7 @@ export class NotificationsService {
 			throw new NotFoundException("Notification not found");
 		}
 		try {
-			await this.entityManager.remove(Notification, notification);
+			await this.entityManager.delete(Notification, notification);
 			return new GenericResponse("Notification removed successfully");
 		} catch (error) {
 			this.logger.error("Error removing notification", error.stack);

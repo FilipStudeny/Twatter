@@ -69,14 +69,17 @@ export class AddFriendRequestCommandHandler implements ICommandHandler<AddFriend
 		}
 
 		try {
-			const notificationExist = await this.notificationsService.checkNotificationById(
-				dto.notificationId,
-			);
+			if (dto.notificationId) {
+				const notificationExist = await this.notificationsService.checkNotificationById(
+					dto.notificationId,
+				);
 
-			if (notificationExist) {
-				return await this.notificationsService.removeNotificationById(dto.notificationId);
+				if (notificationExist) {
+					return await this.notificationsService.removeNotificationById(
+						notificationExist.id,
+					);
+				}
 			}
-
 			if (receiver.configuration.friendRequest_Email_Notification) {
 				await this.emailService.sendFriendRequest(
 					receiver.email,
