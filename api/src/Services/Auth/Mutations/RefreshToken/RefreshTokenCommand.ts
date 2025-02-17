@@ -34,21 +34,18 @@ export class RefreshTokenCommandHandler implements ICommandHandler<RefreshTokenC
 		} catch (error) {
 			if (error.name === "TokenExpiredError") {
 				throw new UnauthorizedException("Refresh token expired.");
-			} else {
-				throw new UnauthorizedException("Invalid refresh token.");
 			}
+			throw new UnauthorizedException("Invalid refresh token.");
 		}
 
 		const user = await this.entityManager.findOne(User, { where: { id: payload.id } });
-
 		if (!user || !user.refreshToken) {
-			throw new UnauthorizedException("Invalid refresh token.");
+			throw new UnauthorizedException("Invalid refresh token asdasdasds.");
 		}
 
 		const isRefreshTokenValid = await bcrypt.compare(refreshToken, user.refreshToken);
-
 		if (!isRefreshTokenValid) {
-			throw new UnauthorizedException("Invalid refresh token.");
+			throw new UnauthorizedException("Invalid refresh token bbbbbbbbbbbbbbbbbb.");
 		}
 
 		const newPayload: JwtPayload = { id: user.id, email: user.email };
@@ -63,7 +60,8 @@ export class RefreshTokenCommandHandler implements ICommandHandler<RefreshTokenC
 			expiresIn: "7d",
 		});
 
-		user.refreshToken = newRefreshToken;
+		const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 10);
+		user.refreshToken = hashedRefreshToken;
 		await this.entityManager.save(user);
 
 		return new SignInResponse(accessToken, newRefreshToken);

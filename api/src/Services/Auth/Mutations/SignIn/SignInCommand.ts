@@ -54,10 +54,11 @@ export class SignInCommandHandler {
 			expiresIn: "7d",
 		});
 
-		const userData = this.mapper.map(user, User, UserDetail);
-
-		user.refreshToken = refreshToken;
+		const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+		user.refreshToken = hashedRefreshToken;
 		await this.entityManager.save(user);
+
+		const userData = this.mapper.map(user, User, UserDetail);
 
 		return new SignInResponse(accessToken, refreshToken, userData);
 	}

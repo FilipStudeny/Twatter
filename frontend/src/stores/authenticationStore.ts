@@ -13,6 +13,7 @@ type AuthenticationState = {
 	getUserData: ()=> UserDetail | null,
 	getRefreshToken: ()=> string | null,
 	getAccessToken: ()=> string | null,
+	setTokens: (accessToken: string, refreshToken: string)=> void,
 };
 
 export const useAuthenticationStore = create<AuthenticationState>()(
@@ -22,7 +23,6 @@ export const useAuthenticationStore = create<AuthenticationState>()(
 			userData: null,
 			accessToken: null,
 			refreshToken: null,
-
 			signIn: (signInResponse: SignInResponse) => {
 				setAuthorizationHeader(signInResponse.accessToken);
 				set({
@@ -32,7 +32,6 @@ export const useAuthenticationStore = create<AuthenticationState>()(
 					refreshToken: signInResponse.refreshToken,
 				});
 			},
-
 			signOut: () => {
 				setAuthorizationHeader();
 				set({
@@ -42,13 +41,26 @@ export const useAuthenticationStore = create<AuthenticationState>()(
 					refreshToken: null,
 				});
 			},
-
 			getUserData: () => get().userData,
 			getRefreshToken: () => get().refreshToken,
 			getAccessToken: () => get().accessToken,
+			setTokens: (accessToken: string, refreshToken: string) => {
+				setAuthorizationHeader(accessToken);
+				set({
+					accessToken,
+					refreshToken,
+					isLoggedIn: true,
+				});
+			},
 		}),
 		{
 			name: "auth-storage",
 		},
 	),
 );
+
+export const authActions = {
+	signOut: () => useAuthenticationStore.getState().signOut(),
+	setTokens: (accessToken: string, refreshToken: string) =>
+		useAuthenticationStore.getState().setTokens(accessToken, refreshToken),
+};
