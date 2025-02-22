@@ -18,17 +18,12 @@ export class GetUserIsFriendQueryHandler implements IQueryHandler<GetUserIsFrien
 	async execute(query: GetUserIsFriendQuery): Promise<GenericResponse> {
 		const { authenticatedUserId, userId } = query;
 
-		const friendship = await this.entityManager
-			.createQueryBuilder()
-			.select("friend.id", "id")
-			.from(User, "user")
-			.leftJoin("user.friends", "friend")
-			.where("user.id = :authenticatedUserId", { authenticatedUserId })
-			.andWhere("friend.id = :userId", { userId })
-			.getRawOne();
+		const authenticatedUser = await this.entityManager.findOne(User, {
+			where: { id: authenticatedUserId },
+			relations: ["friends"],
+		});
 
-		const isFriend = !!friendship;
-
-		return new GenericResponse(null, isFriend);
+		const isFriend = authenticatedUser?.friends.some((friend) => friend.id === userId) || false;
+		return new GenericResponse("Friendship status retrieved", isFriend);
 	}
 }

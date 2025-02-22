@@ -1,0 +1,5 @@
+mutation UpdateFriend($userId: String!){
+    UpdateFriend(userId: $userId){
+        message
+    }
+}

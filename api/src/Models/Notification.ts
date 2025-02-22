@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne } from "typeorm";
+import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
 
 import { BaseEntity } from "./BaseEntity";
 import NotificationType from "./Enums/NotificationType";
@@ -6,10 +6,18 @@ import { User } from "./User";
 
 @Entity()
 export class Notification extends BaseEntity {
-	@ManyToOne(() => User, (user) => user.notifications)
+	@Column()
+	receiverId: string;
+
+	@ManyToOne(() => User)
+	@JoinColumn({ name: "receiverId" })
 	receiver: User;
 
-	@ManyToOne(() => User, (user) => user.sentNotifications, { nullable: true })
+	@Column()
+	senderId: string;
+
+	@ManyToOne(() => User)
+	@JoinColumn({ name: "senderId" })
 	sender: User;
 
 	@Column({

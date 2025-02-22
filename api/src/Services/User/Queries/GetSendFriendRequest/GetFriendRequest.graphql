@@ -1,6 +1,10 @@
 query GetFriendRequest($userId: String!){
     GetFriendRequest(userId: $userId){
-        message
-        result
+        id
+        creator {
+            id
+        }
+        notificationType
+        createdAt
     }
 }

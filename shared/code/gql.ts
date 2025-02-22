@@ -69,6 +69,7 @@ export type CreatePostDto = {
 
 export type GenericResponse = {
   __typename?: 'GenericResponse';
+  currentUserIsReceiver?: Maybe<Scalars['Boolean']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   result?: Maybe<Scalars['Boolean']['output']>;
 };
@@ -112,6 +113,7 @@ export type Mutation = {
   SignInUser: SignInResponse;
   SignOutUser: GenericResponse;
   SignUpUser: GenericResponse;
+  UpdateFriend: GenericResponse;
   UpdateUserConfiguration: GenericResponse;
   createGroup: GenericResponse;
   forgotPassword: GenericResponse;
@@ -177,6 +179,11 @@ export type MutationSignUpUserArgs = {
 };
 
 
+export type MutationUpdateFriendArgs = {
+  userId: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateUserConfigurationArgs = {
   updateDto: UpdateUserConfigurationDto;
 };
@@ -206,8 +213,8 @@ export type NotificationDetail = {
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   creator: UserDetail;
   id: Scalars['String']['output'];
-  isRead: Scalars['Boolean']['output'];
-  message: Scalars['String']['output'];
+  isRead?: Maybe<Scalars['Boolean']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
   notificationType: NotificationType;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
@@ -320,7 +327,7 @@ export enum ProfileVisibility {
 
 export type Query = {
   __typename?: 'Query';
-  GetFriendRequest: GenericResponse;
+  GetFriendRequest?: Maybe<NotificationDetail>;
   GetInterests: PaginatedInterestsListResponse;
   GetNotifications: PaginatedNotificationsResponse;
   GetReports: PaginatedReportsListResponse;
@@ -670,7 +677,7 @@ export type GetNotificationsQueryVariables = Exact<{
 }>;
 
 
-export type GetNotificationsQuery = { __typename?: 'Query', GetNotifications: { __typename?: 'PaginatedNotificationsResponse', total?: number | null, page?: number | null, items?: Array<{ __typename?: 'NotificationDetail', id: string, message: string, isRead: boolean, createdAt?: any | null, notificationType: NotificationType, creator: { __typename?: 'UserDetail', id: string, firstName?: string | null, lastName?: string | null, username?: string | null, profilePictureUrl?: string | null } }> | null } };
+export type GetNotificationsQuery = { __typename?: 'Query', GetNotifications: { __typename?: 'PaginatedNotificationsResponse', total?: number | null, page?: number | null, items?: Array<{ __typename?: 'NotificationDetail', id: string, message?: string | null, isRead?: boolean | null, createdAt?: any | null, notificationType: NotificationType, creator: { __typename?: 'UserDetail', id: string, firstName?: string | null, lastName?: string | null, username?: string | null, profilePictureUrl?: string | null } }> | null } };
 
 export type GetUnreadNotificationsCountQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -761,6 +768,13 @@ export type SendFriendRequestMutationVariables = Exact<{
 
 export type SendFriendRequestMutation = { __typename?: 'Mutation', AddFriendRequest: { __typename?: 'GenericResponse', message?: string | null } };
 
+export type UpdateFriendMutationVariables = Exact<{
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type UpdateFriendMutation = { __typename?: 'Mutation', UpdateFriend: { __typename?: 'GenericResponse', message?: string | null } };
+
 export type UpdateUserConfigurationMutationVariables = Exact<{
   updateDto: UpdateUserConfigurationDto;
 }>;
@@ -773,7 +787,7 @@ export type GetFriendRequestQueryVariables = Exact<{
 }>;
 
 
-export type GetFriendRequestQuery = { __typename?: 'Query', GetFriendRequest: { __typename?: 'GenericResponse', message?: string | null, result?: boolean | null } };
+export type GetFriendRequestQuery = { __typename?: 'Query', GetFriendRequest?: { __typename?: 'NotificationDetail', id: string, notificationType: NotificationType, createdAt?: any | null, creator: { __typename?: 'UserDetail', id: string } } | null };
 
 export type GetUserConfigurationQueryVariables = Exact<{
   userId: Scalars['String']['input'];
@@ -2062,6 +2076,32 @@ useSendFriendRequestMutation.getKey = () => ['SendFriendRequest'];
 
 useSendFriendRequestMutation.fetcher = (variables: SendFriendRequestMutationVariables, options?: RequestInit['headers']) => fetcher<SendFriendRequestMutation, SendFriendRequestMutationVariables>(SendFriendRequestDocument, variables, options);
 
+export const UpdateFriendDocument = /*#__PURE__*/ `
+    mutation UpdateFriend($userId: String!) {
+  UpdateFriend(userId: $userId) {
+    message
+  }
+}
+    `;
+
+export const useUpdateFriendMutation = <
+      TError = GraphQLResponse,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateFriendMutation, TError, UpdateFriendMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateFriendMutation, TError, UpdateFriendMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateFriend'],
+    mutationFn: (variables?: UpdateFriendMutationVariables) => fetcher<UpdateFriendMutation, UpdateFriendMutationVariables>(UpdateFriendDocument, variables)(),
+    ...options
+  }
+    )};
+
+useUpdateFriendMutation.getKey = () => ['UpdateFriend'];
+
+
+useUpdateFriendMutation.fetcher = (variables: UpdateFriendMutationVariables, options?: RequestInit['headers']) => fetcher<UpdateFriendMutation, UpdateFriendMutationVariables>(UpdateFriendDocument, variables, options);
+
 export const UpdateUserConfigurationDocument = /*#__PURE__*/ `
     mutation UpdateUserConfiguration($updateDto: UpdateUserConfigurationDto!) {
   UpdateUserConfiguration(updateDto: $updateDto) {
@@ -2091,8 +2131,12 @@ useUpdateUserConfigurationMutation.fetcher = (variables: UpdateUserConfiguration
 export const GetFriendRequestDocument = /*#__PURE__*/ `
     query GetFriendRequest($userId: String!) {
   GetFriendRequest(userId: $userId) {
-    message
-    result
+    id
+    creator {
+      id
+    }
+    notificationType
+    createdAt
   }
 }
     `;

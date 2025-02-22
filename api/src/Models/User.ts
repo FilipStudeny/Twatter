@@ -4,7 +4,6 @@ import { BanStrike } from "./Administration/BanStrike";
 import { BaseEntity } from "./BaseEntity";
 import { Comment } from "./Comment";
 import { Group } from "./Group";
-import { Notification } from "./Notification";
 import { Password } from "./Password";
 import { Post } from "./Post";
 import { Reaction } from "./Reaction";
@@ -53,12 +52,6 @@ export class User extends BaseEntity {
 	@ManyToMany(() => User, (user) => user.friends)
 	@JoinTable()
 	friends: User[];
-
-	@OneToMany(() => Notification, (notification) => notification.receiver)
-	notifications: Notification[];
-
-	@OneToMany(() => Notification, (notification) => notification.sender)
-	sentNotifications: Notification[];
 
 	@OneToMany(() => Report, (report) => report.reporter)
 	reportsFiled: Report[];

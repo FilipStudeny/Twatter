@@ -1,5 +1,6 @@
 import { NotificationDto } from "@Shared/Input/NotificationDto";
 import GenericResponse from "@Shared/Response/GenericResponse";
+import { NotificationDetail } from "@Shared/Response/NotificationDetail";
 import UserConfigurationDetail from "@Shared/Response/UserConfigurationResponse";
 import { CurrentUser } from "@Utils/JWT/CurrentUser";
 import JwtPayload from "@Utils/JWT/JwtPayload.interface";
@@ -11,6 +12,7 @@ import * as graphqlFields from "graphql-fields";
 import { Public, RouterGuard } from "src/Guards/RouteGuard.guard";
 
 import { AddFriendRequestCommand } from "./Mutations/AddFriendRequest/AddFriendRequestCommand";
+import { UpdateFriendCommand } from "./Mutations/UpdateFriend/UpdateFriendCommand";
 import { UpdateUserConfigurationCommand } from "./Mutations/UpdateUserConfiguration/UpdateUserConfiguration";
 import { UpdateUserConfigurationDto } from "./Mutations/UpdateUserConfiguration/UpdateUserConfiguration.dto";
 import { GetFriendRequestNotificationQuery } from "./Queries/GetSendFriendRequest/GetSendFriendRequestQuery";
@@ -106,16 +108,25 @@ export default class UserResolver {
 		return response;
 	}
 
-	@Query(() => GenericResponse)
+	@Query(() => NotificationDetail, { nullable: true })
 	async GetFriendRequest(
+		@Args("userId", { type: () => String }) userId: string,
+		@CurrentUser() payload: JwtPayload,
+	): Promise<NotificationDetail> {
+		const authenticatedUserId = payload.id;
+
+		const response = await this.queryBus.execute(
+			new GetFriendRequestNotificationQuery(authenticatedUserId, userId),
+		);
+		return response;
+	}
+
+	@Mutation(() => GenericResponse)
+	async UpdateFriend(
 		@Args("userId", { type: () => String }) userId: string,
 		@CurrentUser() payload: JwtPayload,
 	): Promise<GenericResponse> {
 		const authenticatedUserId = payload.id;
-
-		const response = await this.queryBus.execute(
-			new GetFriendRequestNotificationQuery(userId, authenticatedUserId),
-		);
-		return response;
+		return this.commandBus.execute(new UpdateFriendCommand(userId, authenticatedUserId));
 	}
 }

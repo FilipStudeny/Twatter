@@ -82,8 +82,8 @@ type InterestDetail {
 
 type NotificationDetail {
   id: String!
-  message: String!
-  isRead: Boolean!
+  message: String
+  isRead: Boolean
   creator: UserDetail!
   notificationType: NotificationType!
   createdAt: DateTime
@@ -166,6 +166,7 @@ enum ReportType {
 type GenericResponse {
   message: String
   result: Boolean
+  currentUserIsReceiver: Boolean
 }
 
 type SignInResponse {
@@ -243,7 +244,7 @@ type Query {
   getUsers(page: Int! = 1, limit: Int! = 10, userId: String, groupId: String, getAll: Boolean, search: String, friendOf: String): PaginatedUsersResponse!
   GetUserConfiguration(userId: String!): UserConfigurationDetail!
   GetUserIsFriend(userId: String!): GenericResponse!
-  GetFriendRequest(userId: String!): GenericResponse!
+  GetFriendRequest(userId: String!): NotificationDetail
 }
 
 """Filter options for the graph data"""
@@ -270,6 +271,7 @@ type Mutation {
   resetPassword(resetPassword: ResetPasswordInput!): GenericResponse!
   UpdateUserConfiguration(updateDto: UpdateUserConfigurationDto!): GenericResponse!
   AddFriendRequest(addFriendDto: NotificationDto!): GenericResponse!
+  UpdateFriend(userId: String!): GenericResponse!
 }
 
 input ReportDto {

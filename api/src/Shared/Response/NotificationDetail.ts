@@ -10,10 +10,10 @@ export class NotificationDetail {
 	@Field()
 	id: string;
 
-	@Field()
+	@Field({ nullable: true })
 	message: string;
 
-	@Field()
+	@Field({ nullable: true })
 	isRead: boolean;
 
 	@Field(() => UserDetail)

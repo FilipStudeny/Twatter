@@ -67,14 +67,15 @@ export class NotificationsService {
 		type: NotificationType,
 	): Promise<GenericResponse> {
 		const notification = new Notification();
-		notification.receiver = receiver;
-		notification.sender = sender;
+		notification.senderId = sender.id;
+		notification.receiverId = receiver.id;
 		notification.message = message;
 		notification.type = type;
 		notification.isRead = false;
 
 		try {
 			await this.entityManager.save(Notification, notification);
+			this.logger.log(`${sender.username} is sending friend request to ${receiver.username}`);
 			return new GenericResponse("Notification created successfully");
 		} catch (error) {
 			this.logger.error("Error creating notification", error.stack);
@@ -95,6 +96,10 @@ export class NotificationsService {
 		}
 		try {
 			await this.entityManager.remove(Notification, notification);
+			this.logger.log(
+				`Notification (${notification.id}) of type ${notification.type} has been removed`,
+			);
+
 			return new GenericResponse("Notification removed successfully");
 		} catch (error) {
 			this.logger.error("Error removing notification by ID", error.stack);
@@ -197,16 +202,23 @@ export class NotificationsService {
 		pageSize: number = 10,
 	): Promise<{ notifications: Notification[]; total: number }> {
 		const [notifications, total] = await this.entityManager.findAndCount(Notification, {
-			where: {
-				receiver: { id: receiverId },
+			where: { receiverId },
+			relations: ["sender", "receiver"],
+			order: {
+				createdAt: "DESC",
 			},
-			relations: ["sender"],
 			select: {
-				id: true,
-				message: true,
-				type: true,
-				isRead: true,
 				createdAt: true,
+				id: true,
+				isRead: true,
+				message: true,
+				receiver: {
+					id: true,
+					firstName: true,
+					lastName: true,
+					username: true,
+					profilePictureUrl: true,
+				},
 				sender: {
 					id: true,
 					firstName: true,
@@ -214,14 +226,11 @@ export class NotificationsService {
 					username: true,
 					profilePictureUrl: true,
 				},
-			},
-			order: {
-				createdAt: "DESC",
+				type: true,
 			},
 			take: pageSize,
 			skip: (page - 1) * pageSize,
 		});
-
 		return { notifications, total };
 	}
 

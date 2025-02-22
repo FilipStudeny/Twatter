@@ -31,7 +31,6 @@ export default class GetNotificationsQueryHandler implements IQueryHandler<Pagin
 			page,
 			limit,
 		);
-
 		const mappedNotifications = notifications.map((notification) =>
 			this.mapper.map(notification, Notification, NotificationDetail),
 		);
