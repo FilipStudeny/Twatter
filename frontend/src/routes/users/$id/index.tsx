@@ -27,7 +27,7 @@ import {
 	ButtonGroup,
 } from "@mui/material";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import {
 	NotificationDetail,
@@ -44,7 +44,6 @@ import {
 export const Route = createFileRoute("/users/$id/")({
 	component: RouteComponent,
 });
-
 function RouteComponent() {
 	const [isProfileImageOpen, setIsProfileImageOpen] = useState(false);
 	const { id } = Route.useParams();
@@ -58,26 +57,33 @@ function RouteComponent() {
 	} = useGetUserQuery({ userId: id });
 
 	const { data: friendRequestResponse, refetch: refetchFriendRequest } = useGetFriendRequestQuery({ userId: id });
-	const { mutateAsync: sendFriendRequest, isPending } = useSendFriendRequestMutation();
+	const friendRequest = friendRequestResponse?.GetFriendRequest ?? null;
+
+	const { mutateAsync: sendFriendRequest, isPending: isSendingFriendRequest } = useSendFriendRequestMutation();
 	const { mutateAsync: updateFriend, isPending: isUpdatingFriend } = useUpdateFriendMutation();
+
 	const { data: userIsFriendResponse, refetch: refetchUserIsFriend } = useGetUserIsFriendQuery({ userId: id });
+	const userIsFriend = userIsFriendResponse?.GetUserIsFriend.result ?? false;
 
 	const { getUserData } = useAuthenticationStore();
 	const authenticatedUserId = getUserData()?.id ?? "";
 
-	const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-		setTabValue(newValue);
-	};
+	const user = userData?.getUsers?.items?.[0] ?? null;
+	const fullName = useMemo(() => `${user?.firstName} ${user?.lastName}`.trim(), [user?.firstName, user?.lastName]);
 
-	const handleSendFriendRequest = async () => {
+	const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
+		setTabValue(newValue);
+	}, []);
+
+	const handleSendFriendRequest = useCallback(async () => {
 		const authUserData = getUserData();
 		const displayName =
 			authUserData?.username ?? `${authUserData?.firstName ?? ""} ${authUserData?.lastName ?? ""}`.trim();
 		const message = `${displayName} wants to be your friend`;
 
 		const dto: NotificationDto = {
-			notificationId: friendRequestResponse?.GetFriendRequest?.id,
-			receiverId: user.id,
+			notificationId: friendRequest?.id,
+			receiverId: user?.id,
 			message,
 			type: NotificationType.FriendRequest,
 		};
@@ -85,23 +91,23 @@ function RouteComponent() {
 		try {
 			await sendFriendRequest({ dto });
 			await refetchFriendRequest();
-		} catch (err) {
-			console.error("Failed to send friend request", err);
-		}
-	};
-
-	const handleUpdateFriend = async () => {
-		const userId = id;
-
-		try {
-			await updateFriend({ userId });
 			await refetchUserIsFriend();
 
 		} catch (err) {
 			console.error("Failed to send friend request", err);
 		}
+	}, [getUserData, friendRequest?.id, user?.id, sendFriendRequest, refetchFriendRequest, refetchUserIsFriend]);
 
-	};
+	const handleUpdateFriend = useCallback(async () => {
+		try {
+			await updateFriend({ userId: id });
+			await refetchUserIsFriend();
+			await refetchFriendRequest();
+
+		} catch (err) {
+			console.error("Failed to update friend", err);
+		}
+	}, [updateFriend, id, refetchUserIsFriend, refetchFriendRequest]);
 
 	if (userLoading) {
 		return <LoadingState />;
@@ -111,12 +117,7 @@ function RouteComponent() {
 		return <ErrorState errorMessage={userErrorMessage} onReload={() => window.location.reload()} />;
 	}
 
-	const user = userData.getUsers.items[0];
-	const fullName = `${user.firstName} ${user.lastName}`.trim();
-
-	const myUserId = "1234";
-	const isOwner = myUserId === user.id;
-	const userIsFriend = userIsFriendResponse?.GetUserIsFriend.result ?? false;
+	const isOwner = authenticatedUserId === user?.id;
 
 	return (
 		<Container maxWidth='lg' sx={{ py: 1 }}>
@@ -130,9 +131,7 @@ function RouteComponent() {
 			>
 				<Box
 					sx={{
-						background: `linear-gradient(${user.userConfiguration?.profileBackgroundLightAngle}deg, ${
-							user?.userConfiguration?.profileBackgroundColor1
-						} 30%, ${user?.userConfiguration?.profileBackgroundColor2} 90%)`,
+						background: `linear-gradient(${user?.userConfiguration?.profileBackgroundLightAngle}deg, ${user?.userConfiguration?.profileBackgroundColor1} 30%, ${user?.userConfiguration?.profileBackgroundColor2} 90%)`,
 						height: 140,
 						position: "relative",
 					}}
@@ -141,16 +140,16 @@ function RouteComponent() {
 					user={user}
 					fullName={fullName}
 					handleSendFriendRequest={handleSendFriendRequest}
-					isPending={isPending}
-					friendRequest={friendRequestResponse?.GetFriendRequest ?? null}
 					onAvatarClick={() => setIsProfileImageOpen(true)}
 					authenticatedUserId={authenticatedUserId}
+					friendRequest={friendRequest}
 					handleUpdateFriend={handleUpdateFriend}
 					isUpdatingFriend={isUpdatingFriend}
 					userIsFriend={userIsFriend}
+					isSendingFriendRequest={isSendingFriendRequest}
 				/>
 				<ProfileVisibilityOverlay
-					visibility={user.userConfiguration?.profileVisibility ?? ProfileVisibility.Public}
+					visibility={user?.userConfiguration?.profileVisibility ?? ProfileVisibility.Public}
 					isOwner={isOwner}
 					isFriend={userIsFriend}
 				>
@@ -161,7 +160,7 @@ function RouteComponent() {
 			<ProfileImageModal
 				isOpen={isProfileImageOpen}
 				onClose={() => setIsProfileImageOpen(false)}
-				imageUrl={user.profilePictureUrl ?? ""}
+				imageUrl={user?.profilePictureUrl ?? ""}
 				fullName={fullName}
 			/>
 		</Container>
@@ -230,11 +229,12 @@ function UserProfileHeader({
 	handleUpdateFriend,
 	isUpdatingFriend,
 	userIsFriend,
+	isSendingFriendRequest,
 }: {
 	user: any,
 	fullName: string,
 	handleSendFriendRequest: ()=> void,
-	isPending: boolean,
+	isSendingFriendRequest: boolean,
 	onAvatarClick: ()=> void,
 	authenticatedUserId: string,
 	friendRequest: NotificationDetail | null,
@@ -294,16 +294,17 @@ function UserProfileHeader({
 				{/* Action Buttons */}
 				<Stack direction='row' spacing={1} alignItems='center' mt={4}>
 					{showFriendRequestButtons && (
-						<Stack direction="row" spacing={1} alignItems="center">
+						<Stack direction='row' spacing={1} alignItems='center'>
 							{/* If already friends, show "Remove Friend" */}
 							{userIsFriend && (
 								<Button
 									onClick={handleUpdateFriend}
-									variant="outlined"
-									size="small"
+									variant='outlined'
+									size='small'
 									startIcon={<Close />}
 									sx={{ borderRadius: 3 }}
-									color="error"
+									color='error'
+									loading={isUpdatingFriend}
 								>
 									Remove Friend
 								</Button>
@@ -312,23 +313,20 @@ function UserProfileHeader({
 							{!friendRequest && !userIsFriend && (
 								<Button
 									onClick={handleSendFriendRequest}
-									variant="contained"
-									size="small"
+									variant='contained'
+									size='small'
 									startIcon={<PersonAdd />}
-									sx={{
-										textTransform: "none",
-										borderRadius: 3,
-									}}
+									sx={{ textTransform: "none", borderRadius: 3 }}
+									loading={isSendingFriendRequest}
 								>
 									Add Friend
 								</Button>
 							)}
-
-							{/* If friendRequest exists and current user is the RECEIVER, show "Accept" / "Decline" */}
+							{/* If friendRequest exists and current user is the RECEIVER, show "Accept"/"Decline" */}
 							{friendRequest && isCurrentUserReceiver && !userIsFriend && (
-								<ButtonGroup variant="contained" size="small" sx={{ borderRadius: 3 }}>
+								<ButtonGroup variant='contained' size='small' sx={{ borderRadius: 3 }}>
 									<Button
-										color="info"
+										color='info'
 										startIcon={<CheckCircle />}
 										sx={{ borderRadius: 3 }}
 										onClick={handleUpdateFriend}
@@ -337,27 +335,28 @@ function UserProfileHeader({
 										Accept
 									</Button>
 									<Button
-										color="warning"
+										color='warning'
 										startIcon={<Close />}
 										sx={{ borderRadius: 3 }}
 										onClick={handleSendFriendRequest}
+										loading={isSendingFriendRequest}
 									>
 										Decline
 									</Button>
 								</ButtonGroup>
 							)}
-
 							{/* If friendRequest exists and current user is the SENDER, show "Cancel Friend Request" */}
 							{friendRequest && !isCurrentUserReceiver && !userIsFriend && (
 								<Button
-									variant="outlined"
-									size="small"
+									variant='outlined'
+									size='small'
 									startIcon={<Close />}
-									color="error"
+									color='error'
 									sx={{ borderRadius: 3 }}
 									onClick={handleSendFriendRequest}
+									loading={isSendingFriendRequest}
 								>
-									Cancel friend request
+									Cancel Friend Request
 								</Button>
 							)}
 						</Stack>
