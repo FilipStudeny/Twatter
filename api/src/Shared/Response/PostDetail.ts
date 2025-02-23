@@ -1,3 +1,4 @@
+import ReactionType from "@Models/Enums/ReactionType";
 import { DbResponse } from "@Shared/DbResponse";
 import { ReactionsCount } from "@Shared/Response/ReactionsCount";
 import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
@@ -52,6 +53,9 @@ export class PostDetail {
 	@Field(() => Boolean, { nullable: true })
 	isPinned: boolean;
 
+	@Field(() => ReactionType, { nullable: true })
+	myReaction: ReactionType;
+
 	static createMap(mapper: Mapper): void {
 		createMap(
 			mapper,
@@ -80,6 +84,10 @@ export class PostDetail {
 			forMember(
 				(destination) => destination.isPinned,
 				mapFrom((source) => !!source.post_pinnedCommentId),
+			),
+			forMember(
+				(destination) => destination.myReaction,
+				mapFrom((source) => source.myReaction),
 			),
 
 			// Map creator

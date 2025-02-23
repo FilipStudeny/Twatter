@@ -68,9 +68,6 @@ export default class UserDetail {
 	@Field({ nullable: true })
 	updatedAt?: Date;
 
-	@Field(() => Boolean, { nullable: true })
-	friendRequestSend?: boolean;
-
 	static createMap(mapper: Mapper): void {
 		createMap(
 			mapper,
@@ -196,10 +193,6 @@ export default class UserDetail {
 								source.user_commentReactedTo_App_Notification,
 						}) as UserConfigurationDetail,
 				),
-			),
-			forMember(
-				(destination) => destination.friendRequestSend,
-				mapFrom((source) => source.friendRequestSend),
 			),
 		);
 

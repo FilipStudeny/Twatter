@@ -1,5 +1,4 @@
 // GetUsersQuery.ts
-import NotificationType from "@Models/Enums/NotificationType";
 import { User } from "@Models/User";
 import { DbResponse } from "@Shared/DbResponse";
 import UserDetail from "@Shared/Response/UserDetail";
@@ -35,8 +34,7 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 	) {}
 
 	async execute(query: GetUsersQuery): Promise<PaginatedUsersResponse> {
-		const { page, limit, requestedFields, userId, groupId, getAll, friendOf, search, currentUserId } =
-			query;
+		const { page, limit, requestedFields, userId, groupId, getAll, friendOf, search } = query;
 		const skip = (page - 1) * limit;
 
 		if (userId && !isUUID(userId)) {
@@ -196,17 +194,6 @@ export default class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery
 		if (requestedFields.createdGroupsCount) {
 			qb.leftJoin("user.createdGroups", "createdGroup");
 			qb.addSelect('COUNT(DISTINCT createdGroup.id) AS "createdGroups_count"');
-		}
-		if (requestedFields.friendRequestSend && currentUserId) {
-			qb.leftJoin(
-				"user.notifications", // Use the correct relation property name here
-				"friendRequest",
-				"friendRequest.senderId = :currentUserId AND friendRequest.type = :friendRequestType",
-				{ currentUserId, friendRequestType: NotificationType.FRIEND_REQUEST },
-			);
-			qb.addSelect(
-				'MAX(CASE WHEN friendRequest.id IS NOT NULL THEN 1 ELSE 0 END) AS "friendRequestSend"',
-			);
 		}
 		qb.addSelect('COUNT(*) OVER() AS "total_count"');
 

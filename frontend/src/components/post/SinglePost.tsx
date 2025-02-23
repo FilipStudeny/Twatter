@@ -15,6 +15,7 @@ import {
 import {
 	Avatar,
 	Box,
+	Button,
 	Card,
 	CardContent,
 	CardHeader,
@@ -22,15 +23,14 @@ import {
 	Dialog,
 	IconButton,
 	Stack,
-	Tooltip,
 	Typography,
 	useTheme,
 } from "@mui/material";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import CommentsModal from "./comments/CommentsModal";
-import { PostDetail } from "../../../../shared";
+import { CreateOrUpdateReactionDto, PostDetail, ReactionsCount, ReactionTargetType, ReactionType, useAddReactionMutation, useGetPostReactionsQuery } from "../../../../shared";
 
 const REACTION_CONFIG = {
 	like: {
@@ -64,6 +64,99 @@ const REACTION_CONFIG = {
 		label: "Love reactions",
 	},
 } as const;
+
+export interface ReactionRowProps {
+	targetId: string,
+	reactions: ReactionsCount,
+	myReaction?: ReactionType,
+	reactionTarget: ReactionTargetType,
+}
+
+export const ReactionRow: React.FC<ReactionRowProps> = ({ targetId, reactions, myReaction, reactionTarget }) => {
+	const { mutateAsync: addReaction } = useAddReactionMutation();
+	const { refetch } = useGetPostReactionsQuery({ postId: targetId }, { enabled: false });
+
+	const [localReactions, setLocalReactions] = useState<ReactionsCount>(reactions);
+	const [loadingReaction, setLoadingReaction] = useState<ReactionType | null>(null);
+	const [selectedReaction, setSelectedReaction] = useState<ReactionType | null>(myReaction ?? null);
+
+	useEffect(() => {
+		setLocalReactions(reactions);
+	}, [reactions]);
+
+	useEffect(() => {
+		setSelectedReaction(myReaction ?? null);
+	}, [myReaction]);
+
+	const handleReactionClick = useCallback(
+		async (reactionType: ReactionType) => {
+			try {
+				setLoadingReaction(reactionType);
+				const dto: CreateOrUpdateReactionDto = {
+					reactionType,
+					targetId,
+					targetType: reactionTarget,
+				};
+				await addReaction({ createOrUpdateReactionData: dto });
+				console.log(`Reaction ${reactionType} created for target ${targetId}`);
+
+				const { data } = await refetch();
+				if (data) {
+					setLocalReactions(data.getPosts.items?.[0].reactions ?? reactions);
+					setSelectedReaction(reactionType);
+				} else {
+					setSelectedReaction(reactionType);
+				}
+			} catch (error) {
+				console.error("Error creating reaction:", error);
+			} finally {
+				setLoadingReaction(null);
+			}
+		},
+		[targetId, reactionTarget, addReaction, refetch, reactions],
+	);
+
+	return (
+		<Stack direction='row' spacing={1.5} alignItems='center' sx={{ mb: 2, flexWrap: "wrap" }}>
+			{(Object.keys(REACTION_CONFIG) as (keyof ReactionsCount)[]).map((type) => {
+				const count = localReactions[type] || 0;
+				const reactionType = type.toUpperCase() as ReactionType;
+
+				return (
+					<Button
+						key={type}
+						loading={loadingReaction === reactionType}
+						onClick={() => handleReactionClick(reactionType)}
+						variant={selectedReaction && selectedReaction.toLowerCase() === type ? "contained" : "outlined"}
+						color={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.color}
+						sx={{
+							textTransform: "capitalize",
+							fontWeight: 500,
+							height: 32,
+							borderRadius: 2,
+							px: 1,
+							transition: "transform 0.2s ease, box-shadow 0.2s ease",
+							"& .MuiButton-startIcon": {
+								fontSize: "1rem",
+								mr: 0.5,
+							},
+							"& .MuiButton-label": {
+								fontSize: "0.95rem",
+							},
+							"&:hover": {
+								transform: "scale(1.03)",
+								boxShadow: (theme) => `0 2px 6px ${theme.palette.action.hover}`,
+							},
+						}}
+						startIcon={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.icon}
+					>
+						{count}
+					</Button>
+				);
+			})}
+		</Stack>
+	);
+};
 
 interface SinglePostProps {
 	post: PostDetail,
@@ -164,55 +257,14 @@ export function SinglePost({ post, canOpenComments = false }: SinglePostProps) {
 						</Box>
 					)}
 
-					{/* Updated reactions section */}
-					{post.reactions && Object.keys(post.reactions).length > 0 && (
-						<Stack
-							direction='row'
-							spacing={1}
-							sx={{
-								mb: 2,
-								flexWrap: "wrap",
-								gap: 0.5,
-							}}
-						>
-							{Object.entries(post.reactions).map(
-								([type, count]) =>
-									(count as number) > 0 && (
-										<Tooltip
-											key={type}
-											title={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.label}
-										>
-											<Chip
-												icon={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.icon}
-												label={count}
-												size='small'
-												variant='outlined'
-												color={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.color}
-												sx={{
-													textTransform: "capitalize",
-													fontWeight: 500,
-													height: "28px",
-													borderRadius: 2,
-													transition: "all 0.2s ease-in-out",
-													"& .MuiChip-icon": {
-														fontSize: "0.9rem",
-														marginLeft: "4px",
-													},
-													"& .MuiChip-label": {
-														px: 1,
-														fontSize: "0.8rem",
-													},
-													"&:hover": {
-														transform: "translateY(-1px)",
-														boxShadow: (theme) => `0 2px 8px ${theme.palette.action.hover}`,
-														backgroundColor: "action.hover",
-													},
-												}}
-											/>
-										</Tooltip>
-									),
-							)}
-						</Stack>
+					{/* Use the ReactionRow component */}
+					{post.reactions && (
+						<ReactionRow
+							reactions={post.reactions}
+							myReaction={post.myReaction ?? undefined}
+							targetId={post.id}
+							reactionTarget={ReactionTargetType.Post}
+						/>
 					)}
 
 					{/* Bottom chips section */}

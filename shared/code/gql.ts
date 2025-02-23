@@ -305,6 +305,7 @@ export type PostDetail = {
   id: Scalars['String']['output'];
   interest?: Maybe<InterestDetail>;
   isPinned?: Maybe<Scalars['Boolean']['output']>;
+  myReaction?: Maybe<ReactionType>;
   pinnedComment?: Maybe<CommentDetail>;
   postPicture?: Maybe<Scalars['String']['output']>;
   reactions?: Maybe<ReactionsCount>;
@@ -550,7 +551,6 @@ export type UserDetail = {
   email?: Maybe<Scalars['String']['output']>;
   filedReportsCount?: Maybe<Scalars['Float']['output']>;
   firstName?: Maybe<Scalars['String']['output']>;
-  friendRequestSend?: Maybe<Scalars['Boolean']['output']>;
   friendsCount?: Maybe<Scalars['Float']['output']>;
   id: Scalars['String']['output'];
   joinedGroupsCount?: Maybe<Scalars['Float']['output']>;
@@ -706,7 +706,14 @@ export type GetPostsListQueryVariables = Exact<{
 }>;
 
 
-export type GetPostsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'PostDetail', id: string, content: string, postPicture?: string | null, commentsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, profilePictureUrl?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id?: string | null, name?: string | null } | null }> | null } };
+export type GetPostsListQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', total?: number | null, page?: number | null, limit?: number | null, items?: Array<{ __typename: 'PostDetail', id: string, content: string, postPicture?: string | null, myReaction?: ReactionType | null, commentsCount?: number | null, createdAt?: any | null, updatedAt?: any | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, profilePictureUrl?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, sad: number, smile: number, angry: number, love: number } | null, interest?: { __typename?: 'InterestDetail', id?: string | null, name?: string | null } | null, group?: { __typename?: 'GroupDetail', id?: string | null, name?: string | null } | null }> | null } };
+
+export type GetPostReactionsQueryVariables = Exact<{
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type GetPostReactionsQuery = { __typename?: 'Query', getPosts: { __typename?: 'PaginatedPostsListResponse', items?: Array<{ __typename?: 'PostDetail', reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
 
 export type GetAdministrationPostsListQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -1592,6 +1599,7 @@ export const GetPostsListDocument = /*#__PURE__*/ `
         id
         name
       }
+      myReaction
       commentsCount
       createdAt
       updatedAt
@@ -1646,6 +1654,67 @@ useInfiniteGetPostsListQuery.getKey = (variables?: GetPostsListQueryVariables) =
 
 
 useGetPostsListQuery.fetcher = (variables?: GetPostsListQueryVariables, options?: RequestInit['headers']) => fetcher<GetPostsListQuery, GetPostsListQueryVariables>(GetPostsListDocument, variables, options);
+
+export const GetPostReactionsDocument = /*#__PURE__*/ `
+    query GetPostReactions($postId: String!) {
+  getPosts(limit: 1, page: 1, postId: $postId) {
+    items {
+      reactions {
+        like
+        dislike
+        smile
+        angry
+        sad
+        love
+      }
+    }
+  }
+}
+    `;
+
+export const useGetPostReactionsQuery = <
+      TData = GetPostReactionsQuery,
+      TError = GraphQLResponse
+    >(
+      variables: GetPostReactionsQueryVariables,
+      options?: Omit<UseQueryOptions<GetPostReactionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetPostReactionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetPostReactionsQuery, TError, TData>(
+      {
+    queryKey: ['GetPostReactions', variables],
+    queryFn: fetcher<GetPostReactionsQuery, GetPostReactionsQueryVariables>(GetPostReactionsDocument, variables),
+    ...options
+  }
+    )};
+
+useGetPostReactionsQuery.document = GetPostReactionsDocument;
+
+useGetPostReactionsQuery.getKey = (variables: GetPostReactionsQueryVariables) => ['GetPostReactions', variables];
+
+export const useInfiniteGetPostReactionsQuery = <
+      TData = InfiniteData<GetPostReactionsQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetPostReactionsQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetPostReactionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetPostReactionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetPostReactionsQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetPostReactions.infinite', variables],
+      queryFn: (metaData) => fetcher<GetPostReactionsQuery, GetPostReactionsQueryVariables>(GetPostReactionsDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetPostReactionsQuery.getKey = (variables: GetPostReactionsQueryVariables) => ['GetPostReactions.infinite', variables];
+
+
+useGetPostReactionsQuery.fetcher = (variables: GetPostReactionsQueryVariables, options?: RequestInit['headers']) => fetcher<GetPostReactionsQuery, GetPostReactionsQueryVariables>(GetPostReactionsDocument, variables, options);
 
 export const GetAdministrationPostsListDocument = /*#__PURE__*/ `
     query GetAdministrationPostsList($page: Int = 1, $limit: Int = 10, $creatorId: String, $groupId: String, $interestId: String, $postId: String) {

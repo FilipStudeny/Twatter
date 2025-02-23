@@ -166,4 +166,6 @@ export class DbResponse {
 	user_profileVisibility: string;
 
 	friendRequestSend: boolean;
+
+	myReaction: string;
 }

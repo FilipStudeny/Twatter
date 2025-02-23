@@ -13,6 +13,7 @@ export class GetPostsListQuery {
 		public readonly page: number,
 		public readonly limit: number,
 		public readonly requestedFields: PostDetail,
+		public readonly currentUserId: string,
 		public readonly creatorId?: string,
 		public readonly postId?: string,
 		public readonly interestId?: string,
@@ -71,24 +72,46 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 			qb.addSelect('post."pinnedCommentId" AS "post_pinnedCommentId"');
 		}
 
+		const groupByColumns = [
+			"post.id",
+			"post.content",
+			"post.postPicture",
+			"post.createdAt",
+			"post.updatedAt",
+			"post.pinnedCommentId",
+		];
+
+		if (requestedFields.myReaction) {
+			qb.leftJoin("post.reactions", "myReaction", "myReaction.userId = :currentUserId", {
+				currentUserId: query.currentUserId,
+			});
+			qb.addSelect("myReaction.type", "myReaction");
+			groupByColumns.push("myReaction.type");
+		}
+
 		if (requestedFields.creator) {
 			qb.leftJoin("post.creator", "creator");
 
 			const creatorFields = [];
 			if (requestedFields.creator.id) {
 				creatorFields.push('creator.id AS "creator_id"');
+				groupByColumns.push("creator.id");
 			}
 			if (requestedFields.creator.username) {
 				creatorFields.push('creator.username AS "creator_username"');
+				groupByColumns.push("creator.username");
 			}
 			if (requestedFields.creator.firstName) {
 				creatorFields.push('creator."firstName" AS "creator_firstName"');
+				groupByColumns.push('creator."firstName"');
 			}
 			if (requestedFields.creator.lastName) {
 				creatorFields.push('creator."lastName" AS "creator_lastName"');
+				groupByColumns.push('creator."lastName"');
 			}
 			if (requestedFields.creator.profilePictureUrl) {
 				creatorFields.push('creator."profilePictureUrl" AS "creator_profilePictureUrl"');
+				groupByColumns.push('creator."profilePictureUrl"');
 			}
 			if (creatorFields.length > 0) {
 				qb.addSelect(creatorFields);
@@ -97,12 +120,15 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 
 		if (requestedFields.interest) {
 			qb.leftJoin("post.interest", "interest");
+
 			const interestFields = [];
 			if (requestedFields.interest.id) {
 				interestFields.push('interest.id AS "interest_id"');
+				groupByColumns.push("interest.id");
 			}
 			if (requestedFields.interest.name) {
 				interestFields.push('interest.name AS "interest_name"');
+				groupByColumns.push("interest.name");
 			}
 			if (interestFields.length > 0) {
 				qb.addSelect(interestFields);
@@ -131,40 +157,9 @@ export class GetPostsListQueryHandler implements IQueryHandler<GetPostsListQuery
 			qb.addSelect('COUNT(DISTINCT comment.id) AS "comments_count"');
 		}
 
-		if (requestedFields.group) {
-			qb.leftJoin("post.group", "group");
-			const groupFields = [];
-			if (requestedFields.group.id) {
-				groupFields.push('group.id AS "group_id"');
-			}
-			if (requestedFields.group.name) {
-				groupFields.push('group.name AS "group_name"');
-			}
-			if (groupFields.length > 0) {
-				qb.addSelect(groupFields);
-			}
-		}
-
 		qb.addSelect('COUNT(*) OVER() AS "total_count"');
 
-		qb.groupBy(
-			[
-				"post.id",
-				"post.content",
-				"post.postPicture",
-				"post.createdAt",
-				"post.updatedAt",
-				"post.pinnedCommentId",
-				"creator.id",
-				"creator.username",
-				"creator.firstName",
-				"creator.lastName",
-				"interest.id",
-				"interest.name",
-				"group.id",
-				"group.name",
-			].join(", "),
-		);
+		qb.groupBy(groupByColumns.join(", "));
 
 		qb.orderBy('post."createdAt"', "DESC");
 		qb.offset(skip).limit(limit);

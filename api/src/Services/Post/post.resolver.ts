@@ -54,12 +54,24 @@ export default class PostsResolver {
 		@Args("postId", { type: () => String, nullable: true }) postId: string,
 		@Args("interestId", { type: () => String, nullable: true }) interestId: string,
 		@Args("groupId", { type: () => String, nullable: true }) groupId: string,
+		@CurrentUser() payload: JwtPayload,
 
 		@Info() info: GraphQLResolveInfo,
 	) {
 		const fields = graphqlFields(info);
+		const authenticatedUserId = payload.id;
+
 		return this.queryBus.execute(
-			new GetPostsListQuery(page, limit, fields.items, creatorId, postId, interestId, groupId),
+			new GetPostsListQuery(
+				page,
+				limit,
+				fields.items,
+				authenticatedUserId,
+				creatorId,
+				postId,
+				interestId,
+				groupId,
+			),
 		);
 	}
 }
