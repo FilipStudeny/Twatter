@@ -30,13 +30,23 @@ export default class CommentsResolver {
 		@Args("limit", { type: () => Int }) limit: number,
 		@Args("creatorId", { type: () => String, nullable: true }) creatorId: string,
 		@Args("postId", { type: () => String, nullable: true }) postId: string,
-		@Args("id", { type: () => String, nullable: true }) commentId: string,
-
+		@Args("commentId", { type: () => String, nullable: true }) commentId: string,
+		@CurrentUser() payload: JwtPayload,
 		@Info() info: GraphQLResolveInfo,
 	) {
 		const fields = graphqlFields(info);
+		const authenticatedUserId = payload.id;
+
 		return this.queryBus.execute(
-			new GetCommentsListQuery(page, limit, fields.items, postId, commentId, creatorId),
+			new GetCommentsListQuery(
+				page,
+				limit,
+				fields.items,
+				authenticatedUserId,
+				postId,
+				commentId,
+				creatorId,
+			),
 		);
 	}
 

@@ -70,6 +70,17 @@ type CommentDetail {
   strikesCount: Float
   createdAt: DateTime
   updatedAt: DateTime
+  myReaction: ReactionType
+}
+
+"""Different types of reactions available"""
+enum ReactionType {
+  LIKE
+  DISLIKE
+  SMILE
+  ANGRY
+  SAD
+  LOVE
 }
 
 type InterestDetail {
@@ -130,16 +141,6 @@ type PostDetail {
   pinnedComment: CommentDetail
   isPinned: Boolean
   myReaction: ReactionType
-}
-
-"""Different types of reactions available"""
-enum ReactionType {
-  LIKE
-  DISLIKE
-  SMILE
-  ANGRY
-  SAD
-  LOVE
 }
 
 type ReportDetail {
@@ -248,7 +249,7 @@ type Query {
   GetReports(userId: String!, page: Int = 1, limit: Int = 10): PaginatedReportsListResponse!
   GetInterests(page: Int! = 1, limit: Int! = 10, interestId: String): PaginatedInterestsListResponse!
   getUserReactions(userId: String!, page: Int = 1, limit: Int = 10): PaginatedUserReactionsResponse!
-  getCommentsList(page: Int!, limit: Int!, creatorId: String, postId: String, id: String): PaginatedCommentsListResponse!
+  getCommentsList(page: Int!, limit: Int!, creatorId: String, postId: String, commentId: String): PaginatedCommentsListResponse!
   getPostsStatistics(filter: GraphFilter!, year: Int, weekNumber: Int): [PostGraphDataDto!]!
   getPosts(page: Int!, limit: Int!, creatorId: String, postId: String, interestId: String, groupId: String): PaginatedPostsListResponse!
   getUsers(page: Int! = 1, limit: Int! = 10, userId: String, groupId: String, getAll: Boolean, search: String, friendOf: String): PaginatedUsersResponse!

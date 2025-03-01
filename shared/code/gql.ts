@@ -32,6 +32,7 @@ export type CommentDetail = {
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   creator: UserDetail;
   id: Scalars['String']['output'];
+  myReaction?: Maybe<ReactionType>;
   postId: Scalars['String']['output'];
   reactions?: Maybe<ReactionsCount>;
   reportsCount?: Maybe<Scalars['Float']['output']>;
@@ -380,8 +381,8 @@ export type QueryGetUserIsFriendArgs = {
 
 
 export type QueryGetCommentsListArgs = {
+  commentId?: InputMaybe<Scalars['String']['input']>;
   creatorId?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['String']['input']>;
   limit: Scalars['Int']['input'];
   page: Scalars['Int']['input'];
   postId?: InputMaybe<Scalars['String']['input']>;
@@ -648,7 +649,14 @@ export type GetCommentsByPostIdQueryVariables = Exact<{
 }>;
 
 
-export type GetCommentsByPostIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename: 'CommentDetail', id: string, content: string, postId: string, createdAt?: any | null, updatedAt?: any | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, profilePictureUrl?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+export type GetCommentsByPostIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename: 'CommentDetail', id: string, content: string, postId: string, createdAt?: any | null, updatedAt?: any | null, myReaction?: ReactionType | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, profilePictureUrl?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+
+export type GetCommentReactionsQueryVariables = Exact<{
+  commentId: Scalars['String']['input'];
+}>;
+
+
+export type GetCommentReactionsQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', items?: Array<{ __typename?: 'CommentDetail', reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
 
 export type GetCommentsByCreatorIdQueryVariables = Exact<{
   creatorId: Scalars['String']['input'];
@@ -657,7 +665,7 @@ export type GetCommentsByCreatorIdQueryVariables = Exact<{
 }>;
 
 
-export type GetCommentsByCreatorIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename: 'CommentDetail', id: string, content: string, postId: string, createdAt?: any | null, updatedAt?: any | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, profilePictureUrl?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
+export type GetCommentsByCreatorIdQuery = { __typename?: 'Query', getCommentsList: { __typename?: 'PaginatedCommentsListResponse', page?: number | null, total?: number | null, limit?: number | null, items?: Array<{ __typename: 'CommentDetail', id: string, content: string, postId: string, createdAt?: any | null, updatedAt?: any | null, myReaction?: ReactionType | null, creator: { __typename?: 'UserDetail', id: string, username?: string | null, firstName?: string | null, lastName?: string | null, profilePictureUrl?: string | null }, reactions?: { __typename?: 'ReactionsCount', like: number, dislike: number, smile: number, angry: number, sad: number, love: number } | null }> | null } };
 
 export type CreateGroupMutationVariables = Exact<{
   createGroupDto: CreateGroupDto;
@@ -1154,6 +1162,7 @@ export const GetCommentsByPostIdDocument = /*#__PURE__*/ `
       }
       createdAt
       updatedAt
+      myReaction
     }
     page
     total
@@ -1206,6 +1215,67 @@ useInfiniteGetCommentsByPostIdQuery.getKey = (variables: GetCommentsByPostIdQuer
 
 useGetCommentsByPostIdQuery.fetcher = (variables: GetCommentsByPostIdQueryVariables, options?: RequestInit['headers']) => fetcher<GetCommentsByPostIdQuery, GetCommentsByPostIdQueryVariables>(GetCommentsByPostIdDocument, variables, options);
 
+export const GetCommentReactionsDocument = /*#__PURE__*/ `
+    query GetCommentReactions($commentId: String!) {
+  getCommentsList(limit: 1, page: 1, commentId: $commentId) {
+    items {
+      reactions {
+        like
+        dislike
+        smile
+        angry
+        sad
+        love
+      }
+    }
+  }
+}
+    `;
+
+export const useGetCommentReactionsQuery = <
+      TData = GetCommentReactionsQuery,
+      TError = GraphQLResponse
+    >(
+      variables: GetCommentReactionsQueryVariables,
+      options?: Omit<UseQueryOptions<GetCommentReactionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetCommentReactionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetCommentReactionsQuery, TError, TData>(
+      {
+    queryKey: ['GetCommentReactions', variables],
+    queryFn: fetcher<GetCommentReactionsQuery, GetCommentReactionsQueryVariables>(GetCommentReactionsDocument, variables),
+    ...options
+  }
+    )};
+
+useGetCommentReactionsQuery.document = GetCommentReactionsDocument;
+
+useGetCommentReactionsQuery.getKey = (variables: GetCommentReactionsQueryVariables) => ['GetCommentReactions', variables];
+
+export const useInfiniteGetCommentReactionsQuery = <
+      TData = InfiniteData<GetCommentReactionsQuery>,
+      TError = GraphQLResponse
+    >(
+      variables: GetCommentReactionsQueryVariables,
+      options: Omit<UseInfiniteQueryOptions<GetCommentReactionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetCommentReactionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useInfiniteQuery<GetCommentReactionsQuery, TError, TData>(
+      (() => {
+    const { queryKey: optionsQueryKey, ...restOptions } = options;
+    return {
+      queryKey: optionsQueryKey ?? ['GetCommentReactions.infinite', variables],
+      queryFn: (metaData) => fetcher<GetCommentReactionsQuery, GetCommentReactionsQueryVariables>(GetCommentReactionsDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      ...restOptions
+    }
+  })()
+    )};
+
+useInfiniteGetCommentReactionsQuery.getKey = (variables: GetCommentReactionsQueryVariables) => ['GetCommentReactions.infinite', variables];
+
+
+useGetCommentReactionsQuery.fetcher = (variables: GetCommentReactionsQueryVariables, options?: RequestInit['headers']) => fetcher<GetCommentReactionsQuery, GetCommentReactionsQueryVariables>(GetCommentReactionsDocument, variables, options);
+
 export const GetCommentsByCreatorIdDocument = /*#__PURE__*/ `
     query GetCommentsByCreatorId($creatorId: String!, $page: Int!, $limit: Int!) {
   getCommentsList(creatorId: $creatorId, page: $page, limit: $limit) {
@@ -1231,6 +1301,7 @@ export const GetCommentsByCreatorIdDocument = /*#__PURE__*/ `
       }
       createdAt
       updatedAt
+      myReaction
     }
     page
     total

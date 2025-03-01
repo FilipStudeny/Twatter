@@ -51,7 +51,6 @@ function RouteComponent() {
 		<>
 			<SinglePost post={post} canOpenComments={false} />
 			<CommentsSection postId={id} />
-
 		</>
 	);
 }

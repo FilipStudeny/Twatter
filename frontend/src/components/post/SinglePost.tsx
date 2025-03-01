@@ -1,21 +1,15 @@
 import { RouterLink } from "@Components/navigation/routerLink";
+import { ReactionsRow } from "@Components/reactions/ReactionsRow";
 import { ReportButton } from "@Components/report/ReportButton";
 import {
 	Category as CategoryIcon,
 	Comment as CommentIcon,
-	Favorite as FavoriteIcon,
 	Group as GroupIcon,
-	Mood as MoodIcon,
-	SentimentDissatisfied as SentimentDissatisfiedIcon,
-	SentimentVeryDissatisfied as SentimentVeryDissatisfiedIcon,
-	ThumbDown as ThumbDownIcon,
-	ThumbUp as ThumbUpIcon,
 	ZoomIn as ZoomInIcon,
 } from "@mui/icons-material";
 import {
 	Avatar,
 	Box,
-	Button,
 	Card,
 	CardContent,
 	CardHeader,
@@ -27,136 +21,10 @@ import {
 	useTheme,
 } from "@mui/material";
 import dayjs from "dayjs";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import CommentsModal from "./comments/CommentsModal";
-import { CreateOrUpdateReactionDto, PostDetail, ReactionsCount, ReactionTargetType, ReactionType, useAddReactionMutation, useGetPostReactionsQuery } from "../../../../shared";
-
-const REACTION_CONFIG = {
-	like: {
-		icon: <ThumbUpIcon fontSize='small' />,
-		color: "success",
-		label: "Likes",
-	},
-	dislike: {
-		icon: <ThumbDownIcon fontSize='small' />,
-		color: "error",
-		label: "Dislikes",
-	},
-	sad: {
-		icon: <SentimentDissatisfiedIcon fontSize='small' />,
-		color: "info",
-		label: "Sad reactions",
-	},
-	smile: {
-		icon: <MoodIcon fontSize='small' />,
-		color: "warning",
-		label: "Happy reactions",
-	},
-	angry: {
-		icon: <SentimentVeryDissatisfiedIcon fontSize='small' />,
-		color: "error",
-		label: "Angry reactions",
-	},
-	love: {
-		icon: <FavoriteIcon fontSize='small' />,
-		color: "primary",
-		label: "Love reactions",
-	},
-} as const;
-
-export interface ReactionRowProps {
-	targetId: string,
-	reactions: ReactionsCount,
-	myReaction?: ReactionType,
-	reactionTarget: ReactionTargetType,
-}
-
-export const ReactionRow: React.FC<ReactionRowProps> = ({ targetId, reactions, myReaction, reactionTarget }) => {
-	const { mutateAsync: addReaction } = useAddReactionMutation();
-	const { refetch } = useGetPostReactionsQuery({ postId: targetId }, { enabled: false });
-
-	const [localReactions, setLocalReactions] = useState<ReactionsCount>(reactions);
-	const [loadingReaction, setLoadingReaction] = useState<ReactionType | null>(null);
-	const [selectedReaction, setSelectedReaction] = useState<ReactionType | null>(myReaction ?? null);
-
-	useEffect(() => {
-		setLocalReactions(reactions);
-	}, [reactions]);
-
-	useEffect(() => {
-		setSelectedReaction(myReaction ?? null);
-	}, [myReaction]);
-
-	const handleReactionClick = useCallback(
-		async (reactionType: ReactionType) => {
-			try {
-				setLoadingReaction(reactionType);
-				const dto: CreateOrUpdateReactionDto = {
-					reactionType,
-					targetId,
-					targetType: reactionTarget,
-				};
-				await addReaction({ createOrUpdateReactionData: dto });
-				console.log(`Reaction ${reactionType} created for target ${targetId}`);
-
-				const { data } = await refetch();
-				if (data) {
-					setLocalReactions(data.getPosts.items?.[0].reactions ?? reactions);
-					setSelectedReaction(reactionType);
-				} else {
-					setSelectedReaction(reactionType);
-				}
-			} catch (error) {
-				console.error("Error creating reaction:", error);
-			} finally {
-				setLoadingReaction(null);
-			}
-		},
-		[targetId, reactionTarget, addReaction, refetch, reactions],
-	);
-
-	return (
-		<Stack direction='row' spacing={1.5} alignItems='center' sx={{ mb: 2, flexWrap: "wrap" }}>
-			{(Object.keys(REACTION_CONFIG) as (keyof ReactionsCount)[]).map((type) => {
-				const count = localReactions[type] || 0;
-				const reactionType = type.toUpperCase() as ReactionType;
-
-				return (
-					<Button
-						key={type}
-						loading={loadingReaction === reactionType}
-						onClick={() => handleReactionClick(reactionType)}
-						variant={selectedReaction && selectedReaction.toLowerCase() === type ? "contained" : "outlined"}
-						color={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.color}
-						sx={{
-							textTransform: "capitalize",
-							fontWeight: 500,
-							height: 32,
-							borderRadius: 2,
-							px: 1,
-							transition: "transform 0.2s ease, box-shadow 0.2s ease",
-							"& .MuiButton-startIcon": {
-								fontSize: "1rem",
-								mr: 0.5,
-							},
-							"& .MuiButton-label": {
-								fontSize: "0.95rem",
-							},
-							"&:hover": {
-								transform: "scale(1.03)",
-								boxShadow: (theme) => `0 2px 6px ${theme.palette.action.hover}`,
-							},
-						}}
-						startIcon={REACTION_CONFIG[type as keyof typeof REACTION_CONFIG]?.icon}
-					>
-						{count}
-					</Button>
-				);
-			})}
-		</Stack>
-	);
-};
+import { PostDetail, ReactionTargetType } from "../../../../shared";
 
 interface SinglePostProps {
 	post: PostDetail,
@@ -259,7 +127,7 @@ export function SinglePost({ post, canOpenComments = false }: SinglePostProps) {
 
 					{/* Use the ReactionRow component */}
 					{post.reactions && (
-						<ReactionRow
+						<ReactionsRow
 							reactions={post.reactions}
 							myReaction={post.myReaction ?? undefined}
 							targetId={post.id}

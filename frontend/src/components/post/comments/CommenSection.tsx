@@ -1,11 +1,11 @@
-// CommentsSection.tsx
 import { GET_ERROR_LIST } from "@Utils/getResponseError";
-import { Box, Button, CircularProgress, Typography, Alert } from "@mui/material";
+import { Box, Button, CircularProgress, Typography, Alert, Stack, Paper } from "@mui/material";
 import React from "react";
 
 import { useInfiniteScroll } from "hooks/infiniteScroll";
 
 import Comment from "./Comment";
+import CreateCommentForm from "./CreateCommentForm";
 import { useInfiniteGetCommentsByPostIdQuery } from "../../../../../shared";
 
 interface CommentsSectionProps {
@@ -44,12 +44,14 @@ function CommentsSection({ postId }: CommentsSectionProps) {
 
 	const { sentinelRef } = useInfiniteScroll(Boolean(hasNextPage), isFetchingNextPage, fetchNextPage);
 
-	const handleReportCommentClick = (commentId: string, username: string) => {
-		console.log(`Reporting comment [id=${commentId}] by user: ${username}`);
+	const handleCreateComment = async (markdownContent: string) => {
+		console.log("Markdown content:", markdownContent);
 	};
 
 	return (
 		<Box sx={{ mt: 3 }}>
+			<CreateCommentForm onSubmit={handleCreateComment} />
+
 			<Typography variant='h6' gutterBottom>
 				Comments
 			</Typography>
@@ -68,23 +70,24 @@ function CommentsSection({ postId }: CommentsSectionProps) {
 				</Alert>
 			)}
 
-			{commentPages?.pages.map((page, pageIndex) => (
-				<React.Fragment key={pageIndex}>
-					{page?.getCommentsList?.items?.map((comment) => (
-						<Box key={comment.id} sx={{ mb: 2 }}>
-							<Comment
-								comment={comment}
-								onReportClick={handleReportCommentClick}
-							/>
-						</Box>
-					))}
-				</React.Fragment>
-			))}
+			<Stack spacing={2}>
+				{commentPages?.pages.map((page, pageIndex) => (
+					<React.Fragment key={pageIndex}>
+						{page?.getCommentsList?.items?.map((comment) => (
+							<Paper key={comment.id} sx={{ p: 2 }} elevation={1}>
+								<Comment comment={comment} />
+							</Paper>
+						))}
+					</React.Fragment>
+				))}
+			</Stack>
 
 			{!isLoadingComments &&
 				!commentsFetchFailed &&
 				commentPages?.pages?.[0]?.getCommentsList?.items?.length === 0 && (
-				<Typography variant='body2'>No comments yet.</Typography>
+				<Typography variant='body2' sx={{ mt: 2 }}>
+					No comments yet.
+				</Typography>
 			)}
 
 			{hasNextPage && (

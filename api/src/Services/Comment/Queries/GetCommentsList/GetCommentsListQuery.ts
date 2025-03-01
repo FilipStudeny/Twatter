@@ -13,6 +13,7 @@ export class GetCommentsListQuery {
 		public readonly page: number,
 		public readonly limit: number,
 		public readonly requestedFields: CommentDetail,
+		public readonly currentUserId?: string,
 		public readonly postId?: string,
 		public readonly commentId?: string,
 		public readonly creatorId?: string,
@@ -29,11 +30,10 @@ export class GetCommentsListQueryHandler implements IQueryHandler<GetCommentsLis
 	async execute(query: GetCommentsListQuery): Promise<PaginatedCommentsListResponse> {
 		const { page, limit, requestedFields, postId, commentId, creatorId } = query;
 		const skip = (page - 1) * limit;
-
 		const qb = this.entityManager.createQueryBuilder("comment", "comment");
+
 		qb.select(['comment.id AS "comment_id"']);
 
-		// Filtering logic
 		if (commentId) {
 			qb.where("comment.id = :commentId", { commentId });
 		} else {
@@ -45,41 +45,55 @@ export class GetCommentsListQueryHandler implements IQueryHandler<GetCommentsLis
 			}
 		}
 
-		// Requested fields selection
+		const groupByColumns: string[] = ["comment.id"];
 		if (requestedFields.postId) {
 			qb.addSelect('comment.postId AS "comment_post_id"');
+			groupByColumns.push("comment.postId");
 		}
-
 		if (requestedFields.content) {
 			qb.addSelect('comment.content AS "comment_content"');
+			groupByColumns.push("comment.content");
 		}
-
 		if (requestedFields.createdAt) {
 			qb.addSelect('comment."createdAt" AS "comment_createdAt"');
+			groupByColumns.push('comment."createdAt"');
 		}
-
 		if (requestedFields.updatedAt) {
 			qb.addSelect('comment."updatedAt" AS "comment_updatedAt"');
+			groupByColumns.push('comment."updatedAt"');
+		}
+
+		if (requestedFields.myReaction) {
+			qb.leftJoin("comment.reactions", "myReaction", "myReaction.userId = :currentUserId", {
+				currentUserId: query.currentUserId,
+			});
+			qb.addSelect("myReaction.type", "myReaction");
+			groupByColumns.push("myReaction.type");
 		}
 
 		if (requestedFields.creator) {
 			qb.leftJoin("comment.creator", "creator");
-
 			const creatorFields = [];
+
 			if (requestedFields.creator.id) {
 				creatorFields.push('creator.id AS "creator_id"');
+				groupByColumns.push("creator.id");
 			}
 			if (requestedFields.creator.username) {
 				creatorFields.push('creator.username AS "creator_username"');
+				groupByColumns.push("creator.username");
 			}
 			if (requestedFields.creator.firstName) {
 				creatorFields.push('creator."firstName" AS "creator_firstName"');
+				groupByColumns.push('creator."firstName"');
 			}
 			if (requestedFields.creator.lastName) {
 				creatorFields.push('creator."lastName" AS "creator_lastName"');
+				groupByColumns.push('creator."lastName"');
 			}
 			if (requestedFields.creator.profilePictureUrl) {
 				creatorFields.push('creator."profilePictureUrl" AS "creator_profilePictureUrl"');
+				groupByColumns.push('creator."profilePictureUrl"');
 			}
 			if (creatorFields.length > 0) {
 				qb.addSelect(creatorFields);
@@ -87,92 +101,80 @@ export class GetCommentsListQueryHandler implements IQueryHandler<GetCommentsLis
 		}
 
 		if (requestedFields.reactions) {
-			qb.leftJoin("comment.reactions", "reaction");
-			const reactionsFields = [];
+			const reactionSelects: string[] = [];
 
 			if (requestedFields.reactions.like) {
-				reactionsFields.push(
-					`SUM(CASE WHEN reaction.type = 'like' THEN 1 ELSE 0 END) AS "like_count"`,
-				);
+				reactionSelects.push(`
+					(SELECT SUM(CASE WHEN r.type = 'like' THEN 1 ELSE 0 END)
+					 FROM reaction r
+					 WHERE r."commentId" = comment.id) AS "like_count"
+				`);
 			}
 			if (requestedFields.reactions.dislike) {
-				reactionsFields.push(
-					`SUM(CASE WHEN reaction.type = 'dislike' THEN 1 ELSE 0 END) AS "dislike_count"`,
-				);
+				reactionSelects.push(`
+					(SELECT SUM(CASE WHEN r.type = 'dislike' THEN 1 ELSE 0 END)
+					 FROM reaction r
+					 WHERE r."commentId" = comment.id) AS "dislike_count"
+				`);
 			}
 			if (requestedFields.reactions.smile) {
-				reactionsFields.push(
-					`SUM(CASE WHEN reaction.type = 'smile' THEN 1 ELSE 0 END) AS "smile_count"`,
-				);
+				reactionSelects.push(`
+					(SELECT SUM(CASE WHEN r.type = 'smile' THEN 1 ELSE 0 END)
+					 FROM reaction r
+					 WHERE r."commentId" = comment.id) AS "smile_count"
+				`);
 			}
 			if (requestedFields.reactions.angry) {
-				reactionsFields.push(
-					`SUM(CASE WHEN reaction.type = 'angry' THEN 1 ELSE 0 END) AS "angry_count"`,
-				);
+				reactionSelects.push(`
+					(SELECT SUM(CASE WHEN r.type = 'angry' THEN 1 ELSE 0 END)
+					 FROM reaction r
+					 WHERE r."commentId" = comment.id) AS "angry_count"
+				`);
 			}
 			if (requestedFields.reactions.sad) {
-				reactionsFields.push(
-					`SUM(CASE WHEN reaction.type = 'sad' THEN 1 ELSE 0 END) AS "sad_count"`,
-				);
+				reactionSelects.push(`
+					(SELECT SUM(CASE WHEN r.type = 'sad' THEN 1 ELSE 0 END)
+					 FROM reaction r
+					 WHERE r."commentId" = comment.id) AS "sad_count"
+				`);
 			}
 			if (requestedFields.reactions.love) {
-				reactionsFields.push(
-					`SUM(CASE WHEN reaction.type = 'love' THEN 1 ELSE 0 END) AS "love_count"`,
-				);
+				reactionSelects.push(`
+					(SELECT SUM(CASE WHEN r.type = 'love' THEN 1 ELSE 0 END)
+					 FROM reaction r
+					 WHERE r."commentId" = comment.id) AS "love_count"
+				`);
 			}
-			if (reactionsFields.length > 0) {
-				qb.addSelect(reactionsFields);
+
+			if (reactionSelects.length > 0) {
+				qb.addSelect(reactionSelects);
 			}
 		}
 
 		if (requestedFields.reportsCount) {
-			qb.leftJoin("comment.reports", "reports");
-			qb.addSelect('COUNT(DISTINCT reports.id) AS "reports_count"');
+			qb.addSelect(`
+				(SELECT COUNT(*)
+				 FROM report rep
+				 WHERE rep."commentId" = comment.id) AS "reports_count"
+			`);
 		}
 
 		if (requestedFields.strikesCount) {
-			qb.leftJoin("comment.strikes", "strikes");
-			qb.addSelect('COUNT(DISTINCT strikes.id) AS "strikes_count"');
+			qb.addSelect(`
+				(SELECT COUNT(*)
+				 FROM strike st
+				 WHERE st."commentId" = comment.id) AS "strikes_count"
+			`);
 		}
 
 		qb.addSelect('COUNT(*) OVER() AS "total_count"');
-
-		// Group by fields
-		const groupByFields = ["comment.id"];
-
-		if (requestedFields.content) {
-			groupByFields.push("comment.content");
-		}
-		if (requestedFields.createdAt) {
-			groupByFields.push('comment."createdAt"');
-		}
-		if (requestedFields.updatedAt) {
-			groupByFields.push('comment."updatedAt"');
-		}
-		if (requestedFields.creator) {
-			if (requestedFields.creator.id) {
-				groupByFields.push("creator.id");
-			}
-			if (requestedFields.creator.username) {
-				groupByFields.push("creator.username");
-			}
-			if (requestedFields.creator.firstName) {
-				groupByFields.push('creator."firstName"');
-			}
-			if (requestedFields.creator.lastName) {
-				groupByFields.push('creator."lastName"');
-			}
-		}
-
-		qb.groupBy(groupByFields.join(", "));
+		qb.groupBy(groupByColumns.join(", "));
 		qb.orderBy('comment."createdAt"', "DESC");
 		qb.offset(skip).limit(limit);
 
 		const commentsWithCounts: DbResponse[] = await qb.getRawMany();
 		const total = commentsWithCounts.length > 0 ? parseInt(commentsWithCounts[0].total_count, 10) : 0;
-		const comments = commentsWithCounts.map((commentWithCounts) =>
-			this.mapper.map(commentWithCounts, DbResponse, CommentDetail),
-		);
+		const comments = commentsWithCounts.map((raw) => this.mapper.map(raw, DbResponse, CommentDetail));
 
 		return new PaginatedCommentsListResponse(comments, total, page, limit);
 	}

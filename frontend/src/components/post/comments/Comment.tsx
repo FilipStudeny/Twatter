@@ -1,17 +1,16 @@
+import { ReactionsRow } from "@Components/reactions/ReactionsRow";
 import { ReportButton } from "@Components/report/ReportButton";
-import { reactionChipColors, reactionIcons } from "@Utils/reactions";
-import { Box, Stack, Avatar, Chip, Typography, Paper } from "@mui/material";
+import { Box, Stack, Avatar, Typography, Paper } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
 
-import { CommentDetail } from "../../../../../shared";
+import { CommentDetail, ReactionTargetType } from "../../../../../shared";
 
 interface CommentProps {
 	comment: CommentDetail,
 }
 
 const Comment: React.FC<CommentProps> = ({ comment }) => {
-	// Get avatar fallback letter from username
 	const avatarFallback = comment.creator.username?.charAt(0).toUpperCase() ?? "?";
 
 	return (
@@ -86,48 +85,12 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
 						{comment.content}
 					</Typography>
 					{comment.reactions && (
-						<Stack
-							direction='row'
-							spacing={1}
-							sx={{
-								flexWrap: "wrap",
-								gap: 0.5,
-							}}
-						>
-							{Object.entries(comment.reactions).map(
-								([reactionType, count]) =>
-									(count as number) > 0 && (
-										<Chip
-											key={reactionType}
-											icon={reactionIcons[reactionType]}
-											label={count}
-											size='small'
-											variant='outlined'
-											color={reactionChipColors[reactionType] ?? "default"}
-											sx={{
-												textTransform: "capitalize",
-												fontWeight: 500,
-												height: "28px",
-												borderRadius: 2,
-												transition: "all 0.2s ease-in-out",
-												"& .MuiChip-icon": {
-													fontSize: "0.9rem",
-													marginLeft: "4px",
-												},
-												"& .MuiChip-label": {
-													px: 1,
-													fontSize: "0.8rem",
-												},
-												"&:hover": {
-													transform: "translateY(-1px)",
-													boxShadow: (theme) => `0 2px 8px ${theme.palette.action.hover}`,
-													backgroundColor: "action.hover",
-												},
-											}}
-										/>
-									),
-							)}
-						</Stack>
+						<ReactionsRow
+							reactions={comment.reactions}
+							myReaction={comment.myReaction ?? undefined}
+							targetId={comment.id}
+							reactionTarget={ReactionTargetType.Comment}
+						/>
 					)}
 				</Box>
 			</Stack>

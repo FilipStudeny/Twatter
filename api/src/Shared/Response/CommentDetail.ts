@@ -1,3 +1,4 @@
+import ReactionType from "@Models/Enums/ReactionType";
 import { DbResponse } from "@Shared/DbResponse";
 import { ReactionsCount } from "@Shared/Response/ReactionsCount";
 import { createMap, forMember, mapFrom, Mapper } from "@automapper/core";
@@ -34,6 +35,9 @@ export class CommentDetail {
 	@Field({ nullable: true })
 	updatedAt: Date;
 
+	@Field(() => ReactionType, { nullable: true })
+	myReaction: ReactionType;
+
 	static createMap(mapper: Mapper): void {
 		createMap(
 			mapper,
@@ -54,6 +58,10 @@ export class CommentDetail {
 			forMember(
 				(destination) => destination.content,
 				mapFrom((source) => source.comment_content),
+			),
+			forMember(
+				(destination) => destination.myReaction,
+				mapFrom((source) => source.myReaction),
 			),
 			forMember(
 				(destination) => destination.createdAt,

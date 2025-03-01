@@ -22,10 +22,27 @@ query GetCommentsByPostId($postId: String!, $page: Int!, $limit: Int!) {
 			}
 			createdAt
 			updatedAt
+			myReaction
 		}
 		page
 		total
 		limit
+	}
+}
+
+
+query GetCommentReactions($commentId: String!) {
+	getCommentsList(limit: 1, page: 1, commentId: $commentId) {
+		items {
+			reactions {
+				like
+				dislike
+				smile
+				angry
+				sad
+				love
+			}
+		}
 	}
 }
 
@@ -53,6 +70,7 @@ query GetCommentsByCreatorId($creatorId: String!, $page: Int!, $limit: Int!) {
 			}
 			createdAt
 			updatedAt
+			myReaction
 		}
 		page
 		total
