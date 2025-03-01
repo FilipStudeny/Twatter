@@ -3,6 +3,7 @@ import { ReportButton } from "@Components/report/ReportButton";
 import { Box, Stack, Avatar, Typography, Paper } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
+import ReactMarkdown from "react-markdown";
 
 import { CommentDetail, ReactionTargetType } from "../../../../../shared";
 
@@ -72,18 +73,9 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
 						</Stack>
 						<ReportButton reportTarget={comment} />
 					</Stack>
-					<Typography
-						variant='body2'
-						sx={{
-							whiteSpace: "pre-line",
-							mb: 2,
-							lineHeight: 1.6,
-							color: "text.primary",
-							fontSize: "0.925rem",
-						}}
-					>
-						{comment.content}
-					</Typography>
+					<Box sx={{ mb: 2, lineHeight: 1.6, color: "text.primary", fontSize: "0.925rem" }}>
+						<ReactMarkdown>{comment.content}</ReactMarkdown>
+					</Box>
 					{comment.reactions && (
 						<ReactionsRow
 							reactions={comment.reactions}

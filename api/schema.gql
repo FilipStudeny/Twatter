@@ -271,7 +271,7 @@ type Mutation {
   CreateAdmin(createAdminDto: CreateAdminDto!): GenericResponse!
   createGroup(createGroupDto: CreateGroupDto!): GenericResponse!
   AddReaction(createOrUpdateReactionData: CreateOrUpdateReactionDto!): GenericResponse!
-  CreateComment(createComment: CreateCommentDto!, postId: String!): GenericResponse!
+  CreateComment(createComment: CreateCommentDto!): GenericResponse!
   PinComment(postId: String!, commentId: String!): GenericResponse!
   CreatePost(createPost: CreatePostDto!): GenericResponse!
   SignInUser(signInUser: SignInCredentials!): SignInResponse!
@@ -333,6 +333,7 @@ enum ReactionTargetType {
 }
 
 input CreateCommentDto {
+  postId: String!
   content: String!
 }
 

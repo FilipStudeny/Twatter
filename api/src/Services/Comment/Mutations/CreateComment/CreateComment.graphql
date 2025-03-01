@@ -1,5 +1,5 @@
-mutation CreateComment($createComment: CreateCommentDto!, $postId: String!) {
-	CreateComment(createComment: $createComment, postId: $postId) {
+mutation CreateComment($createComment: CreateCommentDto!) {
+	CreateComment(createComment: $createComment) {
 		message
 	}
 }

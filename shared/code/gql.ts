@@ -49,6 +49,7 @@ export type CreateAdminDto = {
 
 export type CreateCommentDto = {
   content: Scalars['String']['input'];
+  postId: Scalars['String']['input'];
 };
 
 export type CreateGroupDto = {
@@ -140,7 +141,6 @@ export type MutationCreateAdminArgs = {
 
 export type MutationCreateCommentArgs = {
   createComment: CreateCommentDto;
-  postId: Scalars['String']['input'];
 };
 
 
@@ -628,7 +628,6 @@ export type SignUpMutation = { __typename?: 'Mutation', SignUpUser: { __typename
 
 export type CreateCommentMutationVariables = Exact<{
   createComment: CreateCommentDto;
-  postId: Scalars['String']['input'];
 }>;
 
 
@@ -1086,8 +1085,8 @@ useSignUpMutation.getKey = () => ['SignUp'];
 useSignUpMutation.fetcher = (variables: SignUpMutationVariables, options?: RequestInit['headers']) => fetcher<SignUpMutation, SignUpMutationVariables>(SignUpDocument, variables, options);
 
 export const CreateCommentDocument = /*#__PURE__*/ `
-    mutation CreateComment($createComment: CreateCommentDto!, $postId: String!) {
-  CreateComment(createComment: $createComment, postId: $postId) {
+    mutation CreateComment($createComment: CreateCommentDto!) {
+  CreateComment(createComment: $createComment) {
     message
   }
 }

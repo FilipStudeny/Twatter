@@ -53,11 +53,10 @@ export default class CommentsResolver {
 	@Mutation(() => GenericResponse)
 	async CreateComment(
 		@Args("createComment") createCommentDto: CreateCommentDto,
-		@Args("postId") postId: string,
 		@CurrentUser() payload: JwtPayload,
 	): Promise<GenericResponse> {
 		const userId = payload.id;
-		return this.commandBus.execute(new CreateCommentCommand(createCommentDto, userId, postId));
+		return this.commandBus.execute(new CreateCommentCommand(createCommentDto, userId));
 	}
 
 	@Mutation(() => GenericResponse)

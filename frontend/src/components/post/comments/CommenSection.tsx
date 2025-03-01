@@ -21,11 +21,12 @@ function CommentsSection({ postId }: CommentsSectionProps) {
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
+		refetch: refetchComments,
 	} = useInfiniteGetCommentsByPostIdQuery(
 		{
 			postId,
-			page: 0,
-			limit: 0,
+			page: 1,
+			limit: 5,
 		},
 		{
 			initialPageParam: { page: 1, limit: 5 },
@@ -44,13 +45,9 @@ function CommentsSection({ postId }: CommentsSectionProps) {
 
 	const { sentinelRef } = useInfiniteScroll(Boolean(hasNextPage), isFetchingNextPage, fetchNextPage);
 
-	const handleCreateComment = async (markdownContent: string) => {
-		console.log("Markdown content:", markdownContent);
-	};
-
 	return (
-		<Box sx={{ mt: 3 }}>
-			<CreateCommentForm onSubmit={handleCreateComment} />
+		<Box sx={{ mt: 3, width: "100%" }}>
+			<CreateCommentForm postId={postId} refetchComments={refetchComments} />
 
 			<Typography variant='h6' gutterBottom>
 				Comments
