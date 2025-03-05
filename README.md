@@ -49,14 +49,14 @@ Twatter is a social media platform inspired by Twitter and similar services. It 
 
 ## Screenshots
 
-![Twatter Example](/images/img_01.png)
-![Twatter Example](/images/img_02.png)
-![Twatter Example](/images/img_03.png)
-![Twatter Example](/images/img_04.png)
-![Twatter Example](/images/img_05.png)
-![Twatter Example](/images/img_06.png)
-![Twatter Example](/images/img_07.png)
-![Twatter Example](/images/img_08.png)
+![Twatter Example](/images/img_01.PNG)
+![Twatter Example](/images/img_02.PNG)
+![Twatter Example](/images/img_03.PNG)
+![Twatter Example](/images/img_04.PNG)
+![Twatter Example](/images/img_05.PNG)
+![Twatter Example](/images/img_06.PNG)
+![Twatter Example](/images/img_07.PNG)
+![Twatter Example](/images/img_08.PNG)
 
 ---
 
