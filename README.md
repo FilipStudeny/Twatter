@@ -49,14 +49,14 @@ Twatter is a social media platform inspired by Twitter and similar services. It 
 
 ## Screenshots
 
-![Twatter Example](./images/img_01.png)
-![Twatter Example](./images/img_02.png)
-![Twatter Example](./images/img_03.png)
-![Twatter Example](./images/img_04.png)
-![Twatter Example](./images/img_05.png)
-![Twatter Example](./images/img_06.png)
-![Twatter Example](./images/img_07.png)
-![Twatter Example](./images/img_08.png)
+![Twatter Example](/images/img_01.png)
+![Twatter Example](/images/img_02.png)
+![Twatter Example](/images/img_03.png)
+![Twatter Example](/images/img_04.png)
+![Twatter Example](/images/img_05.png)
+![Twatter Example](/images/img_06.png)
+![Twatter Example](/images/img_07.png)
+![Twatter Example](/images/img_08.png)
 
 ---
 
@@ -70,6 +70,19 @@ Twatter is a social media platform inspired by Twitter and similar services. It 
 
 - **Shared**  
   Houses shared code, including models and GraphQL code generated via Codegen.
+
+---
+
+## Used docker images
+
+- **Mailhog**  
+  Used for capturing and testing emails during development.
+
+- **Redis**  
+  In-memory data store for caching, sessions, and more.
+
+- **Postgres**  
+  Primary database for Twatter.
 
 ---
 
