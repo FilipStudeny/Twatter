@@ -17,6 +17,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as UsersIndexImport } from './routes/users/index'
 import { Route as SettingsProfileImport } from './routes/settings/profile'
 import { Route as SettingsAccountImport } from './routes/settings/account'
+import { Route as PostCreateImport } from './routes/post/create'
 import { Route as PostIdImport } from './routes/post/$id'
 import { Route as AuthenticationSignUpImport } from './routes/_authentication/sign-up'
 import { Route as AuthenticationSignInImport } from './routes/_authentication/sign-in'
@@ -60,6 +61,12 @@ const SettingsAccountRoute = SettingsAccountImport.update({
   id: '/account',
   path: '/account',
   getParentRoute: () => SettingsRoute,
+} as any)
+
+const PostCreateRoute = PostCreateImport.update({
+  id: '/post/create',
+  path: '/post/create',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const PostIdRoute = PostIdImport.update({
@@ -152,6 +159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostIdImport
       parentRoute: typeof rootRoute
     }
+    '/post/create': {
+      id: '/post/create'
+      path: '/post/create'
+      fullPath: '/post/create'
+      preLoaderRoute: typeof PostCreateImport
+      parentRoute: typeof rootRoute
+    }
     '/settings/account': {
       id: '/settings/account'
       path: '/account'
@@ -214,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof AuthenticationSignInRoute
   '/sign-up': typeof AuthenticationSignUpRoute
   '/post/$id': typeof PostIdRoute
+  '/post/create': typeof PostCreateRoute
   '/settings/account': typeof SettingsAccountRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/users': typeof UsersIndexRoute
@@ -229,6 +244,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof AuthenticationSignInRoute
   '/sign-up': typeof AuthenticationSignUpRoute
   '/post/$id': typeof PostIdRoute
+  '/post/create': typeof PostCreateRoute
   '/settings/account': typeof SettingsAccountRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/users': typeof UsersIndexRoute
@@ -245,6 +261,7 @@ export interface FileRoutesById {
   '/_authentication/sign-in': typeof AuthenticationSignInRoute
   '/_authentication/sign-up': typeof AuthenticationSignUpRoute
   '/post/$id': typeof PostIdRoute
+  '/post/create': typeof PostCreateRoute
   '/settings/account': typeof SettingsAccountRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/users/': typeof UsersIndexRoute
@@ -262,6 +279,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/post/$id'
+    | '/post/create'
     | '/settings/account'
     | '/settings/profile'
     | '/users'
@@ -276,6 +294,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/post/$id'
+    | '/post/create'
     | '/settings/account'
     | '/settings/profile'
     | '/users'
@@ -290,6 +309,7 @@ export interface FileRouteTypes {
     | '/_authentication/sign-in'
     | '/_authentication/sign-up'
     | '/post/$id'
+    | '/post/create'
     | '/settings/account'
     | '/settings/profile'
     | '/users/'
@@ -306,6 +326,7 @@ export interface RootRouteChildren {
   AuthenticationSignInRoute: typeof AuthenticationSignInRoute
   AuthenticationSignUpRoute: typeof AuthenticationSignUpRoute
   PostIdRoute: typeof PostIdRoute
+  PostCreateRoute: typeof PostCreateRoute
   UsersIndexRoute: typeof UsersIndexRoute
   UsersIdReportsRoute: typeof UsersIdReportsRoute
   UsersIdIndexRoute: typeof UsersIdIndexRoute
@@ -319,6 +340,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticationSignInRoute: AuthenticationSignInRoute,
   AuthenticationSignUpRoute: AuthenticationSignUpRoute,
   PostIdRoute: PostIdRoute,
+  PostCreateRoute: PostCreateRoute,
   UsersIndexRoute: UsersIndexRoute,
   UsersIdReportsRoute: UsersIdReportsRoute,
   UsersIdIndexRoute: UsersIdIndexRoute,
@@ -341,6 +363,7 @@ export const routeTree = rootRoute
         "/_authentication/sign-in",
         "/_authentication/sign-up",
         "/post/$id",
+        "/post/create",
         "/users/",
         "/users/$id/reports",
         "/users/$id/"
@@ -370,6 +393,9 @@ export const routeTree = rootRoute
     },
     "/post/$id": {
       "filePath": "post/$id.tsx"
+    },
+    "/post/create": {
+      "filePath": "post/create.tsx"
     },
     "/settings/account": {
       "filePath": "settings/account.tsx",

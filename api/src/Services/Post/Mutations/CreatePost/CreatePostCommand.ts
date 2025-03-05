@@ -81,7 +81,7 @@ export class CreatePostCommandHandler implements ICommandHandler<CreatePostComma
 
 			user.posts.push(post);
 			await this.entityManager.save(User, user);
-			return new GenericResponse("Post created successfully");
+			return new GenericResponse(post.id);
 		} catch (error) {
 			if (error.code === "23503") {
 				throw new NotFoundException("Invalid foreign key provided.");

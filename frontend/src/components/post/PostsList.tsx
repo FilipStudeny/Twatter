@@ -9,6 +9,7 @@ import { useInfiniteScroll } from "hooks/infiniteScroll";
 
 import { PostSkeleton } from "./PostSkeleton";
 import { PostDetail, useInfiniteGetPostsListQuery } from "../../../../shared";
+import { RouterLink } from "@Components/navigation/routerLink";
 
 interface PostsListProps {
 	userId?: string | undefined,
@@ -53,6 +54,13 @@ const PostsList: React.FC<PostsListProps> = ({ userId, interestsId }) => {
 
 	return (
 		<Box sx={{ px: 2, py: 1 }} role='tabpanel' id='tabpanel-posts' aria-labelledby='tab-posts'>
+			{/* CREATE POST BUTTON */}
+			<Box textAlign='right' mb={2}>
+				<Button variant="contained">
+					<RouterLink to='/post/create'>Create Post</RouterLink>
+				</Button>
+			</Box>
+
 			{postsError &&
 				GET_ERROR_LIST(postsErrorMessage).map((errMsg: string, index: number) => (
 					<Alert key={index} severity='error' sx={{ marginTop: "5px" }}>

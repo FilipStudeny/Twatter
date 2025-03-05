@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import dayjs from "dayjs";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 import CommentsModal from "./comments/CommentsModal";
 import { PostDetail, ReactionTargetType } from "../../../../shared";
@@ -70,18 +71,7 @@ export function SinglePost({ post, canOpenComments = false }: SinglePostProps) {
 					{/* Content section remains the same */}
 					{post.content && (
 						<RouterLink to={`/post/${post.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-							<Typography
-								variant='body2'
-								sx={{
-									mb: 2,
-									whiteSpace: "pre-line",
-									"&:hover": {
-										color: theme.palette.primary.main,
-									},
-								}}
-							>
-								{post.content}
-							</Typography>
+							<ReactMarkdown>{post.content}</ReactMarkdown>
 						</RouterLink>
 					)}
 

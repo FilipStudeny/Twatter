@@ -25,7 +25,6 @@ export default class PostsResolver {
 	) {}
 
 	@Mutation(() => GenericResponse)
-	@AdminOnly(AdminRole.ADMINISTRATOR) // Restrict to ADMINISTRATOR role only
 	async CreatePost(
 		@Args("createPost") createPostDto: CreatePostDto,
 		@CurrentUser() payload: JwtPayload,
